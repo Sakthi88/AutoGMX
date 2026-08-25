@@ -1,0 +1,4 @@
+[2026-08-20 19:31:19] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/split_docking_pdb.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/inputs/docking_complex.pdb /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/inputs/protein.pdb /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/inputs/ligand.pdb LIG yes
+Warning: no atoms matched residue name(s) LIG; falling back to all HETATM records in the docking complex.
+[2026-08-20 19:31:19] CMD: obabel /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/inputs/ligand.pdb -O /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/inputs/ligand.mol2
+1 molecule converted

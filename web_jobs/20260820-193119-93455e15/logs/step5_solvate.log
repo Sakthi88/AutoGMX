@@ -1,0 +1,128 @@
+[2026-08-20 19:33:32] Starting step5_solvate
+[2026-08-20 19:33:32] CMD: gmx_cmd solvate -cp /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/04_box/boxed.gro -cs spc216.gro -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/solvated.gro -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/topol.top
+                     :-) GROMACS - gmx solvate, 2025.2 (-:
+
+Executable:   /home/nanomd/gromacs/bin/gmx
+Data prefix:  /home/nanomd/gromacs
+Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
+Command line:
+  gmx solvate -cp /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/04_box/boxed.gro -cs spc216.gro -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/solvated.gro -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/topol.top
+
+Reading solute configuration
+Reading solvent configuration
+
+Initialising inter-atomic distances...
+
+WARNING: Masses and atomic (Van der Waals) radii will be guessed
+         based on residue and atom names, since they could not be
+         definitively assigned from the information in your input
+         files. These guessed numbers might deviate from the mass
+         and radius of the atom type. Please check the output
+         files if necessary. Note, that this functionality may
+         be removed in a future GROMACS version. Please, consider
+         using another file format for your input.
+
+NOTE: From version 5.0 gmx solvate uses the Van der Waals radii
+from the source below. This means the results may be different
+compared to previous GROMACS versions.
+
+++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
+A. Bondi
+van der Waals Volumes and Radii
+J. Phys. Chem. (1964)
+DOI: 10.1021/j100785a001
+-------- -------- --- Thank You --- -------- --------
+
+Generating solvent configuration
+Will generate new solvent configuration of 4x4x3 boxes
+Solvent box contains 28341 atoms in 9447 residues
+Removed 4239 solvent atoms due to solvent-solvent overlap
+Removed 1857 solvent atoms due to solute-solvent overlap
+Sorting configuration
+Found 1 molecule type:
+    SOL (   3 atoms):  7415 residues
+Generated solvent containing 22245 atoms in 7415 residues
+Writing generated configuration to /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/solvated.gro
+
+Output configuration contains 24145 atoms in 7538 residues
+Volume                 :     246.098 (nm^3)
+Density                :     1003.61 (g/l)
+Number of solvent molecules:   7415   
+
+Processing topology
+
+Back Off! I just backed up /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/topol.top to /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/#topol.top.1#
+
+GROMACS reminds you: "The best model of a cat is another cat..., specially the same cat." (Arturo Rosenblueth)
+
+Adding line for 7415 solvent molecules with resname (SOL) to topology file (/home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/topol.top)
+                      :-) GROMACS - gmx grompp, 2025.2 (-:
+
+Executable:   /home/nanomd/gromacs/bin/gmx
+Data prefix:  /home/nanomd/gromacs
+Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
+Command line:
+  gmx grompp -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/topology_preflight.mdp -c /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/solvated.gro -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/topol.top -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/topology_preflight.tpr -maxwarn 1
+
+Generating 1-4 interactions: fudge = 0.5
+
+NOTE 1 [file topol.top, line 17539]:
+  System has non-zero total charge: -1.000000
+  Total charge should normally be an integer. See
+  https://manual.gromacs.org/current/user-guide/floating-point.html
+  for discussion on how close it should be to an integer.
+
+
+
+
+WARNING 1 [file topol.top, line 17539]:
+  You are using Ewald electrostatics in a system with net charge. This can
+  lead to severe artifacts, such as ions moving into regions with low
+  dielectric, due to the uniform background charge. We suggest to
+  neutralize your system with counter ions, possibly in combination with a
+  physiological salt concentration.
+
+Setting the LD random seed to -1116965
+
+Generated 3081 of the 3081 non-bonded parameter combinations
+
+Generated 3081 of the 3081 1-4 parameter combinations
+
+Excluding 3 bonded neighbours molecule type 'Protein_chain_A'
+
+Excluding 3 bonded neighbours molecule type 'ligand'
+
+Excluding 2 bonded neighbours molecule type 'SOL'
+
+++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
+J. S. Hub, B. L. de Groot, H. Grubmueller, G. Groenhof
+Quantifying Artifacts in Ewald Simulations of Inhomogeneous Systems with a Net
+Charge
+J. Chem. Theory Comput. (2014)
+DOI: 10.1021/ct400626b
+-------- -------- --- Thank You --- -------- --------
+
+Number of degrees of freedom in T-Coupling group rest is 50187.00
+The integrator does not provide a ensemble temperature, there is no system ensemble temperature
+
+There was 1 NOTE
+
+There was 1 WARNING
+
+GROMACS reminds you: "The best model of a cat is another cat..., specially the same cat." (Arturo Rosenblueth)
+
+Analysing residue names:
+There are:   122    Protein residues
+There are:     1      Other residues
+There are:  7415      Water residues
+Analysing Protein...
+Analysing residues not classified as Protein/DNA/RNA/Water and splitting into groups...
+
+The largest distance between excluded atoms is 0.445 nm between atom 509 and 710
+Calculating fourier grid dimensions for X Y Z
+Using a fourier grid of 60x60x60, spacing 0.117 0.117 0.117
+
+Estimate for the relative computational load of the PME mesh part: 0.19
+
+This run will generate roughly 2 Mb of data
+[2026-08-20 19:33:32] Finished step5_solvate

@@ -1,0 +1,243 @@
+[2026-08-20 19:33:37] Starting step8_equilibrate
+[2026-08-20 19:33:37] CMD: gmx_cmd grompp -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.mdp -c /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.gro -r /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.gro -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/topol.top -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.tpr -maxwarn 0
+                      :-) GROMACS - gmx grompp, 2025.2 (-:
+
+Executable:   /home/nanomd/gromacs/bin/gmx
+Data prefix:  /home/nanomd/gromacs
+Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
+Command line:
+  gmx grompp -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.mdp -c /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.gro -r /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.gro -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/topol.top -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.tpr -maxwarn 0
+
+Ignoring obsolete mdp entry 'title'
+Generating 1-4 interactions: fudge = 0.5
+Number of degrees of freedom in T-Coupling group Protein is 4603.72
+Number of degrees of freedom in T-Coupling group non-Protein is 44543.28
+
+NOTE 1 [file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.mdp]:
+  Removing center of mass motion in the presence of position restraints
+  might cause artifacts. When you are using position restraints to
+  equilibrate a macro-molecule, the artifacts are usually negligible.
+
+
+There was 1 NOTE
+
+GROMACS reminds you: "Statistics: The only science that enables different experts using the same figures to draw different conclusions." (Evan Esar)
+
+Setting the LD random seed to -293646353
+
+Generated 3081 of the 3081 non-bonded parameter combinations
+
+Generated 3081 of the 3081 1-4 parameter combinations
+
+Excluding 3 bonded neighbours molecule type 'Protein_chain_A'
+
+turning H bonds into constraints...
+
+Excluding 3 bonded neighbours molecule type 'ligand'
+
+turning H bonds into constraints...
+
+Excluding 2 bonded neighbours molecule type 'SOL'
+
+turning H bonds into constraints...
+
+Excluding 1 bonded neighbours molecule type 'NA'
+
+turning H bonds into constraints...
+
+Excluding 1 bonded neighbours molecule type 'CL'
+
+turning H bonds into constraints...
+
+Setting gen_seed to -9440275
+
+Velocities were taken from a Maxwell distribution at 300 K
+Analysing residue names:
+There are:   122    Protein residues
+There are:     1      Other residues
+There are:  7370      Water residues
+There are:    45        Ion residues
+Analysing Protein...
+Analysing residues not classified as Protein/DNA/RNA/Water and splitting into groups...
+
+The largest distance between excluded atoms is 0.442 nm between atom 509 and 710
+
+Determining Verlet buffer for a tolerance of 0.005 kJ/mol/ps at 300 K
+
+Calculated rlist for 1x1 atom pair-list as 1.293 nm, buffer size 0.093 nm
+
+Set rlist, assuming 4x4 atom pair-list, to 1.221 nm, buffer size 0.021 nm
+
+Note that mdrun will redetermine rlist based on the actual pair-list setup
+Calculating fourier grid dimensions for X Y Z
+Using a fourier grid of 60x60x60, spacing 0.117 0.117 0.117
+
+Estimate for the relative computational load of the PME mesh part: 0.20
+
+This run will generate roughly 15 Mb of data
+[2026-08-20 19:33:37] CMD: run_mdrun_with_fallback /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt
+[2026-08-20 19:33:37] mdrun CPU threads: auto (effective: 24); GPU mode: auto
+                      :-) GROMACS - gmx mdrun, 2025.2 (-:
+
+Executable:   /home/nanomd/gromacs/bin/gmx
+Data prefix:  /home/nanomd/gromacs
+Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
+Command line:
+  gmx mdrun -deffnm /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt -pin on -ntmpi 1 -ntomp 24 -nb gpu -pme gpu -bonded gpu
+
+Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.tpr, VERSION 2025.2 (single precision)
+Changing nstlist from 20 to 100, rlist from 1.221 to 1.341
+
+Update groups can not be used for this system because atoms that are (in)directly constrained together are interdispersed with other atoms
+
+1 GPU selected for this run.
+Mapping of GPU IDs to the 2 GPU tasks in the 1 rank on this node:
+  PP:0,PME:0
+PP tasks will do (non-perturbed) short-ranged and most bonded interactions on the GPU
+PP task will update and constrain coordinates on the GPU
+PME tasks will do all aspects on the GPU
+Using 1 MPI thread
+Using 24 OpenMP threads 
+
+starting mdrun 'Protein in water'
+500000 steps,   1000.0 ps.
+
+Writing final coordinates.
+
+               Core t (s)   Wall t (s)        (%)
+       Time:     4573.187      190.551     2400.0
+                 (ns/day)    (hour/ns)
+Performance:      453.422        0.053
+
+GROMACS reminds you: "Kissing You is Like Kissing Gravel" (Throwing Muses)
+
+[2026-08-20 19:36:52] CMD: gmx_cmd grompp -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/npt/npt.mdp -c /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.gro -r /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.gro -t /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.cpt -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/topol.top -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/npt/npt.tpr -maxwarn 0
+                      :-) GROMACS - gmx grompp, 2025.2 (-:
+
+Executable:   /home/nanomd/gromacs/bin/gmx
+Data prefix:  /home/nanomd/gromacs
+Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
+Command line:
+  gmx grompp -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/npt/npt.mdp -c /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.gro -r /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.gro -t /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.cpt -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/topol.top -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/npt/npt.tpr -maxwarn 0
+
+Ignoring obsolete mdp entry 'title'
+Generating 1-4 interactions: fudge = 0.5
+
+NOTE 1 [file topol.top, line 17541]:
+  You are combining position restraints with Parrinello-Rahman pressure
+  coupling, which can lead to instabilities. If you really want to combine
+  position restraints with pressure coupling, we suggest to use C-rescale
+  pressure coupling instead.
+
+Number of degrees of freedom in T-Coupling group Protein is 4603.72
+Number of degrees of freedom in T-Coupling group non-Protein is 44543.28
+
+NOTE 2 [file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/npt/npt.mdp]:
+  Removing center of mass motion in the presence of position restraints
+  might cause artifacts. When you are using position restraints to
+  equilibrate a macro-molecule, the artifacts are usually negligible.
+
+Last frame         -1 time 1000.000   
+
+There were 2 NOTEs
+
+GROMACS reminds you: "Somewhere, something incredible is waiting to be known." (Carl Sagan)
+
+Setting the LD random seed to -432833235
+
+Generated 3081 of the 3081 non-bonded parameter combinations
+
+Generated 3081 of the 3081 1-4 parameter combinations
+
+Excluding 3 bonded neighbours molecule type 'Protein_chain_A'
+
+turning H bonds into constraints...
+
+Excluding 3 bonded neighbours molecule type 'ligand'
+
+turning H bonds into constraints...
+
+Excluding 2 bonded neighbours molecule type 'SOL'
+
+turning H bonds into constraints...
+
+Excluding 1 bonded neighbours molecule type 'NA'
+
+turning H bonds into constraints...
+
+Excluding 1 bonded neighbours molecule type 'CL'
+
+turning H bonds into constraints...
+
+Taking velocities from '/home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.gro'
+Analysing residue names:
+There are:   122    Protein residues
+There are:     1      Other residues
+There are:  7370      Water residues
+There are:    45        Ion residues
+Analysing Protein...
+Analysing residues not classified as Protein/DNA/RNA/Water and splitting into groups...
+
+The largest distance between excluded atoms is 0.429 nm between atom 509 and 710
+
+Determining Verlet buffer for a tolerance of 0.005 kJ/mol/ps at 300 K
+
+Calculated rlist for 1x1 atom pair-list as 1.293 nm, buffer size 0.093 nm
+
+Set rlist, assuming 4x4 atom pair-list, to 1.221 nm, buffer size 0.021 nm
+
+Note that mdrun will redetermine rlist based on the actual pair-list setup
+
+  rest:       	 5.266  5.275  2.474
+  rest:       	 5.266  5.275  2.474
+
+Reading Coordinates, Velocities and Box size from old trajectory
+
+Will read whole trajectory
+
+Using frame at t = 1000 ps
+
+Starting time for run is 0 ps
+Calculating fourier grid dimensions for X Y Z
+Using a fourier grid of 60x60x60, spacing 0.117 0.117 0.117
+
+Estimate for the relative computational load of the PME mesh part: 0.20
+
+This run will generate roughly 15 Mb of data
+[2026-08-20 19:36:53] CMD: run_mdrun_with_fallback /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/npt/npt
+[2026-08-20 19:36:53] mdrun CPU threads: auto (effective: 24); GPU mode: auto
+                      :-) GROMACS - gmx mdrun, 2025.2 (-:
+
+Executable:   /home/nanomd/gromacs/bin/gmx
+Data prefix:  /home/nanomd/gromacs
+Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
+Command line:
+  gmx mdrun -deffnm /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/npt/npt -pin on -ntmpi 1 -ntomp 24 -nb gpu -pme gpu -bonded gpu
+
+Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/npt/npt.tpr, VERSION 2025.2 (single precision)
+Changing nstlist from 20 to 100, rlist from 1.221 to 1.341
+
+Update groups can not be used for this system because atoms that are (in)directly constrained together are interdispersed with other atoms
+
+1 GPU selected for this run.
+Mapping of GPU IDs to the 2 GPU tasks in the 1 rank on this node:
+  PP:0,PME:0
+PP tasks will do (non-perturbed) short-ranged and most bonded interactions on the GPU
+PP task will update and constrain coordinates on the GPU
+PME tasks will do all aspects on the GPU
+Using 1 MPI thread
+Using 24 OpenMP threads 
+
+starting mdrun 'Protein in water'
+500000 steps,   1000.0 ps.
+
+Writing final coordinates.
+
+               Core t (s)   Wall t (s)        (%)
+       Time:     4709.818      196.244     2400.0
+                 (ns/day)    (hour/ns)
+Performance:      440.268        0.055
+
+GROMACS reminds you: "Hangout In the Suburbs If You've Got the Guts" (Urban Dance Squad)
+
+[2026-08-20 19:40:13] Finished step8_equilibrate

@@ -1,0 +1,37 @@
+[2026-08-20 19:31:22] Starting step2_ligand_prep
+[2026-08-20 19:31:22] CMD: obabel /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/02_ligand/ligand.pdb -O /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/02_ligand/ligand.mol2
+1 molecule converted
+[2026-08-20 19:31:22] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/check_acpype_runtime.py acpype
+ACPYPE runtime preflight passed.
+[2026-08-20 19:31:22] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/check_ligand_charge.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/02_ligand/ligand.mol2 0
+Ligand charge preflight passed: charge 0 gives 282 electrons.
+[2026-08-20 19:31:22] CMD: acpype -i /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/02_ligand/ligand.mol2 -b ligand -a gaff2 -n 0
+============================================================================
+| ACPYPE: AnteChamber PYthon Parser interfacE v. 2023.10.27 (c) 2026 AWSdS |
+============================================================================
+==> ... charge set to 0
+==> Executing Antechamber...
+==> * Antechamber OK *
+==> * Parmchk OK *
+==> Executing Tleap...
+==> * Tleap OK *
+==> Removing temporary files...
+==> Using OpenBabel v.3.1.0
+
+==> Writing NEW PDB file
+
+==> Writing CNS/XPLOR files
+
+==> Writing GROMACS files
+
+==> Disambiguating lower and uppercase atomtypes in GMX top file, even if identical.
+
+==> Writing GMX dihedrals for GMX 4.5 and higher.
+
+==> Writing CHARMM files
+
+==> Writing pickle file ligand.pkl
+==> Removing temporary files...
+Total time of execution: 2m 9s
+[2026-08-20 19:33:32] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/normalize_gro_resname.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/02_ligand/ligand.gro /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/02_ligand/ligand.gro LIG
+[2026-08-20 19:33:32] Finished step2_ligand_prep

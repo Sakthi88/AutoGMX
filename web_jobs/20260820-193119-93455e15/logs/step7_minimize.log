@@ -1,0 +1,166 @@
+[2026-08-20 19:33:32] Starting step7_minimize
+[2026-08-20 19:33:32] CMD: gmx_cmd grompp -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.mdp -c /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/solv_ions.gro -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/topol.top -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.tpr -maxwarn 0
+                      :-) GROMACS - gmx grompp, 2025.2 (-:
+
+Executable:   /home/nanomd/gromacs/bin/gmx
+Data prefix:  /home/nanomd/gromacs
+Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
+Command line:
+  gmx grompp -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.mdp -c /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/solv_ions.gro -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/topol.top -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.tpr -maxwarn 0
+
+Generating 1-4 interactions: fudge = 0.5
+Number of degrees of freedom in T-Coupling group rest is 50052.00
+The integrator does not provide a ensemble temperature, there is no system ensemble temperature
+
+GROMACS reminds you: "The best model of a cat is another cat..., specially the same cat." (Arturo Rosenblueth)
+
+Setting the LD random seed to 2140143220
+
+Generated 3081 of the 3081 non-bonded parameter combinations
+
+Generated 3081 of the 3081 1-4 parameter combinations
+
+Excluding 3 bonded neighbours molecule type 'Protein_chain_A'
+
+Excluding 3 bonded neighbours molecule type 'ligand'
+
+Excluding 2 bonded neighbours molecule type 'SOL'
+
+Excluding 1 bonded neighbours molecule type 'NA'
+
+Excluding 1 bonded neighbours molecule type 'CL'
+Analysing residue names:
+There are:   122    Protein residues
+There are:     1      Other residues
+There are:  7370      Water residues
+There are:    45        Ion residues
+Analysing Protein...
+Analysing residues not classified as Protein/DNA/RNA/Water and splitting into groups...
+
+The largest distance between excluded atoms is 0.445 nm between atom 509 and 710
+Calculating fourier grid dimensions for X Y Z
+Using a fourier grid of 60x60x60, spacing 0.117 0.117 0.117
+
+Estimate for the relative computational load of the PME mesh part: 0.19
+
+This run will generate roughly 2 Mb of data
+[2026-08-20 19:33:32] CMD: run_mdrun_with_fallback /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em
+[2026-08-20 19:33:33] mdrun CPU threads: auto (effective: 24); GPU mode: auto
+                      :-) GROMACS - gmx mdrun, 2025.2 (-:
+
+Executable:   /home/nanomd/gromacs/bin/gmx
+Data prefix:  /home/nanomd/gromacs
+Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
+Command line:
+  gmx mdrun -deffnm /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em -pin on -ntmpi 1 -ntomp 24 -nb gpu -pme gpu -bonded gpu
+
+Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.tpr, VERSION 2025.2 (single precision)
+
+-------------------------------------------------------
+Program:     gmx mdrun, version 2025.2
+Source file: src/gromacs/taskassignment/decidegpuusage.cpp (line 437)
+Function:    bool gmx::decideWhetherToUseGpusForPme(bool, TaskTarget, TaskTarget, const std::vector<int>&, const t_inputrec&, int, int, bool)
+
+Inconsistency in user input:
+Cannot compute PME interactions on a GPU, because:
+  PME GPU does not support:
+    Non-dynamical integrator (use md, sd, etc).
+
+For more information and tips for troubleshooting, please check the GROMACS
+website at https://manual.gromacs.org/current/user-guide/run-time-errors.html
+-------------------------------------------------------
+[2026-08-20 19:33:33] GPU mdrun failed; retrying once on CPU with the same run input.
+                      :-) GROMACS - gmx mdrun, 2025.2 (-:
+
+Executable:   /home/nanomd/gromacs/bin/gmx
+Data prefix:  /home/nanomd/gromacs
+Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
+Command line:
+  gmx mdrun -deffnm /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em -pin on -ntmpi 1 -ntomp 24
+
+
+Back Off! I just backed up /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.log to /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/#em.log.1#
+Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.tpr, VERSION 2025.2 (single precision)
+1 GPU selected for this run.
+Mapping of GPU IDs to the 1 GPU task in the 1 rank on this node:
+  PP:0
+PP tasks will do (non-perturbed) short-ranged interactions on the GPU
+PP task will update and constrain coordinates on the CPU
+Using 1 MPI thread
+Using 24 OpenMP threads 
+
+
+Steepest Descents:
+   Tolerance (Fmax)   =  1.00000e+03
+   Number of steps    =        50000
+
+writing lowest energy coordinates.
+
+Steepest Descents converged to Fmax < 1000 in 825 steps
+Potential Energy  = -3.7837925e+05
+Maximum force     =  9.2560583e+02 on atom 626
+Norm of force     =  2.2670343e+01
+
+GROMACS reminds you: "Statistics: The only science that enables different experts using the same figures to draw different conclusions." (Evan Esar)
+
+[2026-08-20 19:33:37] CMD: gmx make_ndx -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.gro -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/indexlig.ndx
+                     :-) GROMACS - gmx make_ndx, 2025.2 (-:
+
+Executable:   /home/nanomd/gromacs/bin/gmx
+Data prefix:  /home/nanomd/gromacs
+Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
+Command line:
+  gmx make_ndx -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.gro -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/indexlig.ndx
+
+
+Reading structure file
+
+GROMACS reminds you: "Statistics: The only science that enables different experts using the same figures to draw different conclusions." (Evan Esar)
+
+Going to read 0 old index file(s)
+Analysing residue names:
+There are:   122    Protein residues
+There are:     1      Other residues
+There are:  7370      Water residues
+There are:    45        Ion residues
+Analysing Protein...
+Analysing residues not classified as Protein/DNA/RNA/Water and splitting into groups...
+
+  0 System              : 24055 atoms
+  1 Protein             :  1823 atoms
+  2 Protein-H           :   958 atoms
+  3 C-alpha             :   122 atoms
+  4 Backbone            :   366 atoms
+  5 MainChain           :   489 atoms
+  6 MainChain+Cb        :   602 atoms
+  7 MainChain+H         :   608 atoms
+  8 SideChain           :  1215 atoms
+  9 SideChain-H         :   469 atoms
+ 10 Prot-Masses         :  1823 atoms
+ 11 non-Protein         : 22232 atoms
+ 12 Other               :    77 atoms
+ 13 UNK                 :    77 atoms
+ 14 NA                  :    23 atoms
+ 15 CL                  :    22 atoms
+ 16 Water               : 22110 atoms
+ 17 SOL                 : 22110 atoms
+ 18 non-Water           :  1945 atoms
+ 19 Ion                 :    45 atoms
+ 20 Water_and_ions      : 22155 atoms
+
+ nr : group      '!': not  'name' nr name   'splitch' nr    Enter: list groups
+ 'a': atom       '&': and  'del' nr         'splitres' nr   'l': list residues
+ 't': atom type  '|': or   'keep' nr        'splitat' nr    'h': help
+ 'r': residue              'res' nr         'chain' char
+ "name": group             'case': case sensitive           'q': save and quit
+ 'ri': residue index
+
+> 
+
+> 
+Copied index group 1 'Protein'
+Copied index group 12 'Ligand'
+Merged two groups with OR: 1823 77 -> 1900
+
+> 
+[2026-08-20 19:33:37] Finished step7_minimize

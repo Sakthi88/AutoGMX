@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title or "GROMACS MD Studio" }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+      (() => {
+        const savedTheme = localStorage.getItem("md-theme");
+        const theme = savedTheme || "dark";
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
+    {% block head_extra %}{% endblock %}
+  </head>
+  <body>
+    <div class="molecular-backdrop" aria-hidden="true"></div>
+    <div class="page-shell">
+      <header class="app-header">
+        <a class="app-brand" href="{{ url_for('index') }}" aria-label="GROMACS MD Studio home">
+          <img src="{{ url_for('static', filename='images/5w07-inha-ligand.jpeg') }}" alt="">
+          <span>
+            <strong>GROMACS MD Studio</strong>
+            <small>Protein-ligand automation</small>
+          </span>
+        </a>
+        <div class="app-actions">
+          <div class="engine-state" aria-label="Local engine ready">
+            <span></span>
+            Local engine
+          </div>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">Dark Mode</button>
+        </div>
+      </header>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <section class="flash-stack">
+            {% for category, message in messages %}
+              <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          </section>
+        {% endif %}
+      {% endwith %}
+
+      <main>
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+    <script>
+      (() => {
+        const button = document.getElementById("theme-toggle");
+        const root = document.documentElement;
+        const syncLabel = () => {
+          const theme = root.dataset.theme || "dark";
+          button.textContent = theme === "dark" ? "Light Mode" : "Dark Mode";
+        };
+        syncLabel();
+        button.addEventListener("click", () => {
+          const nextTheme = (root.dataset.theme || "dark") === "dark" ? "light" : "dark";
+          root.dataset.theme = nextTheme;
+          localStorage.setItem("md-theme", nextTheme);
+          syncLabel();
+        });
+      })();
+    </script>
+  </body>
+</html>

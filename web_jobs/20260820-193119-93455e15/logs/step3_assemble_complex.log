@@ -1,0 +1,4 @@
+[2026-08-20 19:33:32] Starting step3_assemble_complex
+[2026-08-20 19:33:32] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/merge_gro.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/01_protein/protein_processed.gro /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/02_ligand/ligand.gro /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/03_complex/complex.gro
+[2026-08-20 19:33:32] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/assemble_topology.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/03_complex/topol.top ligand.itp posre_ligand.itp ligand 1 /home/nanomd/Desktop/Sakthidhasan/md_pipeline amber99sb-ildn
+[2026-08-20 19:33:32] Finished step3_assemble_complex

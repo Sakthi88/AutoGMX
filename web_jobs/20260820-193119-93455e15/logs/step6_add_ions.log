@@ -1,0 +1,158 @@
+[2026-08-20 19:33:32] Starting step6_add_ions
+[2026-08-20 19:33:32] CMD: gmx_cmd grompp -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/ions.mdp -c /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/solvated.gro -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/topol.top -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/ions.tpr -maxwarn 1
+                      :-) GROMACS - gmx grompp, 2025.2 (-:
+
+Executable:   /home/nanomd/gromacs/bin/gmx
+Data prefix:  /home/nanomd/gromacs
+Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
+Command line:
+  gmx grompp -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/ions.mdp -c /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/solvated.gro -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/topol.top -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/ions.tpr -maxwarn 1
+
+Generating 1-4 interactions: fudge = 0.5
+
+NOTE 1 [file topol.top, line 17539]:
+  System has non-zero total charge: -1.000000
+  Total charge should normally be an integer. See
+  https://manual.gromacs.org/current/user-guide/floating-point.html
+  for discussion on how close it should be to an integer.
+
+
+
+
+WARNING 1 [file topol.top, line 17539]:
+  You are using Ewald electrostatics in a system with net charge. This can
+  lead to severe artifacts, such as ions moving into regions with low
+  dielectric, due to the uniform background charge. We suggest to
+  neutralize your system with counter ions, possibly in combination with a
+  physiological salt concentration.
+
+Setting the LD random seed to -268841985
+
+Generated 3081 of the 3081 non-bonded parameter combinations
+
+Generated 3081 of the 3081 1-4 parameter combinations
+
+Excluding 3 bonded neighbours molecule type 'Protein_chain_A'
+
+Excluding 3 bonded neighbours molecule type 'ligand'
+
+Excluding 2 bonded neighbours molecule type 'SOL'
+
+++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
+J. S. Hub, B. L. de Groot, H. Grubmueller, G. Groenhof
+Quantifying Artifacts in Ewald Simulations of Inhomogeneous Systems with a Net
+Charge
+J. Chem. Theory Comput. (2014)
+DOI: 10.1021/ct400626b
+-------- -------- --- Thank You --- -------- --------
+
+Number of degrees of freedom in T-Coupling group rest is 50187.00
+The integrator does not provide a ensemble temperature, there is no system ensemble temperature
+
+There was 1 NOTE
+
+There was 1 WARNING
+
+GROMACS reminds you: "The best model of a cat is another cat..., specially the same cat." (Arturo Rosenblueth)
+
+Analysing residue names:
+There are:   122    Protein residues
+There are:     1      Other residues
+There are:  7415      Water residues
+Analysing Protein...
+Analysing residues not classified as Protein/DNA/RNA/Water and splitting into groups...
+
+The largest distance between excluded atoms is 0.445 nm between atom 509 and 710
+Calculating fourier grid dimensions for X Y Z
+Using a fourier grid of 60x60x60, spacing 0.117 0.117 0.117
+
+Estimate for the relative computational load of the PME mesh part: 0.19
+
+This run will generate roughly 2 Mb of data
+                      :-) GROMACS - gmx genion, 2025.2 (-:
+
+Executable:   /home/nanomd/gromacs/bin/gmx
+Data prefix:  /home/nanomd/gromacs
+Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
+Command line:
+  gmx genion -s /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/ions.tpr -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/solv_ions.gro -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/topol.top -pname NA -nname CL -neutral -conc 0.15
+
+Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/ions.tpr, VERSION 2025.2 (single precision)
+Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/ions.tpr, VERSION 2025.2 (single precision)
+Group     0 (         System) has 24145 elements
+Group     1 (        Protein) has  1823 elements
+Group     2 (      Protein-H) has   958 elements
+Group     3 (        C-alpha) has   122 elements
+Group     4 (       Backbone) has   366 elements
+Group     5 (      MainChain) has   489 elements
+Group     6 (   MainChain+Cb) has   602 elements
+Group     7 (    MainChain+H) has   608 elements
+Group     8 (      SideChain) has  1215 elements
+Group     9 (    SideChain-H) has   469 elements
+Group    10 (    Prot-Masses) has  1823 elements
+Group    11 (    non-Protein) has 22322 elements
+Group    12 (          Other) has    77 elements
+Group    13 (            UNK) has    77 elements
+Group    14 (          Water) has 22245 elements
+Group    15 (            SOL) has 22245 elements
+Group    16 (      non-Water) has  1900 elements
+Select a group: Number of (3-atomic) solvent molecules: 7415
+
+Back Off! I just backed up /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/topol.top to /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/#topol.top.1#
+Using random seed 1005453247.
+Replacing solvent molecule 3552 (atom 12556) with NA
+Replacing solvent molecule 5067 (atom 17101) with NA
+Replacing solvent molecule 703 (atom 4009) with NA
+Replacing solvent molecule 4486 (atom 15358) with NA
+Replacing solvent molecule 1603 (atom 6709) with NA
+Replacing solvent molecule 2031 (atom 7993) with NA
+Replacing solvent molecule 1537 (atom 6511) with NA
+Replacing solvent molecule 5162 (atom 17386) with NA
+Replacing solvent molecule 5549 (atom 18547) with NA
+Replacing solvent molecule 2054 (atom 8062) with NA
+Replacing solvent molecule 6592 (atom 21676) with NA
+Replacing solvent molecule 4233 (atom 14599) with NA
+Replacing solvent molecule 1985 (atom 7855) with NA
+Replacing solvent molecule 5492 (atom 18376) with NA
+Replacing solvent molecule 1619 (atom 6757) with NA
+Replacing solvent molecule 274 (atom 2722) with NA
+Replacing solvent molecule 2909 (atom 10627) with NA
+Replacing solvent molecule 5199 (atom 17497) with NA
+Replacing solvent molecule 2648 (atom 9844) with NA
+Replacing solvent molecule 7406 (atom 24118) with NA
+Replacing solvent molecule 3444 (atom 12232) with NA
+Replacing solvent molecule 3139 (atom 11317) with NA
+Replacing solvent molecule 1198 (atom 5494) with NA
+Replacing solvent molecule 785 (atom 4255) with CL
+Replacing solvent molecule 3171 (atom 11413) with CL
+Replacing solvent molecule 5011 (atom 16933) with CL
+Replacing solvent molecule 2328 (atom 8884) with CL
+Replacing solvent molecule 6864 (atom 22492) with CL
+Replacing solvent molecule 4847 (atom 16441) with CL
+Replacing solvent molecule 5218 (atom 17554) with CL
+Replacing solvent molecule 1462 (atom 6286) with CL
+Replacing solvent molecule 6417 (atom 21151) with CL
+Replacing solvent molecule 3879 (atom 13537) with CL
+Replacing solvent molecule 3434 (atom 12202) with CL
+Replacing solvent molecule 2736 (atom 10108) with CL
+Replacing solvent molecule 188 (atom 2464) with CL
+Replacing solvent molecule 1730 (atom 7090) with CL
+Replacing solvent molecule 2358 (atom 8974) with CL
+Replacing solvent molecule 6692 (atom 21976) with CL
+Replacing solvent molecule 4798 (atom 16294) with CL
+Replacing solvent molecule 1955 (atom 7765) with CL
+Replacing solvent molecule 3880 (atom 13540) with CL
+Replacing solvent molecule 4821 (atom 16363) with CL
+Replacing solvent molecule 377 (atom 3031) with CL
+Replacing solvent molecule 3976 (atom 13828) with CL
+
+
+GROMACS reminds you: "The best model of a cat is another cat..., specially the same cat." (Arturo Rosenblueth)
+
+Will try to add 23 NA ions and 22 CL ions.
+Select a continuous group of solvent molecules
+Selected 15: 'SOL'
+
+Processing topology
+Replacing 45 solute molecules in topology file (/home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/topol.top)  by 23 NA and 22 CL ions.
+[2026-08-20 19:33:32] Finished step6_add_ions

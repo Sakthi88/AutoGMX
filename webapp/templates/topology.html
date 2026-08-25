@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="detail-layout">
+  <div class="panel detail-panel">
+    <div class="panel-head">
+      <h2>Step 2: Ligand Topology</h2>
+      <p>{{ job.project_name }} | {{ job.id }}</p>
+    </div>
+
+    <div class="status-banner">
+      <div>
+        <span class="status-label">Prepared Inputs</span>
+        <strong>Ligand separated</strong>
+        <p>Generated files are ready. Choose the ligand topology method and continue into the MD run.</p>
+      </div>
+      <div class="status-banner-side">
+        <span class="status status-awaiting_topology">Awaiting Topology</span>
+        <strong>Stage 2</strong>
+        <p>Topology setup</p>
+      </div>
+    </div>
+
+    <div class="facts">
+      <div><span>Docked PDB</span><strong>{{ job.generated_files.docking_complex if job.generated_files and job.generated_files.docking_complex else "Saved in job inputs" }}</strong></div>
+      <div><span>Protein PDB</span><strong>{{ job.generated_files.protein_pdb if job.generated_files else "Generated" }}</strong></div>
+      <div><span>Ligand PDB</span><strong>{{ job.generated_files.ligand_pdb if job.generated_files else "Generated" }}</strong></div>
+      <div><span>Ligand MOL2</span><strong>{{ job.generated_files.ligand_mol2 if job.generated_files else "Generated" }}</strong></div>
+    </div>
+  </div>
+
+  <div class="panel upload-panel">
+    <div class="panel-head">
+      <h2>Launch Setup</h2>
+      <p>Upload prepared topology files, or generate topology from the separated ligand with an installed tool.</p>
+    </div>
+
+    <form action="{{ url_for('topology_upload', job_id=job.id) }}" method="post" enctype="multipart/form-data" class="upload-form">
+      <label>
+        <span>Project name</span>
+        <input type="text" name="project_name" value="{{ job.project_name }}" required>
+      </label>
+
+      <div class="triple">
+        <label>
+          <span>Topology method</span>
+          <select name="ligand_prep_tool" id="ligand_prep_tool">
+            <option value="prepared_topology">Upload prepared topology</option>
+            <option value="acpype">Generate with ACPYPE</option>
+            <option value="pypolybuilder">Generate with pyPolyBuilder</option>
+          </select>
+        </label>
+        <label>
+          <span>Force field</span>
+          <select name="force_field">
+            {% for value, label in force_field_options %}
+              <option value="{{ value }}" {% if value == "amber99sb-ildn" %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>
+          <span>Water model</span>
+          <select name="water_model">
+            {% for value, label in water_model_options %}
+              <option value="{{ value }}" {% if value == "tip3p" %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      </div>
+
+      <div class="triple">
+        <label>
+          <span>Ligand residue</span>
+          <input type="text" name="ligand_resname" value="LIG" maxlength="5" required>
+        </label>
+        <label>
+          <span>Ligand name</span>
+          <input type="text" name="ligand_name" value="ligand" required>
+        </label>
+        <label>
+          <span>Net charge</span>
+          <input type="number" name="ligand_charge" value="0" required>
+        </label>
+      </div>
+
+      <div class="triple">
+        <label>
+          <span>Production time (ns)</span>
+          <input type="number" name="md_time_ns" value="100" min="1" step="1" required>
+        </label>
+        <label>
+          <span>NVT nsteps</span>
+          <input type="number" name="nvt_steps" min="1" step="1" placeholder="Optional override">
+        </label>
+        <label>
+          <span>NPT nsteps</span>
+          <input type="number" name="npt_steps" min="1" step="1" placeholder="Optional override">
+        </label>
+      </div>
+
+      <div class="double">
+        <label>
+          <span>CPU threads</span>
+          <select name="ntomp"><option value="auto" selected>Auto (detect)</option><option value="1">1</option><option value="2">2</option><option value="4">4</option><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="24">24</option><option value="32">32</option><option value="48">48</option><option value="64">64</option></select>
+        </label>
+        <label>
+          <span>GPU acceleration</span>
+          <select name="use_gpu">
+            <option value="auto">Auto (all available GPUs)</option>
+            <option value="yes">Require GPU</option>
+            <option value="no">CPU only</option>
+          </select>
+        </label>
+      </div>
+
+      <label>
+        <span>GROMACS command</span>
+        <input type="text" name="gmx_bin" value="C:\Program Files\Gromacs\bin\gmx.exe" required>
+      </label>
+
+      <label class="checkbox">
+        <input type="checkbox" name="strip_hetatm" checked>
+        <span>Strip heteroatoms from the protein before `pdb2gmx`</span>
+      </label>
+
+      <label class="checkbox">
+        <input type="checkbox" name="md_center_nojump" checked>
+        <span>Apply `-pbc nojump` before creating `md_center.xtc`</span>
+      </label>
+
+      <div class="file-grid topology-section" data-topology-section="prepared_topology">
+        <label class="file-drop">
+          <span>Ligand topology (.itp)</span>
+          <input type="file" name="ligand_itp" accept=".itp,.top">
+        </label>
+        <label class="file-drop">
+          <span>Ligand coordinates (.gro)</span>
+          <input type="file" name="ligand_gro" accept=".gro">
+        </label>
+        <label class="file-drop">
+          <span>Ligand restraints (.itp)</span>
+          <input type="file" name="ligand_posre" accept=".itp">
+        </label>
+        <label class="file-drop">
+          <span>Ligand parameters (.prm, if required)</span>
+          <input type="file" name="ligand_prm" accept=".prm,.itp">
+        </label>
+      </div>
+
+      <div class="topology-section method-note" data-topology-section="acpype" hidden>
+        <strong>ACPYPE generation</strong>
+        <p>Uses the separated ligand MOL2 file. AmberTools executables are required, and AMBER-family protein force fields are recommended.</p>
+      </div>
+
+      <div class="topology-section pypolybuilder-box" data-topology-section="pypolybuilder" hidden>
+        <div class="method-note">
+          <strong>pyPolyBuilder generation</strong>
+          <p>Upload pyPolyBuilder parameter and building-block inputs. The pipeline will normalize outputs to `ligand.itp`, `ligand.gro`, and `ligand.top`.</p>
+        </div>
+
+        <div class="triple">
+          <label>
+            <span>pyPolyBuilder command</span>
+            <input type="text" name="pypolybuilder_bin" value="pypolybuilder">
+          </label>
+          <label>
+            <span>Build mode</span>
+            <select name="pypolybuilder_mode" id="pypolybuilder_mode">
+              <option value="dendrimer">Dendrimer</option>
+              <option value="polymer">Polymer</option>
+            </select>
+          </label>
+          <label>
+            <span>Generations</span>
+            <input type="number" name="pypolybuilder_ngen" value="0" min="0" step="1">
+          </label>
+        </div>
+
+        <div class="triple">
+          <label>
+            <span>Geometry steps</span>
+            <input type="number" name="pypolybuilder_nsteps" value="200" min="1" step="1">
+          </label>
+          <label>
+            <span>GA generations</span>
+            <input type="number" name="pypolybuilder_ngenga" value="20" min="1" step="1">
+          </label>
+          <label>
+            <span>GA population</span>
+            <input type="number" name="pypolybuilder_npop" value="25" min="1" step="1">
+          </label>
+        </div>
+
+        <div class="double">
+          <label>
+            <span>pyPolyBuilder force-field folder</span>
+            <input type="text" name="pypolybuilder_forcefield_path" placeholder="Optional path ending in .ff">
+          </label>
+          <label>
+            <span>Extra pyPolyBuilder args</span>
+            <input type="text" name="pypolybuilder_extra_args" placeholder="Optional">
+          </label>
+        </div>
+
+        <div class="file-grid">
+          <label class="file-drop">
+            <span>Parameter file (.itp)</span>
+            <input type="file" name="pypolybuilder_params" accept=".itp">
+          </label>
+          <label class="file-drop pypoly-mode pypoly-dendrimer">
+            <span>Core file (.itp)</span>
+            <input type="file" name="pypolybuilder_core" accept=".itp">
+          </label>
+          <label class="file-drop pypoly-mode pypoly-dendrimer">
+            <span>Terminal file (.itp)</span>
+            <input type="file" name="pypolybuilder_terminal" accept=".itp">
+          </label>
+          <label class="file-drop pypoly-mode pypoly-dendrimer">
+            <span>Intermediate file (.itp)</span>
+            <input type="file" name="pypolybuilder_intermediate" accept=".itp">
+          </label>
+          <label class="file-drop pypoly-mode pypoly-polymer" hidden>
+            <span>Building blocks (.itp)</span>
+            <input type="file" name="pypolybuilder_bbs" accept=".itp" multiple>
+          </label>
+          <label class="file-drop pypoly-mode pypoly-polymer" hidden>
+            <span>Connections file (.in)</span>
+            <input type="file" name="pypolybuilder_connections" accept=".in,.txt">
+          </label>
+        </div>
+      </div>
+
+      <div class="analysis-chain">
+        <strong>After MD finishes</strong>
+        <label class="checkbox"><input type="checkbox" name="run_result_analysis" checked><span>Run result analysis</span></label>
+        <label class="checkbox"><input type="checkbox" name="run_free_energy" checked><span>Run linked free-energy task</span></label>
+
+      </div>
+
+      <div class="action-row">
+        <a class="secondary-btn" href="{{ url_for('job_detail', job_id=job.id) }}">Back</a>
+        <button type="submit" class="primary-btn">Start MD Run</button>
+      </div>
+    </form>
+  </div>
+</section>
+<script>
+  const methodSelect = document.querySelector("#ligand_prep_tool");
+  const modeSelect = document.querySelector("#pypolybuilder_mode");
+  const sections = document.querySelectorAll("[data-topology-section]");
+  const preparedItp = document.querySelector("input[name='ligand_itp']");
+  const syncTopologyMethod = () => {
+    const method = methodSelect.value;
+    sections.forEach((section) => {
+      section.hidden = section.dataset.topologySection !== method;
+    });
+    preparedItp.required = method === "prepared_topology";
+  };
+  const syncPyPolyMode = () => {
+    const mode = modeSelect.value;
+    document.querySelectorAll(".pypoly-mode").forEach((field) => {
+      field.hidden = !field.classList.contains(`pypoly-${mode}`);
+    });
+  };
+  methodSelect.addEventListener("change", syncTopologyMethod);
+  modeSelect.addEventListener("change", syncPyPolyMode);
+  syncTopologyMethod();
+  syncPyPolyMode();
+</script>
+{% endblock %}
