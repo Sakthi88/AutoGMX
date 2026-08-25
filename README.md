@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Automated GROMACS Protein-Ligand MD Pipeline (MM-PBSA Version)
 
 > **⚠️ IMPORTANT WARNINGS - READ BEFORE RUNNING**
@@ -342,3 +343,7 @@ If you use this pipeline, please cite:
 ## License
 
 MIT License - See LICENSE file for details.
+=======
+# AutoGMX
+GROMACS Automation
+>>>>>>> ecb898619f8418077a6c8a09c5728549ed7b80f2
