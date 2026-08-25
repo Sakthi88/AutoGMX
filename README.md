@@ -1,0 +1,2 @@
+# AutoGMX
+GROMACS Automation
