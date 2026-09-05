@@ -377,6 +377,31 @@ body { background: radial-gradient(circle at 12% 8%, rgba(105,210,235,.36), tran
 .molecular-backdrop { position:fixed; inset:0; z-index:-1; pointer-events:none; background:radial-gradient(circle at 8% 8%, rgba(105,210,235,.16), transparent 25rem), radial-gradient(circle at 92% 15%, rgba(143,125,248,.12), transparent 24rem); }
 @media (max-width:560px) { .app-header { align-items:flex-start; flex-direction:column; } .app-actions { width:100%; justify-content:space-between; } }
 
+.corner-logo {
+  position: absolute;
+  top: 22px;
+  left: 22px;
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  border-radius: 12px;
+  opacity: 0.85;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 10;
+}
+.corner-logo:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+@media (max-width:700px) {
+  .corner-logo {
+    top: 12px;
+    left: 12px;
+    width: 48px;
+    height: 48px;
+  }
+}
+
 /* Prominent GROMACS masthead */
 .app-brand { gap:16px; }
 .app-brand strong { font-size:clamp(1.8rem,5vw,3.7rem); line-height:.98; letter-spacing:-.055em; white-space:nowrap; }
