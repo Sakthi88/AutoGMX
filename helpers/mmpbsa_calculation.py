@@ -1,25 +1,36 @@
 #!/usr/bin/env python3
-"""MM-PBSA binding free-energy calculation using GROMACS energy extraction.
+"""MM-PBSA binding free-energy calculation (GROMACS MM + APBS PB + SASA).
 
-Uses GROMACS tools for accurate MM energies (real force-field parameters,
-proper PBC, correct exclusions) and APBS for Poisson-Boltzmann solvation.
+Drop-in replacement for helpers/mmpbsa_calculation.py.
 
-Workflow per frame:
-  1. Write frame to PDB
-  2. Run PDB2PQR for charge/radius assignment
-  3. Run APBS for polar solvation energy
-  4. Compute SASA for non-polar solvation
-  5. Extract MM interaction energy via GROMACS gmx energy
+Fixes vs. the previous helper
+-----------------------------
+* Do not write PDB of the solvated system for GROMACS. Write GRO instead so
+  MDAnalysis does not spam stderr (altLocs / chainIDs / occupancies) and so
+  grompp sees native coordinates with a box.
+* PB/SA use the dry complex (receptor + ligand) only — never waters/ions.
+* PQR is written from TPR charges + Bondi radii (ligands work; PDB2PQR is
+  optional).
+* APBS input is valid mg-auto with calcenergy; polar energy is parsed from
+  APBS output (no broken DX interpolation).
+* gmx energy XVG legends are parsed as `@ s0 legend "..."`.
+* Receptor-Ligand *and* Ligand-Receptor terms, including 1-4.
+* Automation-friendly: MDAnalysis warnings suppressed, MMPBSA_STATUS line,
+  non-zero exit only on hard failure.
 
-Output:
-    mmpbsa_results.csv   -- per-frame component breakdown
-    mmpbsa_summary.csv   -- averaged results with standard deviations
-    mmpbsa_summary.json  -- machine-readable summary
-    decomposition.csv    -- per-residue energy decomposition (if enabled)
+Outputs (in --output-dir)
+    mmpbsa_results.csv
+    mmpbsa_summary.csv
+    mmpbsa_summary.json
+    mmpbsa_decomposition.png / mmpbsa_timeseries.png  (if matplotlib)
+    decomposition.csv  (if --decompose)
 """
+from __future__ import annotations
+
 import argparse
 import csv
 import json
+import logging
 import os
 import re
 import shutil
@@ -27,719 +38,918 @@ import subprocess
 import sys
 import tempfile
 import textwrap
+import warnings
 from pathlib import Path
 
 import numpy as np
 
+warnings.filterwarnings("ignore", category=UserWarning)
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+os.environ.setdefault("MDA_SILENT", "1")
+
 try:
     import MDAnalysis as mda
+    logging.getLogger("MDAnalysis").setLevel(logging.ERROR)
 except ImportError as exc:
-    raise SystemExit(f"MDAnalysis is required: {exc}")
+    raise SystemExit(f"MDAnalysis is required: {exc}") from exc
 
 
-# ── Constants ──────────────────────────────────────────────────────────────────
 NM_TO_ANG = 10.0
 KJ_TO_KCAL = 1.0 / 4.184
-BOLTZMANN_KCAL = 0.001987204  # kT in kcal/mol at 300K
+COULOMB_KCAL = 332.0636
+
+log = logging.getLogger("mmpbsa")
 
 
-# ── GROMACS helpers ────────────────────────────────────────────────────────────
-def _run(cmd, cwd=None, input_text=None, check=True):
+# ── process helpers ──────────────────────────────────────────────────────────
+def _run(cmd, cwd=None, input_text=None, check=True, log_name="cmd"):
     result = subprocess.run(
-        cmd, cwd=cwd, capture_output=True, text=True,
-        input=input_text, check=False,
+        cmd,
+        cwd=cwd,
+        capture_output=True,
+        text=True,
+        input=input_text,
+        check=False,
+        env={**os.environ, "GMX_MAXBACKUP": "-1", "GMX_NO_TERM": "1"},
     )
     if check and result.returncode != 0:
+        err = (result.stderr or result.stdout or "")[-2500:]
         raise RuntimeError(
-            f"Command failed ({result.returncode}): {' '.join(cmd)}\n"
-            f"stderr: {result.stderr[:2000]}"
+            f"{log_name} failed ({result.returncode}): {' '.join(str(c) for c in cmd)}\n{err}"
         )
     return result
 
 
 def _gmx_version(gmx_bin):
-    r = _run([gmx_bin, "--version"], check=False)
-    m = re.search(r"VERSION\s+(\S+)", r.stdout + r.stderr)
+    r = _run([gmx_bin, "--version"], check=False, log_name="gmx --version")
+    m = re.search(r"VERSION\s+(\S+)", (r.stdout or "") + (r.stderr or ""))
     return m.group(1) if m else "unknown"
 
 
-def _build_energy_mdp(mdp_template_path, out_mdp_path):
-    """Create an MDP file with energy groups for energy extraction."""
-    content = mdp_template_path.read_text()
+def _which(name):
+    return shutil.which(name) is not None
 
-    # Remove any existing energygrps or continuation lines to avoid duplicates
-    lines = content.splitlines()
+
+# ── index / topology discovery ───────────────────────────────────────────────
+def _parse_ndx(path):
+    groups = {}
+    current = None
+    with open(path, "r") as fh:
+        for raw in fh:
+            line = raw.strip()
+            if not line:
+                continue
+            if line.startswith("[") and line.endswith("]"):
+                current = line[1:-1].strip()
+                groups[current] = []
+            elif current is not None:
+                groups[current].extend(int(x) - 1 for x in line.split() if x.lstrip("-").isdigit())
+    return groups
+
+
+def _write_ndx(path, groups):
+    lines = []
+    for name, indices in groups.items():
+        lines.append(f"[ {name} ]")
+        row = []
+        for i, idx in enumerate(indices):
+            row.append(str(int(idx) + 1))
+            if len(row) == 15:
+                lines.append(" ".join(row))
+                row = []
+        if row:
+            lines.append(" ".join(row))
+    path.write_text("\n".join(lines) + "\n")
+
+
+def _find_file(start: Path, names, extra_globs=None, depth=3):
+    dirs = [start]
+    cur = start
+    for _ in range(depth):
+        cur = cur.parent
+        dirs.append(cur)
+    for d in dirs:
+        for n in names:
+            p = d / n
+            if p.exists():
+                return p
+        if extra_globs:
+            for g in extra_globs:
+                hits = sorted(d.glob(g))
+                if hits:
+                    return hits[0]
+    return None
+
+
+def _stage_topology(tpr_or_top: Path, temp_dir: Path):
+    """Copy .top/.itp/.ff next to a working directory so grompp can #include them."""
+    src_dir = tpr_or_top.parent
+    for pattern in ("*.itp", "*.top", "*.rtp", "*.dat"):
+        for f in src_dir.glob(pattern):
+            dest = temp_dir / f.name
+            if not dest.exists():
+                shutil.copy2(f, dest)
+    for ff in src_dir.glob("*.ff"):
+        if ff.is_dir() and not (temp_dir / ff.name).exists():
+            shutil.copytree(ff, temp_dir / ff.name)
+
+    if tpr_or_top.suffix == ".top":
+        dest = temp_dir / tpr_or_top.name
+        if tpr_or_top.resolve() != dest.resolve():
+            shutil.copy2(tpr_or_top, dest)
+        return dest
+
+    found = _find_file(src_dir, ["topol.top", "system.top", "complex.top"], extra_globs=["*.top"])
+    if found:
+        dest = temp_dir / found.name
+        shutil.copy2(found, dest)
+        # also copy includes from the .top's directory if different
+        if found.parent.resolve() != src_dir.resolve():
+            for f in found.parent.glob("*.itp"):
+                shutil.copy2(f, temp_dir / f.name)
+            for ff in found.parent.glob("*.ff"):
+                if ff.is_dir() and not (temp_dir / ff.name).exists():
+                    shutil.copytree(ff, temp_dir / ff.name)
+        return dest
+    return None
+
+
+# ── GROMACS MM ───────────────────────────────────────────────────────────────
+def _build_energy_mdp(mdp_template_path, out_mdp_path):
+    content = mdp_template_path.read_text() if mdp_template_path else ""
+    drop_prefixes = (
+        "energygrps",
+        "continuation",
+        "nsteps",
+        "nstxout",
+        "nstvout",
+        "nstfout",
+        "nstenergy",
+        "nstlog",
+        "nstxout-compressed",
+        "nstcalcenergy",
+        # Anything below references index-group NAMES from the original
+        # simulation (e.g. "Protein", "Non-Protein", "SOL"). Our rerun only
+        # defines System/Receptor/Ligand/Complex in index.ndx, so leaving
+        # these in makes grompp fail with
+        # "Group X referenced in the .mdp file was not found".
+        "tc-grps",
+        "tcoupl",
+        "tau-t",
+        "ref-t",
+        "nsttcouple",
+        "nh-chain-length",
+        "pcoupl",
+        "pcoupltype",
+        "tau-p",
+        "ref-p",
+        "compressibility",
+        "refcoord-scaling",
+        "acc-grps",
+        "accelerate",
+        "freezegrps",
+        "freezedim",
+        "energygrp-excl",
+        "energygrp-flags",
+        "deform",
+        "wall-atomtype",
+        "wall-density",
+        "qmmm-grps",
+        "gen-vel",
+        "gen-temp",
+        "gen-seed",
+    )
     filtered = []
-    for line in lines:
+    skip_cont = False
+    for line in content.splitlines():
         stripped = line.strip()
-        if stripped.startswith(("energygrps", "continuation")):
+        if skip_cont:
+            skip_cont = stripped.endswith("\\")
+            continue
+        # GROMACS treats "_" and "-" as interchangeable in mdp parameter
+        # names (tau_t == tau-t, gen_vel == gen-vel, ...). Normalize before
+        # matching drop_prefixes so an underscore-spelled template doesn't
+        # slip past the filter and collide with the hyphen-spelled
+        # replacements added below ("doubly defined" grompp error).
+        normalized = stripped.replace("_", "-")
+        if any(normalized.startswith(p) for p in drop_prefixes):
+            skip_cont = stripped.endswith("\\")
             continue
         filtered.append(line)
 
     additions = [
+        "nsteps = 0",
+        "nstenergy = 1",
+        "nstcalcenergy = 1",
+        "nstlog = 1",
+        "nstxout = 0",
+        "nstvout = 0",
+        "nstfout = 0",
+        "nstxout-compressed = 0",
         "energygrps = Receptor Ligand",
         "continuation = yes",
+        # Group-free equivalents: nsteps=0 rerun does no integration, so
+        # coupling algorithms are irrelevant, but grompp still parses these
+        # keywords and needs *some* valid value.
+        "tcoupl = no",
+        "pcoupl = no",
+        "gen-vel = no",
+        "tc-grps = System",
+        "tau-t = 0.1",
+        "ref-t = 300",
     ]
-    content = "\n".join(filtered).rstrip() + "\n" + "\n".join(additions) + "\n"
-    out_mdp_path.write_text(content)
+    body = "\n".join(filtered).rstrip()
+    out_mdp_path.write_text(body + ("\n" if body else "") + "\n".join(additions) + "\n")
+
+
+def _discover_energy_terms(gmx_bin, edr_path, tpr_path):
+    result = _run(
+        [gmx_bin, "energy", "-f", str(edr_path), "-s", str(tpr_path)],
+        input_text="\n",
+        check=False,
+        log_name="gmx energy (discover)",
+    )
+    text = (result.stdout or "") + "\n" + (result.stderr or "")
+    available = {}
+    for line in text.splitlines():
+        for idx, name in re.findall(r"(\d+)\s+([A-Za-z][\w().\-:/]*)", line):
+            n = int(idx)
+            if n <= 0:
+                continue
+            if name in ("kJ/mol", "K", "bar", "nm", "nm^3", "kg/m^3", "End", "Select"):
+                continue
+            available[name] = n
+    return available
+
+
+def _pick_pair_terms(available):
+    """Return {kind: term_name} for receptor-ligand pair interactions."""
+    picked = {}
+    kinds = [
+        ("coul", ("Coul-SR", "Coulomb-SR", "Coulomb-(SR)", "Coul-SR:")),
+        ("lj", ("LJ-SR", "LJ-(SR)", "LJ-SR:")),
+        ("coul14", ("Coul-14", "Coulomb-14")),
+        ("lj14", ("LJ-14",)),
+    ]
+    for kind, needles in kinds:
+        for name in available:
+            low = name
+            if not any(n in low for n in needles):
+                continue
+            has_rec = "Receptor" in name
+            has_lig = "Ligand" in name
+            if has_rec and has_lig:
+                picked[kind] = name
+                break
+    return picked
+
+
+def _parse_xvg(path):
+    legend = []
+    rows = []
+    with open(path, "r") as fh:
+        for line in fh:
+            if line.startswith("@"):
+                m = re.search(r"@\s*s(\d+)\s+legend\s+\"(.+)\"", line)
+                if m:
+                    legend.append((int(m.group(1)), m.group(2)))
+                continue
+            if line.startswith("#") or not line.strip():
+                continue
+            parts = line.split()
+            try:
+                rows.append([float(x) for x in parts])
+            except ValueError:
+                continue
+    return legend, rows
 
 
 def _extract_interaction_energy(gmx_bin, edr_path, tpr_path):
-    """Extract Receptor-Ligand interaction energy using gmx energy.
-
-    Uses gmx energy with -s (TPR) to discover pair-specific energy terms,
-    then extracts them. The TPR must have energygrps = Receptor Ligand.
-    Returns (vdw_kj, elec_kj, total_kj) in kJ/mol.
-    """
+    """Return (vdw_kj, elec_kj) from Receptor-Ligand pair terms."""
     edr_path = Path(edr_path)
     tpr_path = Path(tpr_path)
-    energy_xvg = edr_path.parent / "energy.xvg"
+    if not edr_path.exists():
+        raise RuntimeError(f"EDR not written: {edr_path}")
 
-    # Step 1: Discover available energy terms
-    # Run gmx energy with -s to get the interactive term list
-    discover_result = _run(
-        [gmx_bin, "energy", "-f", str(edr_path), "-s", str(tpr_path)],
-        input_text="\n",  # empty selection to get term list then exit
-        check=False,
-    )
-
-    # Parse the term list from combined output
-    # GROMACS prints the term list to its output (stdout or stderr varies)
-    output_text = discover_result.stdout + "\n" + discover_result.stderr
-
-    available = {}
-    for line in output_text.split("\n"):
-        line = line.strip()
-        # Match: "  7  LJ-(SR)" or "  7  Coul-SR:Receptor-Ligand"
-        # GROMACS 2025.2 format: "  N  Term-Name"
-        m = re.match(r"^\s*(\d+)\s+(\S+(?:\s+\S+)?)\s*$", line)
-        if m:
-            idx = int(m.group(1))
-            name = m.group(2).strip()
-            if idx > 0 and name:
-                available[name] = idx
-        # Also handle tabular format: "  7  LJ-(SR)     8  Angle"
-        for pair in re.findall(r"(\d+)\s+([\w().\-:/]+)", line):
-            idx = int(pair[0])
-            name = pair[1].strip()
-            if idx > 0 and name and name not in ("kJ/mol", "K", "bar", "nm",
-                                                   "nm^3", "kg/m^3"):
-                available[name] = idx
-
-    # Find Receptor-Ligand interaction terms
-    coul_key = None
-    lj_key = None
-    for name, idx in available.items():
-        if "Coul-SR" in name and "Receptor" in name and "Ligand" in name:
-            coul_key = name
-        if "LJ-SR" in name and "Receptor" in name and "Ligand" in name:
-            lj_key = name
-
-    if not coul_key and not lj_key:
-        # Broader matching
-        for name, idx in available.items():
-            if "Coul" in name and "Receptor" in name and "Ligand" in name:
-                coul_key = name
-            if "LJ" in name and "Receptor" in name and "Ligand" in name:
-                lj_key = name
-
-    if not coul_key and not lj_key:
+    available = _discover_energy_terms(gmx_bin, edr_path, tpr_path)
+    picked = _pick_pair_terms(available)
+    if "coul" not in picked and "lj" not in picked:
         raise RuntimeError(
-            f"Could not find Receptor-Ligand interaction terms. "
-            f"Available terms: {list(available.keys())[:30]}"
+            "No Receptor-Ligand pair terms in EDR. "
+            f"Available: {list(available.keys())[:40]}"
         )
 
-    # Build selection: term indices followed by 0 to exit
-    sel_indices = []
-    if coul_key:
-        sel_indices.append(str(available[coul_key]))
-    if lj_key:
-        sel_indices.append(str(available[lj_key]))
-    sel_indices.append("0")
-
-    # Step 2: Extract the selected energies
+    order = [k for k in ("coul", "lj", "coul14", "lj14") if k in picked]
+    indices = [str(available[picked[k]]) for k in order] + ["0"]
+    energy_xvg = edr_path.parent / "energy.xvg"
     _run(
-        [gmx_bin, "energy", "-f", str(edr_path), "-s", str(tpr_path),
-         "-o", str(energy_xvg)],
+        [gmx_bin, "energy", "-f", str(edr_path), "-s", str(tpr_path), "-o", str(energy_xvg)],
         cwd=str(edr_path.parent),
-        input_text="\n".join(sel_indices) + "\n",
+        input_text="\n".join(indices) + "\n",
         check=False,
+        log_name="gmx energy (extract)",
+    )
+    if not energy_xvg.exists():
+        raise RuntimeError("gmx energy did not write energy.xvg")
+
+    legend, rows = _parse_xvg(energy_xvg)
+    if not rows:
+        raise RuntimeError("energy.xvg contains no data rows")
+
+    # Map legend series index -> kind. Series s0 is the first energy column
+    # (column 1 of the numeric row; column 0 is time).
+    name_by_series = {s: name for s, name in legend}
+    col_for_kind = {}
+    for series, name in name_by_series.items():
+        for kind, term in picked.items():
+            if term in name or name in term:
+                col_for_kind[kind] = series + 1  # +1 skip time
+    if not col_for_kind:
+        # Fall back to selection order: first energy col = order[0], ...
+        for i, kind in enumerate(order):
+            col_for_kind[kind] = i + 1
+
+    def mean_col(kind):
+        c = col_for_kind.get(kind)
+        if c is None:
+            return 0.0
+        vals = [r[c] for r in rows if len(r) > c]
+        return float(np.mean(vals)) if vals else 0.0
+
+    vdw = mean_col("lj") + mean_col("lj14")
+    elec = mean_col("coul") + mean_col("coul14")
+    return vdw, elec
+
+
+# ── PQR / APBS ───────────────────────────────────────────────────────────────
+_BONDI = {
+    "H": 1.20, "C": 1.70, "N": 1.55, "O": 1.52, "S": 1.80, "P": 1.80,
+    "F": 1.47, "CL": 1.75, "BR": 1.85, "I": 1.98, "NA": 2.27, "MG": 1.73,
+    "ZN": 1.39, "FE": 1.80, "K": 2.75, "CA": 2.31, "MN": 1.73, "CU": 1.40,
+}
+
+
+def _element_of(atom):
+    el = ""
+    try:
+        el = (atom.element or "").upper()
+    except Exception:
+        el = ""
+    if el and el in _BONDI:
+        return el
+    name = re.sub(r"[0-9].*$", "", (getattr(atom, "name", "") or "").upper())
+    typ = re.sub(r"[0-9].*$", "", (getattr(atom, "type", "") or "").upper())
+    for cand in (name, typ):
+        for n in sorted(_BONDI, key=len, reverse=True):
+            if cand == n or cand.startswith(n):
+                return n
+    return "C"
+
+
+def _vdw_radius(atom):
+    return _BONDI.get(_element_of(atom), 1.70)
+
+
+def _atom_charge(atom):
+    try:
+        return float(atom.charge)
+    except Exception:
+        return 0.0
+
+
+def _format_pqr(serial, atom, chain, x, y, z):
+    name = (atom.name or "X")[:4]
+    if len(name) < 4:
+        aname = f" {name:<3s}"
+    else:
+        aname = name
+    resname = (atom.resname or "UNK")[:4]
+    resid = int(getattr(atom, "resid", 1)) % 10000
+    q = _atom_charge(atom)
+    r = _vdw_radius(atom)
+    return (
+        f"ATOM  {serial:5d} {aname} {resname:>3s} {chain} {resid:4d}    "
+        f"{x:8.3f}{y:8.3f}{z:8.3f} {q:7.4f} {r:6.4f}"
     )
 
-    if not energy_xvg.exists():
-        return 0.0, 0.0, 0.0
 
-    # Step 3: Parse XVG - use legend to match columns to terms
-    legend = []
-    with open(energy_xvg, "r") as f:
-        for line in f:
-            if line.startswith("@"):
-                if "legend" in line:
-                    m = re.search(r'@"(\d+)"\s+"(.+)"', line)
-                    if m:
-                        legend.append((int(m.group(1)), m.group(2)))
-            elif line.startswith("#") or not line.strip():
-                continue
-            else:
-                break
-
-    # Map legend columns to our terms
-    coul_col = -1
-    lj_col = -1
-    for col_idx, name in legend:
-        if "Coul-SR" in name and "Receptor" in name and "Ligand" in name:
-            coul_col = col_idx
-        if "LJ-SR" in name and "Receptor" in name and "Ligand" in name:
-            lj_col = col_idx
-
-    # Parse data rows
-    coul_vals = []
-    lj_vals = []
-    with open(energy_xvg, "r") as f:
-        for line in f:
-            if line.startswith(("@", "#")) or not line.strip():
-                continue
-            parts = line.split()
-            if len(parts) >= 2:
-                try:
-                    vals = [float(x) for x in parts[1:]]  # skip time column
-                    if coul_col > 0 and (coul_col - 1) < len(vals):
-                        coul_vals.append(vals[coul_col - 1])
-                    if lj_col > 0 and (lj_col - 1) < len(vals):
-                        lj_vals.append(vals[lj_col - 1])
-                    # Fallback for 2-column data: assume LJ, Coul order
-                    if coul_col < 0 and lj_col < 0:
-                        if len(vals) >= 2:
-                            lj_vals.append(vals[0])
-                            coul_vals.append(vals[1])
-                        elif len(vals) == 1:
-                            lj_vals.append(vals[0])
-                except ValueError:
-                    continue
-
-    vdw = float(np.mean(lj_vals)) if lj_vals else 0.0
-    elec = float(np.mean(coul_vals)) if coul_vals else 0.0
-    return vdw, elec, vdw + elec
+def _write_pqr(ag, path, chain="A"):
+    lines = []
+    for i, atom in enumerate(ag, start=1):
+        x, y, z = atom.position
+        lines.append(_format_pqr(i, atom, chain, x, y, z))
+    lines.append("TER")
+    lines.append("END")
+    Path(path).write_text("\n".join(lines) + "\n")
 
 
-# ── PDB2PQR / APBS helpers ───────────────────────────────────────────────────
-def _run_pdb2pqr(pdb_path, pqr_path, pH=7.0):
-    """Assign charges and radii with PDB2PQR."""
-    _run([
-        "pdb2pqr", "--ff", "AMBER",
-        "--with-ph", str(pH),
-        str(pdb_path), str(pqr_path),
-    ])
+def _prepare_pdb_attrs(ag, chain):
+    n = len(ag)
+    if n == 0:
+        return
+    try:
+        ag.chainIDs = np.array([chain] * n)
+    except Exception:
+        pass
 
 
-def _run_apbs(pqr_path, output_prefix, temp=300.0, ionic=0.15, pdie=1.0, sdie=78.5):
-    """Run APBS to solve the Poisson-Boltzmann equation."""
-    pqr = Path(pqr_path)
-    pqr_content = pqr.read_text()
+def _write_pdb_quiet(ag, path, chain="A"):
+    _prepare_pdb_attrs(ag, chain)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        ag.write(str(path))
 
-    coords = []
-    for line in pqr_content.splitlines():
-        if line.startswith(("ATOM", "HETATM")):
-            x = float(line[30:38])
-            y = float(line[38:46])
-            z = float(line[46:54])
-            coords.append([x, y, z])
 
-    coords = np.array(coords)
-    coords_nm = coords / NM_TO_ANG
-    lo = coords_nm.min(axis=0) - 0.3
-    hi = coords_nm.max(axis=0) + 0.3
+def _nice_dime(n):
+    cands = sorted({2**a * 3**b * 5**c + 1 for a in range(8) for b in range(6) for c in range(4)})
+    n = max(33, int(n))
+    for d in cands:
+        if d >= n:
+            return d
+    return 129
 
-    # Correct APBS DX write syntax: "write dx <name> <filename>"
-    apbs_input = textwrap.dedent(f"""\
-        read mol pqr {pqr.name}
-        elec name comp
+
+def _grid_from_coords(coords_ang, spacing=0.5, fadd=10.0):
+    mins = coords_ang.min(axis=0)
+    maxs = coords_ang.max(axis=0)
+    center = 0.5 * (mins + maxs)
+    flen = np.maximum((maxs - mins) + 2.0 * fadd, 20.0)
+    clen = flen * 1.7
+    dime = [_nice_dime(flen[i] / spacing + 1) for i in range(3)]
+    return dime, clen, flen, center
+
+
+def _write_apbs_in(pqr_path, in_path, dime, cglen, fglen, center, temp, ionic, pdie, sdie):
+    dx, dy, dz = dime
+    cx, cy, cz = cglen
+    fx, fy, fz = fglen
+    ox, oy, oz = center
+    pqr_name = Path(pqr_path).name
+    body = textwrap.dedent(f"""\
+        read
+            mol pqr {pqr_name}
+        end
+        elec name polar
             mg-auto
-            molecule
-            npb Solver
-            bcfl mdh
+            dime {dx} {dy} {dz}
+            cglen {cx:.3f} {cy:.3f} {cz:.3f}
+            fglen {fx:.3f} {fy:.3f} {fz:.3f}
+            cgcent {ox:.3f} {oy:.3f} {oz:.3f}
+            fgcent {ox:.3f} {oy:.3f} {oz:.3f}
+            mol 1
+            lpbe
+            bcfl sdh
             pdie {pdie}
             sdie {sdie}
             srfm smol
             chgm spl2
-            ion 1 {ionic} 2.0
-            ion -1 {ionic} 2.0
+            srad 1.4
+            swin 0.3
+            sdens 10.0
             temp {temp}
-            write dx comp {output_prefix}
+            ion charge 1 conc {ionic} radius 2.0
+            ion charge -1 conc {ionic} radius 2.0
+            calcenergy total
+            calcforce no
         end
+        print elecEnergy polar end
         quit
     """)
-
-    apbs_in = pqr.with_suffix(".in")
-    apbs_in.write_text(apbs_input)
-
-    # Run APBS from the PQR's directory so DX is written there
-    _run(["apbs", str(apbs_in)], cwd=str(pqr.parent))
-
-    # APBS writes to <output_prefix>.dx in the cwd
-    dx_path = pqr.parent / f"{output_prefix}.dx"
-    return dx_path
+    Path(in_path).write_text(body)
 
 
-def _compute_elec_energy_pqr(pqr_path, dx_path, temp=300.0):
-    """Compute electrostatic energy from PQR charges and DX potential grid.
+def _parse_apbs_energy(stdout, stderr):
+    text = (stdout or "") + "\n" + (stderr or "")
+    patterns = [
+        r"Global net ELEC energy\s*=\s*([-+0-9.eE]+)\s*(kJ/mol|kJ\/mol|kcal/mol)?",
+        r"Total electrostatic energy\s*=\s*([-+0-9.eE]+)\s*(kJ/mol|kJ\/mol|kcal/mol)?",
+        r"elecEnergy\s+([-+0-9.eE]+)\s*(kJ/mol|kJ\/mol|kcal/mol)?",
+    ]
+    for pat in patterns:
+        matches = re.findall(pat, text)
+        if matches:
+            val, unit = matches[-1]
+            energy = float(val)
+            unit = (unit or "kJ/mol").lower()
+            if "kcal" in unit:
+                return energy
+            return energy * KJ_TO_KCAL
+    raise RuntimeError("Could not parse APBS electrostatic energy from output.")
 
-    APBS DX potential is in kT/e units. We convert to kcal/mol using:
-        E = q * phi * (RT/F) where RT/F ≈ 0.596 kcal/mol per e at 300K
-        Or equivalently: E_kcal = q * phi_kT * kT_kcal
-    """
-    kT_kcal = BOLTZMANN_KCAL * temp  # kT in kcal/mol
 
-    pqr_content = Path(pqr_path).read_text()
-    coords = []
-    charges = []
-    for line in pqr_content.splitlines():
-        if line.startswith(("ATOM", "HETATM")):
-            x = float(line[30:38])
-            y = float(line[38:46])
-            z = float(line[46:54])
-            q = float(line[54:66])
-            # Convert Å to nm for grid interpolation
-            coords.append([x / NM_TO_ANG, y / NM_TO_ANG, z / NM_TO_ANG])
-            charges.append(q)
+def _run_apbs_energy(pqr_path, work_dir, dime, cglen, fglen, center, temp, ionic, pdie, sdie):
+    pqr_path = Path(pqr_path)
+    in_path = Path(work_dir) / (pqr_path.stem + ".in")
+    _write_apbs_in(pqr_path, in_path, dime, cglen, fglen, center, temp, ionic, pdie, sdie)
+    result = _run(["apbs", str(in_path.name)], cwd=str(work_dir), check=True, log_name="apbs")
+    return _parse_apbs_energy(result.stdout, result.stderr)
 
-    coords = np.array(coords)
-    charges = np.array(charges)
 
-    dx_content = Path(dx_path).read_text()
-    header_lines = []
-    data_values = []
-    for line in dx_content.splitlines():
-        stripped = line.strip()
-        if stripped.startswith(("object", "component", "type", "grid", "origin",
-                               "delta", "label")):
-            header_lines.append(stripped)
-        else:
-            try:
-                vals = [float(v) for v in stripped.split()]
-                data_values.extend(vals)
-            except ValueError:
+# ── SASA ─────────────────────────────────────────────────────────────────────
+def _fibonacci_sphere(n_points):
+    indices = np.arange(n_points, dtype=float) + 0.5
+    phi = np.arccos(1.0 - 2.0 * indices / n_points)
+    theta = np.pi * (1.0 + 5**0.5) * indices
+    x = np.cos(theta) * np.sin(phi)
+    y = np.sin(theta) * np.sin(phi)
+    z = np.cos(phi)
+    return np.column_stack([x, y, z])
+
+
+def _sasa_shrake(positions, radii, probe=1.4, n_points=92):
+    if len(positions) == 0:
+        return 0.0
+    r = np.asarray(radii, dtype=float) + probe
+    try:
+        from scipy.spatial import cKDTree
+        tree = cKDTree(positions)
+        query = lambda i, rad: tree.query_ball_point(positions[i], rad)
+    except Exception:
+        def query(i, rad):
+            d = np.linalg.norm(positions - positions[i], axis=1)
+            return np.where(d <= rad)[0].tolist()
+
+    sphere = _fibonacci_sphere(n_points)
+    max_r = float(r.max())
+    total = 0.0
+    for i in range(len(positions)):
+        nbs = query(i, r[i] + max_r)
+        pts = positions[i] + sphere * r[i]
+        buried = np.zeros(n_points, dtype=bool)
+        for j in nbs:
+            if j == i:
                 continue
-
-    if not data_values:
-        return 0.0
-
-    nx = ny = nz = 0
-    origin = np.zeros(3)
-    delta = np.zeros(3)
-    for line in header_lines:
-        parts = line.split()
-        if "object 1" in line and "contents" in line:
-            nx, ny, nz = int(parts[-3]), int(parts[-2]), int(parts[-1])
-        elif "origin" in line:
-            origin = np.array([float(parts[1]), float(parts[2]), float(parts[3])])
-        elif "delta" in line and len(parts) >= 5:
-            idx = int(parts[1])
-            delta[idx] = float(parts[2])
-
-    if nx * ny * nz == 0 or len(data_values) < nx * ny * nz:
-        return 0.0
-
-    # DX files use column-major (Fortran) order: x changes fastest
-    grid = np.array(data_values[:nx * ny * nz]).reshape((nz, ny, nx), order="F")
-
-    energy = 0.0
-    for i in range(len(charges)):
-        x, y, z = coords[i] - origin
-        ix = x / delta[0] if delta[0] > 0 else 0
-        iy = y / delta[1] if delta[1] > 0 else 0
-        iz = z / delta[2] if delta[2] > 0 else 0
-
-        ix0 = int(np.clip(np.floor(ix), 0, nx - 2))
-        iy0 = int(np.clip(np.floor(iy), 0, ny - 2))
-        iz0 = int(np.clip(np.floor(iz), 0, nz - 2))
-
-        fx = ix - ix0
-        fy = iy - iy0
-        fz = iz - iz0
-
-        # Trilinear interpolation
-        pot = (
-            grid[iz0, iy0, ix0] * (1 - fx) * (1 - fy) * (1 - fz) +
-            grid[iz0, iy0, ix0 + 1] * fx * (1 - fy) * (1 - fz) +
-            grid[iz0, iy0 + 1, ix0] * (1 - fx) * fy * (1 - fz) +
-            grid[iz0, iy0 + 1, ix0 + 1] * fx * fy * (1 - fz) +
-            grid[iz0 + 1, iy0, ix0] * (1 - fx) * (1 - fy) * fz +
-            grid[iz0 + 1, iy0, ix0 + 1] * fx * (1 - fy) * fz +
-            grid[iz0 + 1, iy0 + 1, ix0] * (1 - fx) * fy * fz +
-            grid[iz0 + 1, iy0 + 1, ix0 + 1] * fx * fy * fz
-        )
-        # pot is in kT/e, charges in e, result in kT -> convert to kcal/mol
-        energy += charges[i] * pot * kT_kcal
-
-    return energy
+            d = np.linalg.norm(pts - positions[j], axis=1)
+            buried |= d < r[j]
+        total += (1.0 - buried.mean()) * 4.0 * np.pi * r[i] ** 2
+    return float(total)
 
 
-# ── SASA ──────────────────────────────────────────────────────────────────────
-def _compute_sa(universe, selection, probe=1.4):
-    """Compute SASA using MDAnalysis geometry-based approach."""
-    ag = universe.select_atoms(selection)
+def _compute_sa(ag, probe=1.4):
     if len(ag) == 0:
         return 0.0
+    radii = np.array([_vdw_radius(atom) for atom in ag], dtype=float)
+    return _sasa_shrake(ag.positions, radii, probe=probe)
 
-    # Use MDAnalysis' built-in SASA if available
+
+# ── MM fallback from charges ─────────────────────────────────────────────────
+def _mm_coulomb_fallback(rec_ag, lig_ag, box_ang):
+    rec_pos = rec_ag.positions
+    lig_pos = lig_ag.positions
+    rec_q = np.array([_atom_charge(a) for a in rec_ag])
+    lig_q = np.array([_atom_charge(a) for a in lig_ag])
+    box = np.asarray(box_ang[:3], dtype=float)
+    box[box == 0] = 1e9
+    elec = 0.0
+    vdw = 0.0
+    rec_r = np.array([_vdw_radius(a) for a in rec_ag])
+    lig_r = np.array([_vdw_radius(a) for a in lig_ag])
+    for i in range(len(lig_pos)):
+        diffs = rec_pos - lig_pos[i]
+        diffs -= box * np.round(diffs / box)
+        dist = np.sqrt((diffs ** 2).sum(axis=1))
+        dist = np.clip(dist, 0.12, None)
+        elec += COULOMB_KCAL * np.sum(rec_q * lig_q[i] / dist)
+        sigma = 0.5 * (rec_r + lig_r[i])
+        eps = 0.08
+        sr6 = (sigma / dist) ** 6
+        vdw += np.sum(4.0 * eps * (sr6 ** 2 - sr6))
+    return float(vdw), float(elec)
+
+
+# ── plotting ─────────────────────────────────────────────────────────────────
+def _generate_plots(results, summary, out_dir):
     try:
-        from MDAnalysis.analysis import sa
-        sasa = sa.SASA(ag, probe_radius=probe)
-        sasa.run()
-        return float(sasa.results.area)
-    except (ImportError, AttributeError, TypeError):
-        pass
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+    except ImportError:
+        log.info("matplotlib not available; skipping plots")
+        return
 
-    # Fallback: Shrake-Rupley with KDTree neighbor search
-    from scipy.spatial import cKDTree
-    positions = ag.positions
-    n_atoms = len(ag)
-    
-    # Use element-based radii
-    radii = np.array([_vdw_radius(ag[i].type) for i in range(n_atoms)])
-    probe_r = probe
-    
-    # Generate points on sphere for each atom
-    n_points = 960
-    sphere_pts = _fibonacci_sphere(n_points)
-    
-    # Build KDTree for neighbor search
-    tree = cKDTree(positions)
-    
-    total_area = 0.0
-    for i in range(n_atoms):
-        r = radii[i] + probe_r
-        atom_pts = positions[i] + sphere_pts * r
-        
-        # Find neighbors within 2*max_radius
-        max_r = np.max(radii) + probe_r
-        neighbors = tree.query_ball_point(positions[i], 2 * max_r)
-        
-        # Check each point for burial
-        accessible = 0
-        for pt in atom_pts:
-            buried = False
-            for j in neighbors:
-                if j == i:
-                    continue
-                d = np.linalg.norm(pt - positions[j])
-                if d < radii[j] + probe_r:
-                    buried = True
-                    break
-            if not buried:
-                accessible += 1
-        
-        exposed_fraction = accessible / n_points
-        total_area += exposed_fraction * 4.0 * np.pi * r ** 2
-    
-    return float(total_area)
+    components = ["vdw", "elec", "polar_solv", "nonpolar_solv", "delta_G"]
+    labels = ["vdW", "Electrostatics", "Polar solv.", "Nonpolar solv.", "Total ΔG"]
+    colors = ["#9aa890", "#8a9aa8", "#c17b6a", "#b8a58a", "#c5d0b8"]
 
+    fig, ax = plt.subplots(figsize=(10, 5.5))
+    means = [summary[c]["mean"] for c in components]
+    stds = [summary[c]["std"] for c in components]
+    bars = ax.bar(labels, means, yerr=stds, capsize=4, color=colors, edgecolor="#0e100e", linewidth=0.4)
+    ax.set_ylabel("Energy (kcal/mol)")
+    ax.set_title("MM-PBSA binding free energy")
+    ax.axhline(0, color="#2c322c", linewidth=0.8)
+    ax.grid(axis="y", alpha=0.25)
+    for bar, val in zip(bars, means):
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + 0.4 * np.sign(bar.get_height() or 1),
+            f"{val:.2f}",
+            ha="center",
+            va="bottom" if val >= 0 else "top",
+            fontsize=9,
+        )
+    fig.tight_layout()
+    fig.savefig(str(out_dir / "mmpbsa_decomposition.png"), dpi=180)
+    plt.close(fig)
 
-def _vdw_radius(atom_type):
-    """Get van der Waals radius for atom type (in Å)."""
-    radii = {
-        'H': 1.20, 'C': 1.70, 'N': 1.55, 'O': 1.52, 'S': 1.80,
-        'P': 1.80, 'F': 1.47, 'CL': 1.75, 'BR': 1.85, 'I': 1.98,
-    }
-    at = atom_type.upper()
-    for elem, rad in radii.items():
-        if at.startswith(elem):
-            return rad
-    return 1.70  # default carbon
+    times = [r["time_ps"] for r in results]
+    fig, axes = plt.subplots(2, 2, figsize=(11, 7.5))
+    series = [
+        ("vdw", "van der Waals", "#9aa890", axes[0, 0]),
+        ("elec", "Electrostatics", "#8a9aa8", axes[0, 1]),
+        ("polar_solv", "Polar solvation", "#c17b6a", axes[1, 0]),
+        ("delta_G", "Total ΔG", "#c5d0b8", axes[1, 1]),
+    ]
+    for key, title, color, ax in series:
+        vals = [r[key] for r in results]
+        ax.plot(times, vals, color=color, linewidth=1.0)
+        ax.set_title(title)
+        ax.set_ylabel("kcal/mol")
+        ax.grid(alpha=0.25)
+        mean_val = float(np.mean(vals))
+        ax.axhline(mean_val, color=color, linestyle="--", alpha=0.7, label=f"mean {mean_val:.2f}")
+        ax.legend(fontsize=8)
+    axes[1, 0].set_xlabel("Time (ps)")
+    axes[1, 1].set_xlabel("Time (ps)")
+    fig.suptitle("MM-PBSA energy components")
+    fig.tight_layout()
+    fig.savefig(str(out_dir / "mmpbsa_timeseries.png"), dpi=180)
+    plt.close(fig)
 
 
-def _fibonacci_sphere(n_points):
-    """Generate points on unit sphere using Fibonacci lattice."""
-    indices = np.arange(n_points, dtype=float) + 0.5
-    phi = np.arccos(1 - 2 * indices / n_points)
-    theta = np.pi * (1 + 5**0.5) * indices
-    x = np.cos(theta) * np.sin(phi)
-    y = np.sin(theta) * np.sin(phi)
-    z = np.cos(phi)
-    return np.column_stack([x, y, z])
-    return 1.70  # default carbon
+def _per_residue_decomposition(u, rec_ag, lig_ag, frame_indices, out_dir):
+    residues = rec_ag.residues
+    decomp = []
+    max_frames = min(20, len(frame_indices))
+    for res in residues:
+        vdw_list, elec_list = [], []
+        res_atoms = res.atoms
+        for fidx in frame_indices[:max_frames]:
+            u.trajectory[fidx]
+            box = u.dimensions[:3]
+            vdw, elec = _mm_coulomb_fallback(res_atoms, lig_ag, box)
+            vdw_list.append(vdw)
+            elec_list.append(elec)
+        vdw_m = float(np.mean(vdw_list)) if vdw_list else 0.0
+        elec_m = float(np.mean(elec_list)) if elec_list else 0.0
+        decomp.append({
+            "residue": f"{res.resname}{res.resid}",
+            "resid": int(res.resid),
+            "resname": str(res.resname),
+            "vdw_mean": vdw_m,
+            "elec_mean": elec_m,
+            "total_mean": vdw_m + elec_m,
+        })
+    csv_path = out_dir / "decomposition.csv"
+    with open(csv_path, "w", newline="") as fh:
+        writer = csv.DictWriter(
+            fh, fieldnames=["residue", "resid", "resname", "vdw_mean", "elec_mean", "total_mean"]
+        )
+        writer.writeheader()
+        writer.writerows(decomp)
+    log.info("Per-residue decomposition: %s", csv_path)
+    ordered = sorted(decomp, key=lambda x: x["total_mean"])
+    (out_dir / "decomposition_summary.json").write_text(json.dumps({
+        "top_binding": ordered[:10],
+        "top_repulsive": ordered[-10:][::-1],
+    }, indent=2))
 
 
-def _fibonacci_sphere(n_points):
-    """Generate points on unit sphere using Fibonacci lattice."""
-    indices = np.arange(n_points, dtype=float) + 0.5
-    phi = np.arccos(1 - 2 * indices / n_points)
-    theta = np.pi * (1 + 5**0.5) * indices
-    x = np.cos(theta) * np.sin(phi)
-    y = np.sin(theta) * np.sin(phi)
-    z = np.cos(phi)
-    return np.column_stack([x, y, z])
-
-
-# ── Main MM-PBSA calculation ──────────────────────────────────────────────────
+# ── main calculation ─────────────────────────────────────────────────────────
 def calculate_mmpbsa(args):
     gmx_bin = args.gmx_bin
-    print(f"GROMACS: {gmx_bin} ({_gmx_version(gmx_bin)})")
-    print(f"Trajectory: {args.trajectory}")
-    print(f"Topology: {args.topology}")
+    log.info("GROMACS: %s (%s)", gmx_bin, _gmx_version(gmx_bin))
+    log.info("Trajectory: %s", args.trajectory)
+    log.info("Topology:   %s", args.topology)
 
-    # Load index file if provided for group selections
+    tpr_path = Path(args.topology)
+    traj_path = Path(args.trajectory)
+
+    ndx_path_in = args.index_file
+    if not ndx_path_in:
+        found = _find_file(tpr_path.parent, ["index.ndx", "md.ndx", "prod.ndx"], extra_globs=["*.ndx"])
+        if found:
+            ndx_path_in = str(found)
+            log.info("Auto-detected index file: %s", found)
+
     ndx_groups = {}
-    if args.index_file and Path(args.index_file).exists():
-        # Parse the index file manually
-        with open(args.index_file, 'r') as f:
-            current_group = None
-            for line in f:
-                line = line.strip()
-                if line.startswith('[') and line.endswith(']'):
-                    current_group = line[1:-1].strip()
-                    ndx_groups[current_group] = []
-                elif current_group and line:
-                    ndx_groups[current_group].extend([int(x) - 1 for x in line.split()])  # 0-based
-        print(f"Loaded index groups: {list(ndx_groups.keys())}")
+    if ndx_path_in and Path(ndx_path_in).exists():
+        ndx_groups = _parse_ndx(ndx_path_in)
+        log.info("Index groups: %s", ", ".join(ndx_groups.keys()))
 
-    u = mda.Universe(args.topology, args.trajectory)
+    u = mda.Universe(str(tpr_path), str(traj_path))
     n_frames = len(u.trajectory)
-    print(f"Trajectory contains {n_frames} frames")
+    log.info("Frames in trajectory: %d", n_frames)
 
-    sel_receptor = args.receptor_selection or "protein"
-    sel_ligand = args.ligand_selection or "resname LIG"
-
-    # Handle "group X" selections using loaded index
-    def resolve_selection(sel):
-        if sel.startswith("group "):
-            group_name = sel[6:].strip()
-            if group_name in ndx_groups:
-                indices = ndx_groups[group_name]
-                # Create a selection string from indices
-                return f"index {' '.join(str(i) for i in indices)}"
-            else:
-                print(f"Warning: Group '{group_name}' not found in index file, available: {list(ndx_groups.keys())}")
-                return "resname UNK"  # fallback
+    def resolve_selection(sel, role):
+        if not sel:
+            return "protein" if role == "receptor" else "resname LIG UNK MOL INH LIGAND"
+        if sel.lower().startswith("group "):
+            name = sel.split(None, 1)[1].strip()
+            # case-insensitive group lookup
+            match = next((g for g in ndx_groups if g.lower() == name.lower()), None)
+            if match is None:
+                log.warning("Group '%s' not in index. Available: %s", name, list(ndx_groups.keys()))
+                if role == "ligand":
+                    return "not protein and not resname SOL HOH WAT NA CL K NA+ CL- ION NAW CLW"
+                return "protein"
+            indices = ndx_groups[match]
+            if not indices:
+                raise SystemExit(f"Index group '{match}' is empty.")
+            return "index " + " ".join(str(i) for i in indices)
         return sel
 
-    sel_receptor = resolve_selection(sel_receptor)
-    sel_ligand = resolve_selection(sel_ligand)
+    sel_receptor = resolve_selection(args.receptor_selection or "protein", "receptor")
+    sel_ligand = resolve_selection(args.ligand_selection or "resname LIG", "ligand")
 
-    n_receptor = u.select_atoms(sel_receptor).n_atoms
-    n_ligand = u.select_atoms(sel_ligand).n_atoms
-    print(f"Receptor: {n_receptor} atoms | Ligand: {n_ligand} atoms")
+    receptor_atoms = u.select_atoms(sel_receptor)
+    ligand_atoms = u.select_atoms(sel_ligand)
+    log.info("Receptor: %d atoms | Ligand: %d atoms", len(receptor_atoms), len(ligand_atoms))
+    if len(receptor_atoms) == 0 or len(ligand_atoms) == 0:
+        raise SystemExit(
+            "One or more selections returned zero atoms. "
+            f"receptor='{sel_receptor}' ligand='{sel_ligand}'. "
+            "Pass -n index.ndx and --ligand-selection 'group Ligand'."
+        )
 
-    if n_receptor == 0 or n_ligand == 0:
-        raise SystemExit("One or more selections returned zero atoms.")
+    complex_atoms = receptor_atoms + ligand_atoms
 
-    # Frame sampling
     frame_step = max(1, args.frame_step)
     frame_indices = list(range(0, n_frames, frame_step))
     if args.max_frames and len(frame_indices) > args.max_frames:
-        frame_indices = frame_indices[:args.max_frames]
-    print(f"Processing {len(frame_indices)} frames (every {frame_step} frame(s))")
+        frame_indices = frame_indices[: args.max_frames]
+    log.info("Processing %d frames (step=%d)", len(frame_indices), frame_step)
 
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     temp_dir = Path(tempfile.mkdtemp(prefix="mmpbsa_"))
+    keep_temp = args.keep_temp
+
+    energy_tpr = None
+    top_for_grompp = None
+    energy_mdp = None
+    ndx_path = temp_dir / "index.ndx"
 
     try:
-        # ── Step 1: Create index with energy groups ───────────────────────
-        print("\n--- Setting up energy groups ---")
-        receptor_atoms = u.select_atoms(sel_receptor)
-        ligand_atoms = u.select_atoms(sel_ligand)
+        _write_ndx(ndx_path, {
+            "System": list(range(u.atoms.n_atoms)),
+            "Receptor": [a.index for a in receptor_atoms],
+            "Ligand": [a.index for a in ligand_atoms],
+            "Complex": [a.index for a in complex_atoms],
+        })
 
-        # Write index file with proper line wrapping (15 atoms per line)
-        ndx_path = temp_dir / "index.ndx"
-        ndx_lines = []
-
-        def _write_ndx_group(name, atom_indices):
-            ndx_lines.append(f"[ {name} ]")
-            line = ""
-            for i, idx in enumerate(atom_indices):
-                line += f" {idx + 1}"  # GROMACS is 1-based
-                if (i + 1) % 15 == 0:
-                    ndx_lines.append(line.strip())
-                    line = ""
-            if line.strip():
-                ndx_lines.append(line.strip())
-
-        _write_ndx_group("System", range(u.atoms.n_atoms))
-        _write_ndx_group("Receptor", (a.index for a in receptor_atoms))
-        _write_ndx_group("Ligand", (a.index for a in ligand_atoms))
-        ndx_path.write_text("\n".join(ndx_lines) + "\n")
-
-        print(f"Index groups: Receptor ({n_receptor} atoms), Ligand ({n_ligand} atoms)")
-
-        # ── Step 2: Create MDP with energy groups ─────────────────────────
         base_mdp = Path(args.mdp_file) if args.mdp_file else None
         if not base_mdp or not base_mdp.exists():
+            found_mdp = _find_file(tpr_path.parent, ["md.mdp", "prod.mdp", "mdout.mdp"], extra_globs=["*.mdp"])
+            base_mdp = found_mdp
+        if not base_mdp or not Path(base_mdp).exists():
             base_mdp = temp_dir / "minimal.mdp"
             base_mdp.write_text(textwrap.dedent("""\
                 integrator = md
-                nsteps = 0
                 dt = 0.002
-                nstxout = 0
-                nstvout = 0
-                nstfout = 0
-                nstlog = 1
-                nstenergy = 1
-                nstxout-compressed = 0
-                continuation = yes
-                constraint_algorithm = lincs
-                constraints = h-bonds
                 cutoff-scheme = Verlet
-                nstlist = 1
+                nstlist = 10
                 rlist = 1.2
                 coulombtype = PME
                 rcoulomb = 1.2
                 vdwtype = Cut-off
                 rvdw = 1.2
                 pbc = xyz
+                constraints = h-bonds
+                constraint_algorithm = lincs
             """))
-
         energy_mdp = temp_dir / "energy.mdp"
-        _build_energy_mdp(base_mdp, energy_mdp)
+        _build_energy_mdp(Path(base_mdp), energy_mdp)
 
-        # ── Step 3: Find .top file for grompp (TPR cannot be used with -p) ───────────
-        top_path = None
-        if args.topology.endswith(".tpr"):
-            top_dir = Path(args.topology).parent
-            # Copy all topology files from production directory for grompp
-            for itp_file in top_dir.glob("*.itp"):
-                shutil.copy2(itp_file, temp_dir / itp_file.name)
-            for top_file in top_dir.glob("*.top"):
-                shutil.copy2(top_file, temp_dir / top_file.name)
-            # Also copy local forcefield directory if exists
-            for ff_dir in top_dir.glob("*.ff"):
-                if ff_dir.is_dir():
-                    shutil.copytree(ff_dir, temp_dir / ff_dir.name, dirs_exist_ok=True)
-
-            # Look for existing .top file
-            for candidate in [top_dir / "topol.top", top_dir / "system.top"]:
-                if candidate.exists():
-                    top_path = candidate
-                    break
-            if not top_path:
-                # Extract topology from TPR using gmx dump
-                top_path = temp_dir / "extracted.top"
-                _run([
-                    gmx_bin, "dump", "-s", str(args.topology), "-o", str(top_path)
-                ], check=False)
-                if not top_path.exists() or top_path.stat().st_size == 0:
-                    raise RuntimeError("Could not extract topology from TPR")
+        top_for_grompp = _stage_topology(tpr_path, temp_dir)
+        if top_for_grompp:
+            log.info("Using topology for grompp: %s", top_for_grompp.name)
         else:
-            top_path = Path(args.topology)
+            log.warning(
+                "No .top file found next to the TPR. MM will use a Coulomb fallback "
+                "from topology charges (approximate LJ)."
+            )
 
-        # Pre-generate a TPR with energy groups for reuse
-        energy_tpr = temp_dir / "energy.tpr"
-        _run([
-            gmx_bin, "grompp",
-            "-f", str(energy_mdp),
-            "-c", str(args.topology),  # TPR contains coordinates
-            "-p", str(top_path),       # Use .top file
-            "-n", str(ndx_path),
-            "-o", str(energy_tpr),
-            "-maxwarn", "5",
-        ], check=False)
+        # Frame-0 GRO of the FULL system (atom order matches TPR/topology).
+        u.trajectory[frame_indices[0]]
+        gro0 = temp_dir / "frame0.gro"
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            u.atoms.write(str(gro0))
 
-        base_tpr = energy_tpr if energy_tpr.exists() else None
+        if top_for_grompp is not None:
+            energy_tpr = temp_dir / "energy.tpr"
+            gp = _run(
+                [
+                    gmx_bin, "grompp",
+                    "-f", str(energy_mdp),
+                    "-c", str(gro0),
+                    "-p", str(top_for_grompp),
+                    "-n", str(ndx_path),
+                    "-o", str(energy_tpr),
+                    "-maxwarn", "10",
+                ],
+                cwd=str(temp_dir),
+                check=False,
+                log_name="grompp",
+            )
+            if not energy_tpr.exists():
+                log.warning("grompp failed; MM fallback will be used.\n%s", (gp.stderr or "")[-1500:])
+                energy_tpr = None
+            else:
+                log.info("Energy-groups TPR ready")
 
-        # ── Step 4: For each frame, extract energies ──────────────────────
+        use_apbs = bool(args.use_apbs) and _which("apbs")
+        if args.use_apbs and not _which("apbs"):
+            log.warning("apbs not on PATH; polar solvation will be 0. Install APBS or pass --no-apbs.")
+            use_apbs = False
+
         results = []
-        pdb_complex = temp_dir / "complex.pdb"
-        pdb_receptor = temp_dir / "receptor.pdb"
-        pdb_ligand = temp_dir / "ligand.pdb"
-
-        for idx, fidx in enumerate(frame_indices):
+        for i, fidx in enumerate(frame_indices):
             u.trajectory[fidx]
-            frame = u.trajectory.frame
-            time_ps = u.trajectory.time
-            print(f"\n  Frame {idx + 1}/{len(frame_indices)} (frame={frame}, t={time_ps:.1f} ps)")
+            frame = int(u.trajectory.frame)
+            time_ps = float(u.trajectory.time)
+            log.info("Frame %d/%d  (frame=%d  t=%.1f ps)", i + 1, len(frame_indices), frame, time_ps)
 
-            # Write frame PDB
-            u.select_atoms("all").write(str(pdb_complex))
-            receptor_atoms.write(str(pdb_receptor))
-            ligand_atoms.write(str(pdb_ligand))
-
-            # ── MM energy via GROMACS ─────────────────────────────────────
             frame_work = temp_dir / f"frame_{fidx:06d}"
             frame_work.mkdir(exist_ok=True)
-            shutil.copy2(pdb_complex, frame_work / "complex.pdb")
-            shutil.copy2(ndx_path, frame_work / "index.ndx")
 
-            # grompp to create frame TPR with energy groups
-            tpr_frame = frame_work / "frame.tpr"
-            # Use topology file from temp_dir (copied with all includes)
-            frame_top = temp_dir / top_path.name
-            _run([
-                gmx_bin, "grompp",
-                "-f", str(energy_mdp),
-                "-c", str(frame_work / "complex.pdb"),
-                "-p", str(frame_top),
-                "-n", str(frame_work / "index.ndx"),
-                "-o", str(tpr_frame),
-                "-maxwarn", "5",
-            ], cwd=str(frame_work), check=False)
+            # Full-system GRO for MM rerun
+            gro_full = frame_work / "full.gro"
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                u.atoms.write(str(gro_full))
 
-            if not tpr_frame.exists():
-                print("    Warning: grompp failed, skipping MM energy for this frame")
-                vdw_kj, elec_kj = 0.0, 0.0
-            else:
-                # mdrun -rerun to compute energies (no -n flag; index is in TPR)
+            vdw = elec = 0.0
+            mm_ok = False
+            if energy_tpr is not None:
                 rerun_edr = frame_work / "frame.edr"
-                _run([
-                    gmx_bin, "mdrun",
-                    "-s", str(tpr_frame),
-                    "-rerun", str(frame_work / "complex.pdb"),
-                    "-e", str(rerun_edr),
-                    "-o", str(frame_work / "frame.xtc"),
-                ], cwd=str(frame_work), check=False)
-
-                # Extract interaction energies
-                vdw_kj, elec_kj = 0.0, 0.0
+                rerun_log = frame_work / "frame.log"
+                md = _run(
+                    [
+                        gmx_bin, "mdrun",
+                        "-s", str(energy_tpr),
+                        "-rerun", str(gro_full),
+                        "-e", str(rerun_edr),
+                        "-g", str(rerun_log),
+                        "-o", str(frame_work / "frame.trr"),
+                        "-cpo", str(frame_work / "state.cpt"),
+                        "-ntomp", "1",
+                        "-nb", "cpu",
+                    ],
+                    cwd=str(frame_work),
+                    check=False,
+                    log_name="mdrun -rerun",
+                )
                 try:
-                    vdw_kj, elec_kj, _ = _extract_interaction_energy(
-                        gmx_bin, rerun_edr, tpr_frame
-                    )
-                    print(f"    MM: vdW={vdw_kj * KJ_TO_KCAL:+.2f}  Elec={elec_kj * KJ_TO_KCAL:+.2f} kcal/mol")
+                    vdw_kj, elec_kj = _extract_interaction_energy(gmx_bin, rerun_edr, energy_tpr)
+                    vdw = vdw_kj * KJ_TO_KCAL
+                    elec = elec_kj * KJ_TO_KCAL
+                    mm_ok = True
                 except Exception as exc:
-                    print(f"    Warning: MM energy extraction failed: {exc}")
+                    log.warning("MM extraction failed: %s", exc)
+                    if md.stderr:
+                        log.debug("%s", md.stderr[-800:])
+            if not mm_ok:
+                vdw, elec = _mm_coulomb_fallback(
+                    receptor_atoms, ligand_atoms, u.dimensions[:3]
+                )
+                log.info("    MM fallback (charges): vdW=%+.2f  Elec=%+.2f kcal/mol", vdw, elec)
+            else:
+                log.info("    MM: vdW=%+.2f  Elec=%+.2f kcal/mol", vdw, elec)
 
-            # Convert to kcal/mol
-            vdw = vdw_kj * KJ_TO_KCAL
-            elec = elec_kj * KJ_TO_KCAL
-
-            # ── Polar solvation (PB) via APBS ────────────────────────────
             polar_solv = 0.0
-            if args.use_apbs:
+            if use_apbs:
                 try:
-                    pqr_complex = frame_work / "complex.pqr"
-                    pqr_receptor = frame_work / "receptor.pqr"
-                    pqr_ligand = frame_work / "ligand.pqr"
-
-                    _run_pdb2pqr(pdb_complex, pqr_complex, pH=args.pH)
-                    _run_pdb2pqr(pdb_receptor, pqr_receptor, pH=args.pH)
-                    _run_pdb2pqr(pdb_ligand, pqr_ligand, pH=args.pH)
-
-                    dx_c = _run_apbs(pqr_complex, "complex",
-                                     temp=args.temperature, ionic=args.ionic_strength)
-                    dx_r = _run_apbs(pqr_receptor, "receptor",
-                                     temp=args.temperature, ionic=args.ionic_strength)
-                    dx_l = _run_apbs(pqr_ligand, "ligand",
-                                     temp=args.temperature, ionic=args.ionic_strength)
-
-                    e_c = _compute_elec_energy_pqr(pqr_complex, dx_c, temp=args.temperature)
-                    e_r = _compute_elec_energy_pqr(pqr_receptor, dx_r, temp=args.temperature)
-                    e_l = _compute_elec_energy_pqr(pqr_ligand, dx_l, temp=args.temperature)
+                    pqr_c = frame_work / "complex.pqr"
+                    pqr_r = frame_work / "receptor.pqr"
+                    pqr_l = frame_work / "ligand.pqr"
+                    _write_pqr(complex_atoms, pqr_c, chain="C")
+                    _write_pqr(receptor_atoms, pqr_r, chain="R")
+                    _write_pqr(ligand_atoms, pqr_l, chain="L")
+                    dime, cglen, fglen, center = _grid_from_coords(complex_atoms.positions)
+                    kwargs = dict(
+                        dime=dime, cglen=cglen, fglen=fglen, center=center,
+                        temp=args.temperature, ionic=args.ionic_strength,
+                        pdie=args.pdie, sdie=args.sdie,
+                    )
+                    e_c = _run_apbs_energy(pqr_c, frame_work, **kwargs)
+                    e_r = _run_apbs_energy(pqr_r, frame_work, **kwargs)
+                    e_l = _run_apbs_energy(pqr_l, frame_work, **kwargs)
                     polar_solv = e_c - e_r - e_l
-                    print(f"    PB: {polar_solv:+.2f} kcal/mol")
+                    log.info("    PB: %+.2f kcal/mol", polar_solv)
                 except Exception as exc:
-                    print(f"    Warning: PB calculation failed: {exc}")
+                    log.warning("    PB failed: %s", exc)
 
-            # ── Non-polar solvation (SA) ──────────────────────────────────
-            sa_c = _compute_sa(u, "all")
-            sa_r = _compute_sa(u, sel_receptor)
-            sa_l = _compute_sa(u, sel_ligand)
-            gamma = args.surface_tension
-            nonpolar_solv = gamma * (sa_c - sa_r - sa_l)
-            print(f"    SA: ΔSA={sa_c - sa_r - sa_l:.1f} Å²  ΔG_SA={nonpolar_solv:+.2f} kcal/mol")
+            sa_c = _compute_sa(complex_atoms)
+            sa_r = _compute_sa(receptor_atoms)
+            sa_l = _compute_sa(ligand_atoms)
+            dsa = sa_c - sa_r - sa_l
+            nonpolar_solv = args.surface_tension * dsa
+            log.info("    SA: ΔSA=%.1f Å²  ΔG_SA=%+.2f kcal/mol", dsa, nonpolar_solv)
 
-            # ── Total ─────────────────────────────────────────────────────
             delta_g = vdw + elec + polar_solv + nonpolar_solv
-            print(f"    ΔG_total = {delta_g:+.2f} kcal/mol")
+            log.info("    ΔG_total = %+.2f kcal/mol", delta_g)
 
             results.append({
                 "frame": frame,
@@ -754,265 +964,76 @@ def calculate_mmpbsa(args):
                 "SA_ligand": sa_l,
             })
 
-    finally:
-        shutil.rmtree(temp_dir, ignore_errors=True)
+            # keep disk light
+            for leftover in frame_work.glob("*.trr"):
+                leftover.unlink(missing_ok=True)
+            for leftover in frame_work.glob("*.cpt"):
+                leftover.unlink(missing_ok=True)
 
-    if not results:
-        raise SystemExit("No frames were processed.")
+        if not results:
+            raise SystemExit("No frames were processed.")
 
-    # ── Write per-frame CSV ───────────────────────────────────────────────
-    csv_path = out_dir / "mmpbsa_results.csv"
-    fieldnames = list(results[0].keys())
-    with open(csv_path, "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(results)
-    print(f"\nPer-frame results: {csv_path}")
+        csv_path = out_dir / "mmpbsa_results.csv"
+        with open(csv_path, "w", newline="") as fh:
+            writer = csv.DictWriter(fh, fieldnames=list(results[0].keys()))
+            writer.writeheader()
+            writer.writerows(results)
+        log.info("Per-frame results: %s", csv_path)
 
-    # ── Summary statistics ────────────────────────────────────────────────
-    components = ["vdw", "elec", "polar_solv", "nonpolar_solv", "delta_G"]
-    summary = {}
-    for comp in components:
-        values = np.array([r[comp] for r in results])
-        summary[comp] = {
-            "mean": float(np.mean(values)),
-            "std": float(np.std(values)),
-            "median": float(np.median(values)),
-            "min": float(np.min(values)),
-            "max": float(np.max(values)),
-            "sem": float(np.std(values) / np.sqrt(len(values))),
-        }
-
-    summary_csv = out_dir / "mmpbsa_summary.csv"
-    with open(summary_csv, "w", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow(["Component", "Mean (kcal/mol)", "Std Dev", "Median", "Min", "Max", "SEM"])
+        components = ["vdw", "elec", "polar_solv", "nonpolar_solv", "delta_G"]
+        summary = {}
         for comp in components:
-            s = summary[comp]
-            writer.writerow([comp, f"{s['mean']:.4f}", f"{s['std']:.4f}",
-                             f"{s['median']:.4f}", f"{s['min']:.4f}",
-                             f"{s['max']:.4f}", f"{s['sem']:.4f}"])
-    print(f"Summary: {summary_csv}")
+            values = np.array([r[comp] for r in results], dtype=float)
+            summary[comp] = {
+                "mean": float(np.mean(values)),
+                "std": float(np.std(values)),
+                "median": float(np.median(values)),
+                "min": float(np.min(values)),
+                "max": float(np.max(values)),
+                "sem": float(np.std(values) / np.sqrt(len(values))),
+            }
 
-    summary_json = {
-        "n_frames": len(results),
-        "frame_step": frame_step,
-        "temperature": args.temperature,
-        "pH": args.pH,
-        "ionic_strength": args.ionic_strength,
-        "surface_tension": args.surface_tension,
-        "energy_method": "GROMACS (force-field parameters from TPR)",
-        "pb_method": "APBS Poisson-Boltzmann" if args.use_apbs else "skipped",
-        "selections": {
-            "receptor": sel_receptor,
-            "ligand": sel_ligand,
-        },
-        "components": summary,
-    }
-    json_path = out_dir / "mmpbsa_summary.json"
-    json_path.write_text(json.dumps(summary_json, indent=2))
-    print(f"JSON summary: {json_path}")
+        with open(out_dir / "mmpbsa_summary.csv", "w", newline="") as fh:
+            w = csv.writer(fh)
+            w.writerow(["Component", "Mean (kcal/mol)", "Std Dev", "Median", "Min", "Max", "SEM"])
+            for comp in components:
+                s = summary[comp]
+                w.writerow([comp, f"{s['mean']:.4f}", f"{s['std']:.4f}", f"{s['median']:.4f}",
+                            f"{s['min']:.4f}", f"{s['max']:.4f}", f"{s['sem']:.4f}"])
 
-    # ── Per-residue decomposition ─────────────────────────────────────────
-    if args.decompose:
-        print("\nRunning per-residue decomposition...")
-        _per_residue_decomposition(u, sel_receptor, sel_ligand, frame_indices, out_dir, args)
+        summary_json = {
+            "n_frames": len(results),
+            "frame_step": frame_step,
+            "temperature": args.temperature,
+            "pH": args.pH,
+            "ionic_strength": args.ionic_strength,
+            "surface_tension": args.surface_tension,
+            "energy_method": "GROMACS energy groups" if energy_tpr is not None else "charge-based Coulomb fallback",
+            "pb_method": "APBS Poisson-Boltzmann (calcenergy)" if use_apbs else "skipped",
+            "selections": {"receptor": sel_receptor[:200], "ligand": sel_ligand[:200]},
+            "components": summary,
+        }
+        (out_dir / "mmpbsa_summary.json").write_text(json.dumps(summary_json, indent=2))
+        log.info("JSON summary: %s", out_dir / "mmpbsa_summary.json")
 
-    # ── Plots ─────────────────────────────────────────────────────────────
-    _generate_plots(results, summary, out_dir)
+        if args.decompose:
+            log.info("Running per-residue decomposition...")
+            _per_residue_decomposition(u, receptor_atoms, ligand_atoms, frame_indices, out_dir)
 
-    print("\nMM-PBSA calculation complete.")
-    return summary_json
+        _generate_plots(results, summary, out_dir)
+        log.info("MM-PBSA calculation complete.")
+        print("MMPBSA_STATUS=success")
+        print(f"MMPBSA_DELTA_G={summary['delta_G']['mean']:.4f}")
+        return summary_json
 
-
-def _per_residue_decomposition(u, sel_receptor, sel_ligand, frame_indices, out_dir, args):
-    """Per-residue decomposition using pair-wise distances and charges.
-
-    Note: This uses generic LJ parameters since force-field-specific
-    parameters are not easily extracted per-atom from the trajectory.
-    The electrostatic component uses actual charges from the topology.
-    """
-    rec_atoms = u.select_atoms(sel_receptor)
-    residues = rec_atoms.residues
-    decomp_results = []
-
-    # Pre-select ligand atoms once
-    lig_atoms = u.select_atoms(sel_ligand)
-
-    for res in residues:
-        res_name = f"{res.resname}{res.resid}"
-        res_atoms = res.atoms
-
-        vdw_list = []
-        elec_list = []
-
-        # Use configurable frame limit
-        max_decomp_frames = min(20, len(frame_indices))
-        for fidx in frame_indices[:max_decomp_frames]:
-            u.trajectory[fidx]
-            rec_pos = res_atoms.positions / NM_TO_ANG  # Å to nm
-            lig_pos = lig_atoms.positions / NM_TO_ANG
-
-            # PBC-aware minimum image distances
-            box = u.trajectory.dimensions[:3] / NM_TO_ANG  # box in nm
-            energy = 0.0
-            for i in range(len(lig_pos)):
-                diffs = rec_pos - lig_pos[i]
-                # Minimum image convention
-                diffs = diffs - box * np.round(diffs / box)
-                dists = np.sqrt(np.sum(diffs ** 2, axis=1))
-                mask = dists < 1.2  # 1.2 nm cutoff
-                if not np.any(mask):
-                    continue
-                close_dists = dists[mask]
-                # Generic LJ params (not force-field specific, but avoids crash)
-                sigma = 0.35
-                epsilon = 0.1
-                sr6 = (sigma / close_dists) ** 6
-                energy += 4.0 * epsilon * np.sum(sr6 ** 2 - sr6)
-            vdw_list.append(energy)
-
-            # Electrostatics using actual charges if available
-            try:
-                rec_q = res_atoms.charges
-                lig_q = lig_atoms.charges
-                if len(rec_q) > 0 and len(lig_q) > 0:
-                    e_elec = 0.0
-                    for i in range(len(lig_pos)):
-                        diffs = rec_pos - lig_pos[i]
-                        diffs = diffs - box * np.round(diffs / box)
-                        dists = np.sqrt(np.sum(diffs ** 2, axis=1))
-                        mask = dists > 0.01
-                        if np.any(mask):
-                            e_elec += 332.0636 * np.sum(rec_q[mask] * lig_q[i] / dists[mask])
-                    elec_list.append(e_elec)
-                else:
-                    elec_list.append(0.0)
-            except Exception:
-                elec_list.append(0.0)
-
-        # Safe mean calculation
-        vdw_mean = float(np.mean(vdw_list)) if vdw_list else 0.0
-        elec_mean = float(np.mean(elec_list)) if elec_list else 0.0
-        if vdw_list and elec_list and len(vdw_list) == len(elec_list):
-            total_mean = float(np.mean(np.array(vdw_list) + np.array(elec_list)))
+    finally:
+        if keep_temp:
+            log.info("Temp dir kept: %s", temp_dir)
         else:
-            total_mean = vdw_mean + elec_mean
-
-        decomp_results.append({
-            "residue": res_name,
-            "resid": int(res.resid),
-            "resname": res.resname,
-            "vdw_mean": vdw_mean,
-            "elec_mean": elec_mean,
-            "total_mean": total_mean,
-        })
-
-    csv_path = out_dir / "decomposition.csv"
-    with open(csv_path, "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=["residue", "resid", "resname",
-                                                "vdw_mean", "elec_mean", "total_mean"])
-        writer.writeheader()
-        writer.writerows(decomp_results)
-    print(f"Per-residue decomposition: {csv_path}")
-
-    decomp_results.sort(key=lambda x: x["total_mean"])
-    summary_path = out_dir / "decomposition_summary.json"
-    summary_path.write_text(json.dumps({
-        "top_binding": decomp_results[:10],
-        "top_repulsive": decomp_results[-10:][::-1],
-    }, indent=2))
-
-    # Plot
-    try:
-        import matplotlib
-        matplotlib.use("Agg")
-        import matplotlib.pyplot as plt
-
-        fig, ax = plt.subplots(figsize=(14, 6))
-        totals = [d["total_mean"] for d in decomp_results]
-        colors = ["#16a34a" if t < 0 else "#dc2626" for t in totals]
-        ax.bar(range(len(totals)), totals, color=colors, width=1.0, edgecolor="none")
-        res_names = [d["residue"] for d in decomp_results]
-        step = max(1, len(res_names) // 20)
-        ax.set_xticks(range(0, len(res_names), step))
-        ax.set_xticklabels([res_names[i] for i in range(0, len(res_names), step)],
-                           rotation=45, ha="right", fontsize=8)
-        ax.set_ylabel("ΔG Contribution (kcal/mol)")
-        ax.set_title("Per-Residue Energy Decomposition")
-        ax.axhline(y=0, color="black", linewidth=0.5)
-        ax.grid(axis="y", alpha=0.3)
-        fig.tight_layout()
-        fig.savefig(str(out_dir / "decomposition_plot.png"), dpi=200)
-        plt.close(fig)
-    except Exception as exc:
-        print(f"Warning: Could not generate decomposition plot: {exc}")
+            shutil.rmtree(temp_dir, ignore_errors=True)
 
 
-def _generate_plots(results, summary, out_dir):
-    """Generate analysis plots."""
-    try:
-        import matplotlib
-        matplotlib.use("Agg")
-        import matplotlib.pyplot as plt
-    except ImportError:
-        print("Warning: matplotlib not available, skipping plots.")
-        return
-
-    components = ["vdw", "elec", "polar_solv", "nonpolar_solv", "delta_G"]
-    labels = ["vdW", "Electrostatics", "Polar Solv.", "Nonpolar Solv.", "Total ΔG"]
-    colors = ["#2563eb", "#dc2626", "#16a34a", "#ca8a04", "#7c3aed"]
-
-    # Bar chart
-    fig, ax = plt.subplots(figsize=(10, 6))
-    means = [summary[c]["mean"] for c in components]
-    stds = [summary[c]["std"] for c in components]
-    bars = ax.bar(labels, means, yerr=stds, capsize=5, color=colors,
-                  edgecolor="black", linewidth=0.5)
-    ax.set_ylabel("Energy (kcal/mol)", fontsize=12)
-    ax.set_title("MM-PBSA Binding Free Energy Decomposition", fontsize=14)
-    ax.axhline(y=0, color="black", linewidth=0.5)
-    ax.grid(axis="y", alpha=0.3)
-    for bar, val in zip(bars, means):
-        ax.text(bar.get_x() + bar.get_width() / 2,
-                bar.get_height() + 0.5 * np.sign(bar.get_height()),
-                f"{val:.2f}", ha="center",
-                va="bottom" if val >= 0 else "top", fontsize=10)
-    fig.tight_layout()
-    fig.savefig(str(out_dir / "mmpbsa_decomposition.png"), dpi=200)
-    plt.close(fig)
-    print(f"Decomposition plot: {out_dir / 'mmpbsa_decomposition.png'}")
-
-    # Time series
-    times = [r["time_ps"] for r in results]
-    fig, axes = plt.subplots(2, 2, figsize=(12, 8))
-    plot_data = [
-        ("vdw", "van der Waals", "#2563eb", axes[0, 0]),
-        ("elec", "Electrostatics", "#dc2626", axes[0, 1]),
-        ("polar_solv", "Polar Solvation", "#16a34a", axes[1, 0]),
-        ("delta_G", "Total ΔG Binding", "#7c3aed", axes[1, 1]),
-    ]
-    for key, title, color, ax in plot_data:
-        vals = [r[key] for r in results]
-        ax.plot(times, vals, color=color, linewidth=0.8, alpha=0.7)
-        ax.set_title(title, fontsize=11)
-        ax.set_ylabel("kcal/mol")
-        ax.grid(alpha=0.3)
-        mean_val = np.mean(vals)
-        ax.axhline(y=mean_val, color=color, linestyle="--", alpha=0.5,
-                   label=f"mean={mean_val:.2f}")
-        ax.legend(fontsize=9)
-    axes[1, 0].set_xlabel("Time (ps)")
-    axes[1, 1].set_xlabel("Time (ps)")
-    fig.suptitle("MM-PBSA Energy Components Over Time", fontsize=13)
-    fig.tight_layout()
-    fig.savefig(str(out_dir / "mmpbsa_timeseries.png"), dpi=200)
-    plt.close(fig)
-    print(f"Time series plot: {out_dir / 'mmpbsa_timeseries.png'}")
-
-
-# ── CLI ────────────────────────────────────────────────────────────────────────
-def parse_args():
+def parse_args(argv=None):
     p = argparse.ArgumentParser(description="MM-PBSA binding free energy calculation")
     p.add_argument("-t", "--trajectory", required=True, help="GROMACS trajectory (.xtc)")
     p.add_argument("-s", "--topology", required=True, help="GROMACS topology (.tpr or .gro)")
@@ -1020,24 +1041,43 @@ def parse_args():
     p.add_argument("-n", "--index-file", default=None, help="GROMACS index file (.ndx)")
     p.add_argument("-f", "--mdp-file", default=None, help="MDP template file")
     p.add_argument("--gmx-bin", default="gmx", help="GROMACS binary")
-    p.add_argument("--receptor-selection", default=None, help="MDAnalysis selection for receptor")
-    p.add_argument("--ligand-selection", default=None, help="MDAnalysis selection for ligand")
+    p.add_argument("--receptor-selection", default=None, help="MDAnalysis selection or 'group NAME'")
+    p.add_argument("--ligand-selection", default=None, help="MDAnalysis selection or 'group NAME'")
     p.add_argument("--frame-step", type=int, default=10, help="Process every N-th frame")
     p.add_argument("--max-frames", type=int, default=None, help="Maximum frames")
     p.add_argument("--temperature", type=float, default=300.0, help="Temperature (K)")
-    p.add_argument("--pH", type=float, default=7.0, help="pH for protonation")
+    p.add_argument("--pH", type=float, default=7.0, help="pH (kept for compatibility)")
     p.add_argument("--ionic-strength", type=float, default=0.15, help="Ionic strength (M)")
     p.add_argument("--surface-tension", type=float, default=0.0072,
                    help="Surface tension (kcal/mol/Å²)")
-    p.add_argument("--use-apbs", action="store_true", default=True,
-                   help="Use APBS for polar solvation")
-    p.add_argument("--no-apbs", action="store_false", dest="use_apbs",
-                   help="Skip APBS")
-    p.add_argument("--decompose", action="store_true", default=False,
-                   help="Per-residue decomposition")
-    return p.parse_args()
+    p.add_argument("--pdie", type=float, default=2.0, help="Solute dielectric for APBS")
+    p.add_argument("--sdie", type=float, default=78.54, help="Solvent dielectric for APBS")
+    p.add_argument("--use-apbs", action="store_true", default=True, help="Use APBS for polar solvation")
+    p.add_argument("--no-apbs", action="store_false", dest="use_apbs", help="Skip APBS")
+    p.add_argument("--decompose", action="store_true", default=False, help="Per-residue decomposition")
+    p.add_argument("--keep-temp", action="store_true", help="Keep per-frame working directory")
+    return p.parse_args(argv)
+
+
+def main(argv=None):
+    logging.basicConfig(
+        level=logging.INFO,
+        format="[%(asctime)s] %(levelname)s %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+        stream=sys.stdout,
+    )
+    args = parse_args(argv)
+    try:
+        calculate_mmpbsa(args)
+    except SystemExit:
+        print("MMPBSA_STATUS=failed")
+        raise
+    except Exception as exc:
+        log.error("%s", exc)
+        print("MMPBSA_STATUS=failed")
+        return 1
+    return 0
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    calculate_mmpbsa(args)
+    sys.exit(main())

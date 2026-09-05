@@ -32,7 +32,7 @@ COMPATIBLE_SETS = {
         ("oplsaa", "tip4p"),
         ("oplsaa", "spce"),
     ],
-    "pypolybuilder": [
+    "atb": [
         ("gromos54a7", "spc"),
         ("gromos54a7", "spce"),
         ("gromos53a6", "spc"),
@@ -40,6 +40,10 @@ COMPATIBLE_SETS = {
         ("gromos45a3", "spc"),
         ("gromos43a2", "spc"),
         ("gromos43a1", "spc"),
+        ("amber99sb-ildn", "tip3p"),
+        ("amber14sb", "tip3p"),
+        ("charmm36", "tip3p"),
+        ("oplsaa", "tip4p"),
     ],
 }
 
@@ -115,9 +119,14 @@ def is_suitable_force_field(tool, force_field):
     if tool == "cgenff":
         return ff_family == "charmm"
     if tool == "acpype":
-        return ff_family in {"amber", "oplsaa"}
+        # ACPYPE is the app's available ligand generator for the AMBER,
+        # CHARMM, and OPLS choices listed in COMPATIBLE_SETS.
+        return ff_family in {"amber", "charmm", "oplsaa"}
     if tool == "pypolybuilder":
         return ff_family == "gromos"
+    if tool == "atb":
+        # ATB supports GROMOS, AMBER, CHARMM, and OPLS
+        return ff_family in {"gromos", "amber", "charmm", "oplsaa"}
     return False
 
 
@@ -146,26 +155,26 @@ def main():
             notes.append("Unsupported ligand-prep tool was replaced with acpype.")
 
         if auto_rectify in {"yes", "true", "1", "auto"}:
-            # A family-compatible name is insufficient when its .ff directory
-            # is not installed. Rectify before the protein step calls pdb2gmx.
-            if not is_suitable_force_field(tool, force_field) or not forcefield_exists(pipeline_dir, force_field):
-                new_force_field, new_water_model = first_available(tool, pipeline_dir)
-                if force_field != new_force_field:
-                    updates["FORCE_FIELD"] = new_force_field
-                notes.append(
-                    f"Auto-rectified unsuitable force field "
-                    f"{force_field}/{tool} to {new_force_field}/{tool}."
+            # The selected force field is authoritative: report an invalid
+            # choice instead of silently substituting the Amber default.
+            if not forcefield_exists(pipeline_dir, force_field):
+                raise SystemExit(
+                    f"Selected force field '{force_field}' is not installed for this GROMACS setup. "
+                    "Install its .ff directory or choose an installed option."
                 )
-                force_field = new_force_field
+            if not is_suitable_force_field(tool, force_field):
+                raise SystemExit(
+                    f"Selected force field '{force_field}' is not supported by ligand preparation tool '{tool}'. "
+                    "Choose a compatible ligand tool or force field; the selection was not changed."
+                )
 
-            selected_water_model = canonical_water_model(force_field)
-            if selected_water_model and water_model != selected_water_model:
-                updates["WATER_MODEL"] = selected_water_model
-                notes.append(
-                    f"Auto-selected water model {selected_water_model} for force field {force_field} "
-                    f"instead of {water_model}."
+            supported_water_models = WATER_BY_FAMILY.get(family(force_field), set())
+            if water_model not in supported_water_models:
+                allowed = ", ".join(sorted(supported_water_models)) or "none"
+                raise SystemExit(
+                    f"Selected water model '{water_model}' is not supported by force field '{force_field}'. "
+                    f"Choose one of: {allowed}. The selection was not changed."
                 )
-                water_model = selected_water_model
 
         # Keep the resolved settings for later pipeline steps, which start in
         # fresh shells and otherwise reload the original job configuration.

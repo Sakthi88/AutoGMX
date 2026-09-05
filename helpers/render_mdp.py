@@ -27,6 +27,9 @@ def main():
         "NPT_STEPS": steps_from_env("NPT_STEPS", "NPT_TIME_PS", "TIMESTEP_PS"),
         "MD_STEPS": steps_from_env("MD_STEPS", "MD_TIME_NS", "TIMESTEP_PS", scale=1000.0),
         "TIMESTEP_PS": os.environ["TIMESTEP_PS"],
+        "MD_CONTINUATION": os.environ.get("MD_CONTINUATION") or "yes",
+        "MD_GEN_VEL": os.environ.get("MD_GEN_VEL") or "no",
+        "MD_GEN_SEED": os.environ.get("MD_GEN_SEED") or "-1",
     }
 
     rendered = text.format(**values)

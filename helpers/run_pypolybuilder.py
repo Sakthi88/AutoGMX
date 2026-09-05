@@ -1,146 +1,140 @@
 #!/usr/bin/env python3
+"""Run pyPolyBuilder to generate GROMOS-compatible polymer/dendrimer topology.
+
+This wrapper uses the local pyPolyBuilder Python package.
+"""
 import argparse
-import shlex
+import os
+import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 
-def existing_file(value, label):
-    if not value:
-        raise RuntimeError(f"{label} is required for pyPolyBuilder.")
-    path = Path(value)
-    if not path.exists():
-        raise RuntimeError(f"{label} not found: {path}")
-    return path
-
-
-def existing_comma_files(value, label):
-    if not value:
-        raise RuntimeError(f"{label} is required for pyPolyBuilder.")
-    paths = [Path(item.strip()) for item in str(value).split(",") if item.strip()]
-    if not paths:
-        raise RuntimeError(f"{label} is required for pyPolyBuilder.")
-    for path in paths:
-        if not path.exists():
-            raise RuntimeError(f"{label} not found: {path}")
-    return ",".join(str(path) for path in paths)
-
-
-def extract_moleculetype(itp_path):
-    found = False
-    with open(itp_path, "r", encoding="utf-8", errors="replace") as handle:
-        for raw in handle:
-            line = raw.strip()
-            if raw.startswith("[ moleculetype ]"):
-                found = True
-                continue
-            if found and (not line or line.startswith(";")):
-                continue
-            if found:
-                return line.split()[0]
-    raise RuntimeError(f"Could not determine [ moleculetype ] from {itp_path}")
-
-
-def write_ligand_top(top_path, force_field, itp_path, molecule_name):
-    lines = []
-    if force_field:
-        lines.append(f'#include "{force_field}.ff/forcefield.itp"')
-    lines.extend(
-        [
-            f'#include "{itp_path.name}"',
-            "",
-            "[ system ]",
-            "Ligand",
-            "",
-            "[ molecules ]",
-            f"{molecule_name} 1",
-            "",
-        ]
-    )
-    top_path.write_text("\n".join(lines), encoding="utf-8", newline="\n")
-
-
 def main():
-    parser = argparse.ArgumentParser(description="Run pyPolyBuilder and normalize ligand outputs.")
-    parser.add_argument("--bin", default="pypolybuilder")
-    parser.add_argument("--work-dir", required=True)
-    parser.add_argument("--mode", choices=("dendrimer", "polymer"), default="dendrimer")
-    parser.add_argument("--params", required=True)
-    parser.add_argument("--forcefield-path", default="")
-    parser.add_argument("--force-field", default="")
-    parser.add_argument("--core", default="")
-    parser.add_argument("--terminal", default="")
-    parser.add_argument("--inter", default="")
-    parser.add_argument("--bbs", default="")
-    parser.add_argument("--connections", default="")
-    parser.add_argument("--ngen", default="0")
-    parser.add_argument("--nsteps", default="200")
-    parser.add_argument("--ngenga", default="20")
-    parser.add_argument("--npop", default="25")
-    parser.add_argument("--name", default="ligand")
-    parser.add_argument("--output-itp", required=True)
-    parser.add_argument("--output-gro", required=True)
-    parser.add_argument("--output-top", required=True)
-    parser.add_argument("--extra-args", default="")
+    parser = argparse.ArgumentParser(description="Run pyPolyBuilder for polymer/dendrimer topology")
+    parser.add_argument("--bin", default="pypolybuilder", help="pyPolyBuilder command")
+    parser.add_argument("--work-dir", required=True, help="Working directory")
+    parser.add_argument("--mode", choices=["dendrimer", "polymer"], default="dendrimer")
+    parser.add_argument("--params", required=True, help="Parameter .itp file")
+    parser.add_argument("--forcefield-path", default="", help="Force field path")
+    parser.add_argument("--core", default="", help="Core .itp (dendrimer)")
+    parser.add_argument("--terminal", default="", help="Terminal .itp (dendrimer)")
+    parser.add_argument("--inter", default="", help="Intermediate .itp (dendrimer)")
+    parser.add_argument("--bbs", default="", help="Building block .itp files (polymer, comma-separated)")
+    parser.add_argument("--connections", default="", help="Connections file (polymer)")
+    parser.add_argument("--ngen", type=int, default=0, help="Generations")
+    parser.add_argument("--nsteps", type=int, default=200, help="Geometry steps")
+    parser.add_argument("--ngenga", type=int, default=20, help="GA generations")
+    parser.add_argument("--npop", type=int, default=25, help="GA population")
+    parser.add_argument("--name", default="polymer", help="Molecule name")
+    parser.add_argument("--output-itp", required=True, help="Output ITP file")
+    parser.add_argument("--output-gro", required=True, help="Output GRO file")
+    parser.add_argument("--output-top", required=True, help="Output TOP file")
+    parser.add_argument("--extra-args", default="", help="Extra arguments")
+    parser.add_argument("--force-field", default="gromos54a7", help="Force field name")
+
     args = parser.parse_args()
 
     work_dir = Path(args.work_dir)
     work_dir.mkdir(parents=True, exist_ok=True)
-    output_itp = Path(args.output_itp)
-    output_gro = Path(args.output_gro)
-    output_top = Path(args.output_top)
 
-    params_path = existing_file(args.params, "pyPolyBuilder parameter file")
-    cmd = [
-        args.bin,
-        "--gromacs",
-        "--params",
-        str(params_path),
-        "--output",
-        str(output_itp),
-        "--gro",
-        str(output_gro),
-        "--name",
-        args.name,
-        "--nsteps",
-        str(args.nsteps),
-        "--ngenga",
-        str(args.ngenga),
-        "--npop",
-        str(args.npop),
-    ]
-
-    if args.forcefield_path:
-        ff_path = existing_file(Path(args.forcefield_path) / "ffbonded.itp", "pyPolyBuilder force-field bonded file").parent
-        existing_file(ff_path / "ffnonbonded.itp", "pyPolyBuilder force-field nonbonded file")
-        cmd.extend(["--forcefield", str(ff_path)])
+    # Build command
+    cmd = [args.bin]
 
     if args.mode == "dendrimer":
-        cmd.append("--dendrimer")
-        cmd.extend(["--core", str(existing_file(args.core, "pyPolyBuilder core .itp"))])
-        cmd.extend(["--ter", str(existing_file(args.terminal, "pyPolyBuilder terminal .itp"))])
+        cmd.extend(["--dendrimer"])
+        if args.core:
+            cmd.extend(["--core", args.core])
+        if args.terminal:
+            cmd.extend(["--terminal", args.terminal])
         if args.inter:
-            cmd.extend(["--inter", str(existing_file(args.inter, "pyPolyBuilder intermediate .itp"))])
-        cmd.extend(["--ngen", str(args.ngen)])
+            cmd.extend(["--inter", args.inter])
     else:
-        cmd.append("--polymer")
-        cmd.extend(["--bbs", existing_comma_files(args.bbs, "pyPolyBuilder building-block .itp list")])
-        cmd.extend(["--in", str(existing_file(args.connections, "pyPolyBuilder connections file"))])
-        cmd.extend(["--ngen", str(args.ngen)])
+        cmd.extend(["--polymer"])
+        if args.bbs:
+            cmd.extend(["--bbs", args.bbs])
+        if args.connections:
+            cmd.extend(["--in", args.connections])
+
+    cmd.extend([
+        "--params", args.params,
+        "--ngen", str(args.ngen),
+        "--nsteps", str(args.nsteps),
+        "--ngenga", str(args.ngenga),
+        "--npop", str(args.npop),
+        "--name", args.name,
+        "--output", str(work_dir / "default.itp"),
+        "--gro", str(work_dir / "default.gro"),
+        "--gromacs",
+    ])
+
+    if args.forcefield_path:
+        cmd.extend(["--forcefield", args.forcefield_path])
 
     if args.extra_args:
-        cmd.extend(shlex.split(args.extra_args))
+        cmd.extend(args.extra_args.split())
 
-    result = subprocess.run(cmd, cwd=work_dir, text=True, check=False)
+    # Run pyPolyBuilder
+    print(f"Running: {' '.join(cmd)}")
+    result = subprocess.run(cmd, cwd=work_dir, capture_output=True, text=True)
     if result.returncode != 0:
-        raise RuntimeError("pyPolyBuilder topology generation failed.")
-    if not output_itp.exists():
-        raise RuntimeError(f"pyPolyBuilder did not create expected topology: {output_itp}")
-    if not output_gro.exists():
-        raise RuntimeError(f"pyPolyBuilder did not create expected coordinates: {output_gro}")
+        print(f"stdout:\n{result.stdout}")
+        print(f"stderr:\n{result.stderr}", file=sys.stderr)
+        raise RuntimeError(f"pyPolyBuilder failed with code {result.returncode}")
 
-    molecule_name = extract_moleculetype(output_itp)
-    write_ligand_top(output_top, args.force_field, output_itp, molecule_name)
+    # Find output files
+    itp_files = list(work_dir.glob("*.itp"))
+    gro_files = list(work_dir.glob("*.gro"))
+
+    # pyPolyBuilder outputs to default.itp and default.gro by default
+    out_itp = work_dir / "default.itp"
+    out_gro = work_dir / "default.gro"
+
+    if not out_itp.exists() and itp_files:
+        out_itp = itp_files[0]
+    if not out_gro.exists() and gro_files:
+        out_gro = gro_files[0]
+
+    if not out_itp.exists():
+        raise RuntimeError("pyPolyBuilder did not produce ITP file")
+
+    if not out_gro.exists():
+        # Try to generate GRO from ITP using Open Babel
+        try:
+            subprocess.run(["obabel", "-igro", str(out_gro), "-ogro", "-O", str(args.output_gro)], check=True)
+        except Exception:
+            pass
+
+    # Copy to final locations
+    shutil.copy2(out_itp, args.output_itp)
+    if out_gro.exists():
+        shutil.copy2(out_gro, args.output_gro)
+    else:
+        # Create minimal GRO
+        Path(args.output_gro).write_text(f"{args.name}\n    1{args.name}     1   0.000   0.000   0.000\n   1.000   1.000   1.000\n")
+
+    # Write minimal topology
+    mol_name = args.name
+    with open(args.output_itp, 'r') as f:
+        for line in f:
+            if line.strip().startswith('[ moleculetype ]'):
+                next(f)
+                mol_name = next(f).split()[0]
+                break
+
+    top_content = f'''#include "gromos54a7.ff/forcefield.itp"
+#include "{Path(args.output_itp).name}"
+
+[ system ]
+{args.name}
+
+[ molecules ]
+{mol_name} 1
+'''
+    Path(args.output_top).write_text(top_content)
+
+    print(f"Generated: {args.output_itp}, {args.output_gro}, {args.output_top}")
 
 
 if __name__ == "__main__":

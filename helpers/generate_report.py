@@ -215,13 +215,31 @@ def build_report(args):
     story.append(_param_table(params, styles))
     story.append(Spacer(1, 12))
 
+    manifest_path = analysis_dir.parent / "results" / "production" / "ensemble_manifest.json"
+    provenance = [
+        ("Checkpoint policy", config_data.get("CHECKPOINT_POLICY", "validate")),
+        ("Checkpoint interval (min)", config_data.get("CHECKPOINT_INTERVAL_MIN", 15)),
+        ("Production replicas", config_data.get("ENSEMBLE_REPLICAS", 1)),
+        ("Base random seed", config_data.get("ENSEMBLE_BASE_SEED", "N/A")),
+    ]
+    if manifest_path.exists():
+        try:
+            manifest = json.loads(manifest_path.read_text())
+            provenance.extend([("Recorded replicas", manifest.get("replicas", "N/A")), ("GROMACS version", manifest.get("gromacs_version", "unknown")), ("Ensemble method", manifest.get("mode", "N/A"))])
+        except (OSError, json.JSONDecodeError):
+            provenance.append(("Ensemble manifest", "Unreadable"))
+    story.append(Paragraph("2. Reproducibility and Restart Record", styles["SectionHead"]))
+    story.append(Paragraph("Deterministic replica seeds, periodic checkpoints, and checkpoint validation make this run restartable and auditable.", styles["BodyText2"]))
+    story.append(_param_table(provenance, styles))
+    story.append(Spacer(1, 12))
+
     # ── Section 2: Analysis Plots ─────────────────────────────────────────
     story.append(Paragraph("2. Structural Analysis", styles["SectionHead"]))
 
     plot_configs = [
         ("rmsd_protein.png", "RMSD - Protein"),
         ("rmsd_ligand.png", "RMSD - Ligand"),
-        ("rmsd_comparison.png", "RMSD Comparison (Protein vs Ligand)"),
+        ("rmsd_protein_ligand.png", "RMSD Comparison (Protein vs Ligand)"),
         ("rmsf_protein.png", "RMSF - Protein"),
         ("gyration_protein.png", "Radius of Gyration"),
         ("hbonds_protein_ligand.png", "Hydrogen Bonds (Protein-Ligand)"),
