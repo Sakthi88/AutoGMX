@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="tabs-shell">
+  <div class="workspace-heading">
+    <p class="eyebrow">Simulation workspace</p>
+    <h1>Full Automation Pipeline</h1>
+    <p>Configure an end-to-end protein-ligand molecular dynamics run.</p>
+  </div>
+  <div class="tab-rail" role="tablist" aria-label="MD workflow tabs">
+    <button type="button" class="tab-btn active" data-tab="auto">1 Full Automation</button>
+    <button type="button" class="tab-btn" data-tab="old">2 GRO + Topology</button>
+    <button type="button" class="tab-btn" data-tab="equil">3 Equilibration</button>
+    <button type="button" class="tab-btn" data-tab="nvt">4 NVT</button>
+    <button type="button" class="tab-btn" data-tab="npt">5 NPT</button>
+    <button type="button" class="tab-btn" data-tab="md">6 MD Run</button>
+    <button type="button" class="tab-btn" data-tab="analysis">7 Result Analysis</button>
+    <button type="button" class="tab-btn" data-tab="free">8 Free Energy</button>
+    <button type="button" class="tab-btn" data-tab="mmpbsa">9 MM-PBSA</button>
+  </div>
+
+  <div class="tab-grid">
+    <div class="tab-panels">
+      <section class="panel tab-panel active" data-panel="auto">
+        <div class="panel-head">
+          <h2>Full Automation</h2>
+          <p>Submit a docked complex and run the complete ligand-to-GROMACS workflow with your chosen topology generator.</p>
+        </div>
+        <form action="{{ url_for('full_auto_job') }}" method="post" enctype="multipart/form-data" class="upload-form">
+          <div class="triple">
+            <label><span>Project name</span><input type="text" name="project_name" value="protein_ligand_auto" required></label>
+            <label>
+              <span>Topology generator</span>
+              <select name="ligand_prep_tool" id="ligand_prep_tool">
+                <option value="acpype">ACPYPE (AMBER/GAFF)</option>
+                <option value="cgenff">CGenFF (CHARMM)</option>
+              </select>
+            </label>
+            <label><span>Ligand residue</span><input type="text" name="ligand_resname" value="LIG" maxlength="5" required></label>
+          </div>
+          <label class="file-drop file-drop-large"><span>Docked PDB file</span><input type="file" name="docking_file" accept=".pdb" required></label>
+          <div class="triple">
+            <label>
+              <span>Force field</span>
+              <select name="force_field" required>
+                {% for value, label in force_field_options %}
+                  <option value="{{ value }}" {% if value == "amber99sb-ildn" %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </label>
+            <label>
+              <span>Water model</span>
+              <select name="water_model">
+                {% for value, label in water_model_options %}
+                  <option value="{{ value }}" {% if value == "tip3p" %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </label>
+            <label><span>Net charge</span><input type="number" name="ligand_charge" value="0" required></label>
+          </div>
+          </div>
+          </div>
+          <div class="triple">
+            <label><span>Production time (ns)</span><input type="number" name="md_time_ns" value="100" min="1" required></label>
+            <label><span>CPU threads</span><select name="ntomp"><option value="auto" selected>Auto (detect)</option><option value="1">1</option><option value="2">2</option><option value="4">4</option><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="24">24</option><option value="32">32</option><option value="48">48</option><option value="64">64</option></select></label>
+            <label><span>GPU acceleration</span><select name="use_gpu"><option value="auto">Auto (all available GPUs)</option><option value="yes">Require GPU</option><option value="no">CPU only</option></select></label>
+          </div>
+          <label><span>GROMACS command</span><input type="text" name="gmx_bin" value="gmx" required></label>
+          <label class="checkbox"><input type="checkbox" name="strip_hetatm" checked><span>Strip protein heteroatoms</span></label>
+          <label class="checkbox"><input type="checkbox" name="md_center_nojump" checked><span>Create centered nojump trajectory</span></label>
+          <label class="checkbox"><input type="checkbox" name="auto_rectify" checked><span>Automatically rectify unsuitable force-field, water, and ligand settings</span></label>
+          <div class="analysis-chain">
+            <strong>After MD finishes</strong>
+            <label class="checkbox"><input type="checkbox" name="run_result_analysis" checked><span>Run result analysis</span></label>
+            <label class="checkbox"><input type="checkbox" name="run_free_energy" checked><span>Run linked free-energy task</span></label>
+          </div>
+          <button type="submit" class="primary-btn">Start Full Automatic MD</button>
+        </form>
+      </section>
+
+      <section class="panel tab-panel" data-panel="old">
+        <div class="panel-head">
+          <h2>Protein + Ligand GRO/Topology</h2>
+          <p>Old method continuation. Upload prepared protein and ligand files; the app assembles the complex and runs the remaining pipeline.</p>
+        </div>
+        <form action="{{ url_for('old_method_job') }}" method="post" enctype="multipart/form-data" class="upload-form">
+          <div class="triple">
+            <label><span>Project name</span><input type="text" name="project_name" value="old_method_continue" required></label>
+            <label>
+              <span>Force field</span>
+              <select name="force_field" required>
+                {% for value, label in force_field_options %}
+                  <option value="{{ value }}" {% if value == "amber99sb-ildn" %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </label>
+            <label>
+              <span>Water model</span>
+              <select name="water_model">
+                {% for value, label in water_model_options %}
+                  <option value="{{ value }}" {% if value == "tip3p" %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </label>
+          </div>
+          <div class="file-grid">
+            <label class="file-drop"><span>Protein GRO</span><input type="file" name="protein_gro" accept=".gro" required></label>
+            <label class="file-drop"><span>Protein topology TOP</span><input type="file" name="protein_top" accept=".top,.itp" required></label>
+            <label class="file-drop"><span>Ligand GRO</span><input type="file" name="ligand_gro" accept=".gro" required></label>
+            <label class="file-drop"><span>Ligand ITP</span><input type="file" name="ligand_itp" accept=".itp" required></label>
+            <label class="file-drop"><span>Ligand PRM (for custom atom types)</span><input type="file" name="ligand_prm" accept=".prm,.itp"></label>
+            <label class="file-drop"><span>Ligand restraints</span><input type="file" name="ligand_posre" accept=".itp"></label>
+          </div>
+          <div class="triple">
+            <label><span>Ligand residue</span><input type="text" name="ligand_resname" value="LIG" maxlength="5" required></label>
+            <label><span>Production time (ns)</span><input type="number" name="md_time_ns" value="100" min="1" required></label>
+            <label><span>CPU threads</span><select name="ntomp"><option value="auto" selected>Auto (detect)</option><option value="1">1</option><option value="2">2</option><option value="4">4</option><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="24">24</option><option value="32">32</option><option value="48">48</option><option value="64">64</option></select></label>
+          </div>
+          <label><span>GROMACS command</span><input type="text" name="gmx_bin" value="gmx" required></label>
+          <label class="checkbox"><input type="checkbox" name="auto_rectify" checked><span>Automatically rectify unsuitable force-field and water settings</span></label>
+          <div class="analysis-chain">
+            <strong>After MD finishes</strong>
+            <label class="checkbox"><input type="checkbox" name="run_result_analysis" checked><span>Run result analysis</span></label>
+            <label class="checkbox"><input type="checkbox" name="run_free_energy" checked><span>Run linked free-energy task</span></label>
+          </div>
+          <button type="submit" class="primary-btn">Assemble And Continue</button>
+        </form>
+      </section>
+
+      {% for tab_id, title, stage_type in [
+        ("equil", "Equilibration Only", "equilibration"),
+        ("nvt", "NVT Restart", "nvt"),
+        ("npt", "NPT Restart", "npt"),
+        ("md", "Production MD Restart", "md"),
+        ("analysis", "Result Analysis", "analysis")
+      ] %}
+      <section class="panel tab-panel" data-panel="{{ tab_id }}">
+        <div class="panel-head">
+          <h2>{{ title }}</h2>
+          <p>Select a previous run or upload a restart ZIP containing `work/`, `state/`, and `web_config.json` compatible files.</p>
+        </div>
+        <form action="{{ url_for('resume_stage_job') }}" method="post" enctype="multipart/form-data" class="upload-form">
+          <input type="hidden" name="stage_type" value="{{ stage_type }}">
+          <div class="double">
+            <label>
+              <span>Previous run</span>
+              <select name="previous_job_id">
+                <option value="">Upload restart ZIP instead</option>
+                {% for job in jobs %}
+                  <option value="{{ job.id }}">{{ job.project_name }} | {{ job.id }}</option>
+                {% endfor %}
+              </select>
+            </label>
+            <label class="file-drop"><span>Manual restart ZIP</span><input type="file" name="restart_zip" accept=".zip"></label>
+          </div>
+          <div class="triple">
+            <label><span>Project name</span><input type="text" name="project_name" value="{{ stage_type }}_restart" required></label>
+            <label><span>Production time (ns)</span><input type="number" name="md_time_ns" value="100" min="1" required></label>
+            <label><span>CPU threads</span><select name="ntomp"><option value="auto" selected>Auto (detect)</option><option value="1">1</option><option value="2">2</option><option value="4">4</option><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="24">24</option><option value="32">32</option><option value="48">48</option><option value="64">64</option></select></label>
+          </div>
+          <label class="checkbox"><input type="checkbox" name="auto_rectify" checked><span>Automatically rectify unsuitable force-field and water settings</span></label>
+          <label><span>GROMACS command</span><input type="text" name="gmx_bin" value="gmx" required></label>
+          <div class="analysis-chain">
+            <strong>Linked analysis</strong>
+            <label class="checkbox"><input type="checkbox" name="run_result_analysis" checked><span>Run result analysis</span></label>
+            <label class="checkbox"><input type="checkbox" name="run_free_energy" checked><span>Run linked free-energy task</span></label>
+          </div>
+          <button type="submit" class="primary-btn">Start {{ title }}</button>
+        </form>
+        {% if tab_id == "analysis" %}
+        <form action="{{ url_for('special_analysis_job') }}" method="post" enctype="multipart/form-data" class="upload-form linked-upload">
+          <input type="hidden" name="analysis_type" value="result_analysis">
+          <label><span>Project name</span><input type="text" name="project_name" value="uploaded_md_analysis"></label>
+          <label class="file-drop file-drop-large"><span>Finished MD files</span><input type="file" name="analysis_files" multiple></label>
+          <div class="analysis-chain">
+            <strong>Also finish</strong>
+            <label class="checkbox"><input type="checkbox" name="run_free_energy" checked><span>Free energy</span></label>
+          </div>
+          <button type="submit" class="secondary-btn">Save MD Results And Run Linked Analysis</button>
+        </form>
+        {% endif %}
+      </section>
+      {% endfor %}
+      <section class="panel tab-panel" data-panel="free">
+        <div class="panel-head">
+          <h2>Free Energy Calculation</h2>
+          <p>Upload free-energy outputs for storage now. The next step can add numerical settings for MM/PBSA, alchemical, or PMF-specific plotting.</p>
+        </div>
+        <form action="{{ url_for('special_analysis_job') }}" method="post" enctype="multipart/form-data" class="upload-form">
+          <input type="hidden" name="analysis_type" value="free_energy_3d">
+          <label><span>Project name</span><input type="text" name="project_name" value="free_energy_3d"></label>
+          <label class="file-drop file-drop-large"><span>Free-energy files / CSV / XVG</span><input type="file" name="analysis_files" multiple></label>
+          <div class="analysis-chain">
+            <strong>Linked analysis</strong>
+          </div>
+          <button type="submit" class="primary-btn">Save Free Energy Inputs</button>
+        </form>
+      </section>
+
+      <section class="panel tab-panel" data-panel="mmpbsa">
+        <div class="panel-head">
+          <h2>MM-PBSA Binding Free Energy</h2>
+          <p>Calculate binding free energy using MM-PBSA with Poisson-Boltzmann electrostatics and generate a comprehensive PDF report.</p>
+        </div>
+        <form action="{{ url_for('mmpbsa_job') }}" method="post" class="upload-form">
+          <div class="double">
+            <label>
+              <span>Project name</span>
+              <input type="text" name="project_name" value="mmpbsa_analysis" required>
+            </label>
+            <label>
+              <span>Previous run</span>
+              <select name="previous_job_id" required>
+                <option value="">Select a completed MD run</option>
+                {% for job in jobs %}
+                  <option value="{{ job.id }}">{{ job.project_name }} | {{ job.id }}</option>
+                {% endfor %}
+              </select>
+            </label>
+          </div>
+
+          <div class="triple">
+            <label>
+              <span>Frame step</span>
+              <input type="number" name="frame_step" value="10" min="1" step="1" title="Process every N-th frame" required>
+            </label>
+            <label>
+              <span>Ionic strength (M)</span>
+              <input type="number" name="ionic_strength" value="0.15" min="0" step="0.01" required>
+            </label>
+            <label>
+              <span>Surface tension (kcal/mol/Å²)</span>
+              <input type="number" name="surface_tension" value="0.0072" min="0" step="0.0001" required>
+            </label>
+          </div>
+
+          <div class="double">
+            <label class="checkbox">
+              <input type="checkbox" name="decompose">
+              <span>Per-residue energy decomposition</span>
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" name="use_apbs" checked>
+              <span>Use APBS for polar solvation</span>
+            </label>
+          </div>
+
+          <p class="small-note">Select a previous run with production MD data (md.tpr + md.xtc). The calculation uses APBS for Poisson-Boltzmann electrostatics and generates a PDF report with all simulation results.</p>
+
+          <button type="submit" class="primary-btn">Run MM-PBSA Calculation</button>
+        </form>
+      </section>
+</div>
+
+    <aside class="panel jobs-panel">
+      <div class="panel-head">
+        <p class="eyebrow">Queue status</p>
+        <h2>Recent jobs</h2>
+      </div>
+      <div class="job-list">
+        {% for job in jobs %}
+          <a class="job-card" href="{{ url_for('job_detail', job_id=job.id) }}">
+            <div>
+              <strong>{{ job.project_name }}</strong>
+              <p>{{ job.id }}</p>
+              <p class="job-meta">{{ job.current_stage }} | {{ job.runtime_display or "00:00:00" }}</p>
+            </div>
+            <span class="status status-{{ job.status }}">{{ job.status_label }}</span>
+          </a>
+        {% else %}
+          <div class="empty-state">No active runs</div>
+        {% endfor %}
+      </div>
+      <section class="runner-console" aria-label="Runner status">
+        <div class="runner-console-head">
+          <span class="console-dot"></span>
+          <strong>Runner output</strong>
+        </div>
+        <pre>{% if jobs %}Latest job: {{ jobs[0].project_name }}
+Stage: {{ jobs[0].current_stage }}
+Status: {{ jobs[0].status_label }}
+Elapsed: {{ jobs[0].runtime_display or "00:00:00" }}{% else %}GROMACS runner ready
+Submit a docked complex to begin.{% endif %}</pre>
+      </section>
+    </aside>
+  </div>
+</section>
+<script>
+  const tabButtons = document.querySelectorAll(".tab-btn");
+  const tabPanels = document.querySelectorAll(".tab-panel");
+  tabButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      tabButtons.forEach((item) => item.classList.remove("active"));
+      tabPanels.forEach((panel) => panel.classList.remove("active"));
+      button.classList.add("active");
+      document.querySelector(`[data-panel="${button.dataset.tab}"]`).classList.add("active");
+    });
+  });
+
+  // Full-auto topology section visibility
+  const methodSelect = document.querySelector("#ligand_prep_tool");
+  if (methodSelect) {
+    const sections = document.querySelectorAll("[data-topology-section]");
+    const syncTopologyMethod = () => {
+      const method = methodSelect.value;
+      sections.forEach((section) => {
+        section.hidden = section.dataset.topologySection !== method;
+      });
+    };
+    methodSelect.addEventListener("change", syncTopologyMethod);
+    syncTopologyMethod();
+  }
+</script>
+{% endblock %}
