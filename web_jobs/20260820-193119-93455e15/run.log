@@ -1,1902 +1,0 @@
-[2026-08-20 19:31:21] Project: protein_ligand_auto
-[2026-08-20 19:31:22] GROMACS: gmx (2025.2)
-[2026-08-20 19:31:22] Force field: amber99sb-ildn
-[2026-08-20 19:31:22] Water model: tip3p
-[2026-08-20 19:31:22] Ligand preparation: acpype
-[2026-08-20 19:31:22] Auto rectification: yes
-[2026-08-20 19:31:22] Protein input: /home/nanomd/Desktop/Sakthidhasan/md_pipeline/inputs/protein.pdb
-[2026-08-20 19:31:22] Ligand input: /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/inputs/ligand.mol2
-[2026-08-20 19:31:22] Starting step1_protein_prep
-[2026-08-20 19:31:22] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/split_docking_pdb.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/inputs/docking_complex.pdb /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/01_protein/protein.cleaned.pdb /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/00_docking/ligand.pdb LIG yes
-Warning: no atoms matched residue name(s) LIG; falling back to all HETATM records in the docking complex.
-[2026-08-20 19:31:22] CMD: gmx pdb2gmx -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/01_protein/protein.cleaned.pdb -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/01_protein/protein_processed.gro -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/01_protein/topol.top -i /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/01_protein/posre.itp -ff amber99sb-ildn -water tip3p -ignh
-                     :-) GROMACS - gmx pdb2gmx, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx pdb2gmx -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/01_protein/protein.cleaned.pdb -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/01_protein/protein_processed.gro -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/01_protein/topol.top -i /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/01_protein/posre.itp -ff amber99sb-ildn -water tip3p -ignh
-
-Opening force field file /home/nanomd/gromacs/share/gromacs/top/amber99sb-ildn.ff/aminoacids.r2b
-Opening force field file /home/nanomd/gromacs/share/gromacs/top/amber99sb-ildn.ff/dna.r2b
-Opening force field file /home/nanomd/gromacs/share/gromacs/top/amber99sb-ildn.ff/rna.r2b
-All occupancies are one
-Opening force field file /home/nanomd/gromacs/share/gromacs/top/amber99sb-ildn.ff/atomtypes.atp
-Opening force field file /home/nanomd/gromacs/share/gromacs/top/amber99sb-ildn.ff/aminoacids.rtp
-Opening force field file /home/nanomd/gromacs/share/gromacs/top/amber99sb-ildn.ff/dna.rtp
-Opening force field file /home/nanomd/gromacs/share/gromacs/top/amber99sb-ildn.ff/rna.rtp
-Opening force field file /home/nanomd/gromacs/share/gromacs/top/amber99sb-ildn.ff/aminoacids.hdb
-Opening force field file /home/nanomd/gromacs/share/gromacs/top/amber99sb-ildn.ff/dna.hdb
-Opening force field file /home/nanomd/gromacs/share/gromacs/top/amber99sb-ildn.ff/rna.hdb
-Opening force field file /home/nanomd/gromacs/share/gromacs/top/amber99sb-ildn.ff/aminoacids.n.tdb
-Opening force field file /home/nanomd/gromacs/share/gromacs/top/amber99sb-ildn.ff/aminoacids.c.tdb
-9 out of 9 lines of specbond.dat converted successfully
-Special Atom Distance matrix:
-                    MET1   MET11   CYX14   CYX29   CYX31   CYX46   CYX47
-                     SD7    SD95   SG119   SG249   SG267   SG370   SG376
-   MET11    SD95   1.330
-   CYX14   SG119   1.650   0.801
-   CYX29   SG249   2.309   2.360   2.759
-   CYX31   SG267   1.625   1.548   1.890   0.877
-   CYX46   SG370   2.035   1.367   1.608   1.391   0.786
-   CYX47   SG376   1.598   1.381   1.759   1.007   0.203   0.649
-   CYX53   SG425   1.946   1.082   1.791   1.966   1.471   1.240   1.282
-   CYX63   SG508   1.890   1.449   2.235   2.588   2.140   2.163   1.989
-   CYX74   SG613   1.650   0.906   0.203   2.921   2.047   1.803   1.923
-   CYX81   SG660   1.806   0.571   1.118   2.707   1.968   1.652   1.779
-   CYX88   SG704   1.856   1.420   2.186   2.738   2.245   2.261   2.093
-   CYX93   SG732   1.650   0.521   1.137   2.702   1.958   1.723   1.776
-   CYX95   SG746   1.789   0.974   1.727   2.025   1.490   1.333   1.305
-  CYX102   SG797   2.108   1.307   1.562   1.551   0.962   0.204   0.804
-  CYX121   SG948   2.303   2.464   2.866   0.203   0.976   1.561   1.124
-                   CYX53   CYX63   CYX74   CYX81   CYX88   CYX93   CYX95
-                   SG425   SG508   SG613   SG660   SG704   SG732   SG746
-   CYX63   SG508   1.016
-   CYX74   SG613   1.939   2.308
-   CYX81   SG660   1.008   1.288   1.203
-   CYX88   SG704   1.136   0.204   2.243   1.239
-   CYX93   SG732   1.045   1.187   1.202   0.204   1.120
-   CYX95   SG746   0.204   0.861   1.861   0.917   0.968   0.918
-  CYX102   SG797   1.139   2.097   1.762   1.532   2.192   1.621   1.246
-  CYX121   SG948   2.100   2.662   3.021   2.829   2.809   2.812   2.145
-                  CYX102
-                   SG797
-  CYX121   SG948   1.726
-Linking CYX-14 SG-119 and CYX-74 SG-613...
-Linking CYX-29 SG-249 and CYX-121 SG-948...
-Linking CYX-31 SG-267 and CYX-47 SG-376...
-Linking CYX-46 SG-370 and CYX-102 SG-797...
-Linking CYX-53 SG-425 and CYX-95 SG-746...
-Linking CYX-63 SG-508 and CYX-88 SG-704...
-Linking CYX-81 SG-660 and CYX-93 SG-732...
-Opening force field file /home/nanomd/gromacs/share/gromacs/top/amber99sb-ildn.ff/aminoacids.arn
-Opening force field file /home/nanomd/gromacs/share/gromacs/top/amber99sb-ildn.ff/dna.arn
-Opening force field file /home/nanomd/gromacs/share/gromacs/top/amber99sb-ildn.ff/rna.arn
-Before cleaning: 4833 pairs
-Before cleaning: 5145 dihedrals
-
-GROMACS reminds you: "Come and play on the hospital roof, I got something that's yours" (Sherlock)
-
-Using the Amber99sb-ildn force field in directory amber99sb-ildn.ff
-
-going to rename amber99sb-ildn.ff/aminoacids.r2b
-
-going to rename amber99sb-ildn.ff/dna.r2b
-
-going to rename amber99sb-ildn.ff/rna.r2b
-Reading /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/01_protein/protein.cleaned.pdb...
-Read '', 958 atoms
-
-Analyzing pdb file
-Splitting chemical chains based on TER records or chain id changing.
-
-There are 1 chains and 0 blocks of water and 122 residues with 958 atoms
-
-  chain  #res #atoms
-
-  1 'A'   122    958  
-
-All occupancies are one
-
-Reading residue database... (Amber99sb-ildn)
-
-Processing chain 1 'A' (958 atoms, 122 residues)
-
-Identified residue MET1 as a starting terminus.
-
-Identified residue GLN122 as a ending terminus.
-
-Checking for duplicate atoms....
-
-Generating any missing hydrogen atoms and/or adding termini.
-
-Now there are 122 residues with 1823 atoms
-
-Making bonds...
-
-Number of bonds was 1856, now 1855
-
-Generating angles, dihedrals and pairs...
-
-Making cmap torsions...
-
-There are 5145 dihedrals,  418 impropers, 3313 angles
-          4785 pairs,     1855 bonds and     0 virtual sites
-
-Total mass 13760.480 a.m.u.
-
-Total charge -1.000 e
-
-Writing topology
-
-Writing coordinate file...
-
-		--------- PLEASE NOTE ------------
-
-You have successfully generated a topology from: /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/01_protein/protein.cleaned.pdb.
-
-The Amber99sb-ildn force field and the tip3p water model are used.
-
-		--------- ETON ESAELP ------------
-[2026-08-20 19:31:22] CMD: gmx_cmd editconf -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/01_protein/protein_processed.gro -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/01_protein/protein_processed.pdb
-                     :-) GROMACS - gmx editconf, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx editconf -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/01_protein/protein_processed.gro -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/01_protein/protein_processed.pdb
-
-
-GROMACS reminds you: "Come and play on the hospital roof, I got something that's yours" (Sherlock)
-
-Note that major changes are planned in future for editconf, to improve usability and utility.
-Read 1823 atoms
-Volume: 60.2972 nm^3, corresponds to roughly 27100 electrons
-No velocities found
-[2026-08-20 19:31:22] Finished step1_protein_prep
-[2026-08-20 19:31:22] Starting step2_ligand_prep
-[2026-08-20 19:31:22] CMD: obabel /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/02_ligand/ligand.pdb -O /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/02_ligand/ligand.mol2
-1 molecule converted
-[2026-08-20 19:31:22] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/check_acpype_runtime.py acpype
-ACPYPE runtime preflight passed.
-[2026-08-20 19:31:22] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/check_ligand_charge.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/02_ligand/ligand.mol2 0
-Ligand charge preflight passed: charge 0 gives 282 electrons.
-[2026-08-20 19:31:22] CMD: acpype -i /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/02_ligand/ligand.mol2 -b ligand -a gaff2 -n 0
-============================================================================
-| ACPYPE: AnteChamber PYthon Parser interfacE v. 2023.10.27 (c) 2026 AWSdS |
-============================================================================
-==> ... charge set to 0
-==> Executing Antechamber...
-==> * Antechamber OK *
-==> * Parmchk OK *
-==> Executing Tleap...
-==> * Tleap OK *
-==> Removing temporary files...
-==> Using OpenBabel v.3.1.0
-
-==> Writing NEW PDB file
-
-==> Writing CNS/XPLOR files
-
-==> Writing GROMACS files
-
-==> Disambiguating lower and uppercase atomtypes in GMX top file, even if identical.
-
-==> Writing GMX dihedrals for GMX 4.5 and higher.
-
-==> Writing CHARMM files
-
-==> Writing pickle file ligand.pkl
-==> Removing temporary files...
-Total time of execution: 2m 9s
-[2026-08-20 19:33:32] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/normalize_gro_resname.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/02_ligand/ligand.gro /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/02_ligand/ligand.gro LIG
-[2026-08-20 19:33:32] Finished step2_ligand_prep
-[2026-08-20 19:33:32] Starting step3_assemble_complex
-[2026-08-20 19:33:32] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/merge_gro.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/01_protein/protein_processed.gro /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/02_ligand/ligand.gro /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/03_complex/complex.gro
-[2026-08-20 19:33:32] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/assemble_topology.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/03_complex/topol.top ligand.itp posre_ligand.itp ligand 1 /home/nanomd/Desktop/Sakthidhasan/md_pipeline amber99sb-ildn
-[2026-08-20 19:33:32] Finished step3_assemble_complex
-[2026-08-20 19:33:32] Starting step4_define_box
-[2026-08-20 19:33:32] CMD: gmx_cmd editconf -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/03_complex/complex.gro -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/04_box/boxed.gro -bt dodecahedron -d 1.0 -c
-                     :-) GROMACS - gmx editconf, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx editconf -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/03_complex/complex.gro -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/04_box/boxed.gro -bt dodecahedron -d 1.0 -c
-
-
-GROMACS reminds you: "The best model of a cat is another cat..., specially the same cat." (Arturo Rosenblueth)
-
-Note that major changes are planned in future for editconf, to improve usability and utility.
-Read 1900 atoms
-Volume: 60.2972 nm^3, corresponds to roughly 27100 electrons
-No velocities found
-    system size :  4.575  3.338  3.948 (nm)
-    diameter    :  5.034               (nm)
-    center      :  0.035 -0.035 -0.021 (nm)
-    box vectors :  4.576  3.338  3.948 (nm)
-    box angles  :  90.00  90.00  90.00 (degrees)
-    box volume  :  60.30               (nm^3)
-    shift       :  5.241  5.310  2.508 (nm)
-new center      :  5.276  5.276  2.487 (nm)
-new box vectors :  7.034  7.034  7.034 (nm)
-new box angles  :  60.00  60.00  90.00 (degrees)
-new box volume  : 246.10               (nm^3)
-[2026-08-20 19:33:32] Finished step4_define_box
-[2026-08-20 19:33:32] Starting step5_solvate
-[2026-08-20 19:33:32] CMD: gmx_cmd solvate -cp /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/04_box/boxed.gro -cs spc216.gro -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/solvated.gro -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/topol.top
-                     :-) GROMACS - gmx solvate, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx solvate -cp /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/04_box/boxed.gro -cs spc216.gro -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/solvated.gro -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/topol.top
-
-Reading solute configuration
-Reading solvent configuration
-
-Initialising inter-atomic distances...
-
-WARNING: Masses and atomic (Van der Waals) radii will be guessed
-         based on residue and atom names, since they could not be
-         definitively assigned from the information in your input
-         files. These guessed numbers might deviate from the mass
-         and radius of the atom type. Please check the output
-         files if necessary. Note, that this functionality may
-         be removed in a future GROMACS version. Please, consider
-         using another file format for your input.
-
-NOTE: From version 5.0 gmx solvate uses the Van der Waals radii
-from the source below. This means the results may be different
-compared to previous GROMACS versions.
-
-++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
-A. Bondi
-van der Waals Volumes and Radii
-J. Phys. Chem. (1964)
-DOI: 10.1021/j100785a001
--------- -------- --- Thank You --- -------- --------
-
-Generating solvent configuration
-Will generate new solvent configuration of 4x4x3 boxes
-Solvent box contains 28341 atoms in 9447 residues
-Removed 4239 solvent atoms due to solvent-solvent overlap
-Removed 1857 solvent atoms due to solute-solvent overlap
-Sorting configuration
-Found 1 molecule type:
-    SOL (   3 atoms):  7415 residues
-Generated solvent containing 22245 atoms in 7415 residues
-Writing generated configuration to /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/solvated.gro
-
-Output configuration contains 24145 atoms in 7538 residues
-Volume                 :     246.098 (nm^3)
-Density                :     1003.61 (g/l)
-Number of solvent molecules:   7415   
-
-Processing topology
-
-Back Off! I just backed up /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/topol.top to /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/#topol.top.1#
-
-GROMACS reminds you: "The best model of a cat is another cat..., specially the same cat." (Arturo Rosenblueth)
-
-Adding line for 7415 solvent molecules with resname (SOL) to topology file (/home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/topol.top)
-                      :-) GROMACS - gmx grompp, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx grompp -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/topology_preflight.mdp -c /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/solvated.gro -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/topol.top -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/topology_preflight.tpr -maxwarn 1
-
-Generating 1-4 interactions: fudge = 0.5
-
-NOTE 1 [file topol.top, line 17539]:
-  System has non-zero total charge: -1.000000
-  Total charge should normally be an integer. See
-  https://manual.gromacs.org/current/user-guide/floating-point.html
-  for discussion on how close it should be to an integer.
-
-
-
-
-WARNING 1 [file topol.top, line 17539]:
-  You are using Ewald electrostatics in a system with net charge. This can
-  lead to severe artifacts, such as ions moving into regions with low
-  dielectric, due to the uniform background charge. We suggest to
-  neutralize your system with counter ions, possibly in combination with a
-  physiological salt concentration.
-
-Setting the LD random seed to -1116965
-
-Generated 3081 of the 3081 non-bonded parameter combinations
-
-Generated 3081 of the 3081 1-4 parameter combinations
-
-Excluding 3 bonded neighbours molecule type 'Protein_chain_A'
-
-Excluding 3 bonded neighbours molecule type 'ligand'
-
-Excluding 2 bonded neighbours molecule type 'SOL'
-
-++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
-J. S. Hub, B. L. de Groot, H. Grubmueller, G. Groenhof
-Quantifying Artifacts in Ewald Simulations of Inhomogeneous Systems with a Net
-Charge
-J. Chem. Theory Comput. (2014)
-DOI: 10.1021/ct400626b
--------- -------- --- Thank You --- -------- --------
-
-Number of degrees of freedom in T-Coupling group rest is 50187.00
-The integrator does not provide a ensemble temperature, there is no system ensemble temperature
-
-There was 1 NOTE
-
-There was 1 WARNING
-
-GROMACS reminds you: "The best model of a cat is another cat..., specially the same cat." (Arturo Rosenblueth)
-
-Analysing residue names:
-There are:   122    Protein residues
-There are:     1      Other residues
-There are:  7415      Water residues
-Analysing Protein...
-Analysing residues not classified as Protein/DNA/RNA/Water and splitting into groups...
-
-The largest distance between excluded atoms is 0.445 nm between atom 509 and 710
-Calculating fourier grid dimensions for X Y Z
-Using a fourier grid of 60x60x60, spacing 0.117 0.117 0.117
-
-Estimate for the relative computational load of the PME mesh part: 0.19
-
-This run will generate roughly 2 Mb of data
-[2026-08-20 19:33:32] Finished step5_solvate
-[2026-08-20 19:33:32] Starting step6_add_ions
-[2026-08-20 19:33:32] CMD: gmx_cmd grompp -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/ions.mdp -c /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/solvated.gro -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/topol.top -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/ions.tpr -maxwarn 1
-                      :-) GROMACS - gmx grompp, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx grompp -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/ions.mdp -c /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/05_solvate/solvated.gro -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/topol.top -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/ions.tpr -maxwarn 1
-
-Generating 1-4 interactions: fudge = 0.5
-
-NOTE 1 [file topol.top, line 17539]:
-  System has non-zero total charge: -1.000000
-  Total charge should normally be an integer. See
-  https://manual.gromacs.org/current/user-guide/floating-point.html
-  for discussion on how close it should be to an integer.
-
-
-
-
-WARNING 1 [file topol.top, line 17539]:
-  You are using Ewald electrostatics in a system with net charge. This can
-  lead to severe artifacts, such as ions moving into regions with low
-  dielectric, due to the uniform background charge. We suggest to
-  neutralize your system with counter ions, possibly in combination with a
-  physiological salt concentration.
-
-Setting the LD random seed to -268841985
-
-Generated 3081 of the 3081 non-bonded parameter combinations
-
-Generated 3081 of the 3081 1-4 parameter combinations
-
-Excluding 3 bonded neighbours molecule type 'Protein_chain_A'
-
-Excluding 3 bonded neighbours molecule type 'ligand'
-
-Excluding 2 bonded neighbours molecule type 'SOL'
-
-++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
-J. S. Hub, B. L. de Groot, H. Grubmueller, G. Groenhof
-Quantifying Artifacts in Ewald Simulations of Inhomogeneous Systems with a Net
-Charge
-J. Chem. Theory Comput. (2014)
-DOI: 10.1021/ct400626b
--------- -------- --- Thank You --- -------- --------
-
-Number of degrees of freedom in T-Coupling group rest is 50187.00
-The integrator does not provide a ensemble temperature, there is no system ensemble temperature
-
-There was 1 NOTE
-
-There was 1 WARNING
-
-GROMACS reminds you: "The best model of a cat is another cat..., specially the same cat." (Arturo Rosenblueth)
-
-Analysing residue names:
-There are:   122    Protein residues
-There are:     1      Other residues
-There are:  7415      Water residues
-Analysing Protein...
-Analysing residues not classified as Protein/DNA/RNA/Water and splitting into groups...
-
-The largest distance between excluded atoms is 0.445 nm between atom 509 and 710
-Calculating fourier grid dimensions for X Y Z
-Using a fourier grid of 60x60x60, spacing 0.117 0.117 0.117
-
-Estimate for the relative computational load of the PME mesh part: 0.19
-
-This run will generate roughly 2 Mb of data
-                      :-) GROMACS - gmx genion, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx genion -s /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/ions.tpr -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/solv_ions.gro -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/topol.top -pname NA -nname CL -neutral -conc 0.15
-
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/ions.tpr, VERSION 2025.2 (single precision)
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/ions.tpr, VERSION 2025.2 (single precision)
-Group     0 (         System) has 24145 elements
-Group     1 (        Protein) has  1823 elements
-Group     2 (      Protein-H) has   958 elements
-Group     3 (        C-alpha) has   122 elements
-Group     4 (       Backbone) has   366 elements
-Group     5 (      MainChain) has   489 elements
-Group     6 (   MainChain+Cb) has   602 elements
-Group     7 (    MainChain+H) has   608 elements
-Group     8 (      SideChain) has  1215 elements
-Group     9 (    SideChain-H) has   469 elements
-Group    10 (    Prot-Masses) has  1823 elements
-Group    11 (    non-Protein) has 22322 elements
-Group    12 (          Other) has    77 elements
-Group    13 (            UNK) has    77 elements
-Group    14 (          Water) has 22245 elements
-Group    15 (            SOL) has 22245 elements
-Group    16 (      non-Water) has  1900 elements
-Select a group: Number of (3-atomic) solvent molecules: 7415
-
-Back Off! I just backed up /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/topol.top to /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/#topol.top.1#
-Using random seed 1005453247.
-Replacing solvent molecule 3552 (atom 12556) with NA
-Replacing solvent molecule 5067 (atom 17101) with NA
-Replacing solvent molecule 703 (atom 4009) with NA
-Replacing solvent molecule 4486 (atom 15358) with NA
-Replacing solvent molecule 1603 (atom 6709) with NA
-Replacing solvent molecule 2031 (atom 7993) with NA
-Replacing solvent molecule 1537 (atom 6511) with NA
-Replacing solvent molecule 5162 (atom 17386) with NA
-Replacing solvent molecule 5549 (atom 18547) with NA
-Replacing solvent molecule 2054 (atom 8062) with NA
-Replacing solvent molecule 6592 (atom 21676) with NA
-Replacing solvent molecule 4233 (atom 14599) with NA
-Replacing solvent molecule 1985 (atom 7855) with NA
-Replacing solvent molecule 5492 (atom 18376) with NA
-Replacing solvent molecule 1619 (atom 6757) with NA
-Replacing solvent molecule 274 (atom 2722) with NA
-Replacing solvent molecule 2909 (atom 10627) with NA
-Replacing solvent molecule 5199 (atom 17497) with NA
-Replacing solvent molecule 2648 (atom 9844) with NA
-Replacing solvent molecule 7406 (atom 24118) with NA
-Replacing solvent molecule 3444 (atom 12232) with NA
-Replacing solvent molecule 3139 (atom 11317) with NA
-Replacing solvent molecule 1198 (atom 5494) with NA
-Replacing solvent molecule 785 (atom 4255) with CL
-Replacing solvent molecule 3171 (atom 11413) with CL
-Replacing solvent molecule 5011 (atom 16933) with CL
-Replacing solvent molecule 2328 (atom 8884) with CL
-Replacing solvent molecule 6864 (atom 22492) with CL
-Replacing solvent molecule 4847 (atom 16441) with CL
-Replacing solvent molecule 5218 (atom 17554) with CL
-Replacing solvent molecule 1462 (atom 6286) with CL
-Replacing solvent molecule 6417 (atom 21151) with CL
-Replacing solvent molecule 3879 (atom 13537) with CL
-Replacing solvent molecule 3434 (atom 12202) with CL
-Replacing solvent molecule 2736 (atom 10108) with CL
-Replacing solvent molecule 188 (atom 2464) with CL
-Replacing solvent molecule 1730 (atom 7090) with CL
-Replacing solvent molecule 2358 (atom 8974) with CL
-Replacing solvent molecule 6692 (atom 21976) with CL
-Replacing solvent molecule 4798 (atom 16294) with CL
-Replacing solvent molecule 1955 (atom 7765) with CL
-Replacing solvent molecule 3880 (atom 13540) with CL
-Replacing solvent molecule 4821 (atom 16363) with CL
-Replacing solvent molecule 377 (atom 3031) with CL
-Replacing solvent molecule 3976 (atom 13828) with CL
-
-
-GROMACS reminds you: "The best model of a cat is another cat..., specially the same cat." (Arturo Rosenblueth)
-
-Will try to add 23 NA ions and 22 CL ions.
-Select a continuous group of solvent molecules
-Selected 15: 'SOL'
-
-Processing topology
-Replacing 45 solute molecules in topology file (/home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/topol.top)  by 23 NA and 22 CL ions.
-[2026-08-20 19:33:32] Finished step6_add_ions
-[2026-08-20 19:33:32] Starting step7_minimize
-[2026-08-20 19:33:32] CMD: gmx_cmd grompp -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.mdp -c /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/solv_ions.gro -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/topol.top -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.tpr -maxwarn 0
-                      :-) GROMACS - gmx grompp, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx grompp -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.mdp -c /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/work/06_ions/solv_ions.gro -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/topol.top -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.tpr -maxwarn 0
-
-Generating 1-4 interactions: fudge = 0.5
-Number of degrees of freedom in T-Coupling group rest is 50052.00
-The integrator does not provide a ensemble temperature, there is no system ensemble temperature
-
-GROMACS reminds you: "The best model of a cat is another cat..., specially the same cat." (Arturo Rosenblueth)
-
-Setting the LD random seed to 2140143220
-
-Generated 3081 of the 3081 non-bonded parameter combinations
-
-Generated 3081 of the 3081 1-4 parameter combinations
-
-Excluding 3 bonded neighbours molecule type 'Protein_chain_A'
-
-Excluding 3 bonded neighbours molecule type 'ligand'
-
-Excluding 2 bonded neighbours molecule type 'SOL'
-
-Excluding 1 bonded neighbours molecule type 'NA'
-
-Excluding 1 bonded neighbours molecule type 'CL'
-Analysing residue names:
-There are:   122    Protein residues
-There are:     1      Other residues
-There are:  7370      Water residues
-There are:    45        Ion residues
-Analysing Protein...
-Analysing residues not classified as Protein/DNA/RNA/Water and splitting into groups...
-
-The largest distance between excluded atoms is 0.445 nm between atom 509 and 710
-Calculating fourier grid dimensions for X Y Z
-Using a fourier grid of 60x60x60, spacing 0.117 0.117 0.117
-
-Estimate for the relative computational load of the PME mesh part: 0.19
-
-This run will generate roughly 2 Mb of data
-[2026-08-20 19:33:32] CMD: run_mdrun_with_fallback /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em
-[2026-08-20 19:33:33] mdrun CPU threads: auto (effective: 24); GPU mode: auto
-                      :-) GROMACS - gmx mdrun, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx mdrun -deffnm /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em -pin on -ntmpi 1 -ntomp 24 -nb gpu -pme gpu -bonded gpu
-
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.tpr, VERSION 2025.2 (single precision)
-
--------------------------------------------------------
-Program:     gmx mdrun, version 2025.2
-Source file: src/gromacs/taskassignment/decidegpuusage.cpp (line 437)
-Function:    bool gmx::decideWhetherToUseGpusForPme(bool, TaskTarget, TaskTarget, const std::vector<int>&, const t_inputrec&, int, int, bool)
-
-Inconsistency in user input:
-Cannot compute PME interactions on a GPU, because:
-  PME GPU does not support:
-    Non-dynamical integrator (use md, sd, etc).
-
-For more information and tips for troubleshooting, please check the GROMACS
-website at https://manual.gromacs.org/current/user-guide/run-time-errors.html
--------------------------------------------------------
-[2026-08-20 19:33:33] GPU mdrun failed; retrying once on CPU with the same run input.
-                      :-) GROMACS - gmx mdrun, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx mdrun -deffnm /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em -pin on -ntmpi 1 -ntomp 24
-
-
-Back Off! I just backed up /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.log to /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/#em.log.1#
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.tpr, VERSION 2025.2 (single precision)
-1 GPU selected for this run.
-Mapping of GPU IDs to the 1 GPU task in the 1 rank on this node:
-  PP:0
-PP tasks will do (non-perturbed) short-ranged interactions on the GPU
-PP task will update and constrain coordinates on the CPU
-Using 1 MPI thread
-Using 24 OpenMP threads 
-
-
-Steepest Descents:
-   Tolerance (Fmax)   =  1.00000e+03
-   Number of steps    =        50000
-
-writing lowest energy coordinates.
-
-Steepest Descents converged to Fmax < 1000 in 825 steps
-Potential Energy  = -3.7837925e+05
-Maximum force     =  9.2560583e+02 on atom 626
-Norm of force     =  2.2670343e+01
-
-GROMACS reminds you: "Statistics: The only science that enables different experts using the same figures to draw different conclusions." (Evan Esar)
-
-[2026-08-20 19:33:37] CMD: gmx make_ndx -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.gro -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/indexlig.ndx
-                     :-) GROMACS - gmx make_ndx, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx make_ndx -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.gro -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/indexlig.ndx
-
-
-Reading structure file
-
-GROMACS reminds you: "Statistics: The only science that enables different experts using the same figures to draw different conclusions." (Evan Esar)
-
-Going to read 0 old index file(s)
-Analysing residue names:
-There are:   122    Protein residues
-There are:     1      Other residues
-There are:  7370      Water residues
-There are:    45        Ion residues
-Analysing Protein...
-Analysing residues not classified as Protein/DNA/RNA/Water and splitting into groups...
-
-  0 System              : 24055 atoms
-  1 Protein             :  1823 atoms
-  2 Protein-H           :   958 atoms
-  3 C-alpha             :   122 atoms
-  4 Backbone            :   366 atoms
-  5 MainChain           :   489 atoms
-  6 MainChain+Cb        :   602 atoms
-  7 MainChain+H         :   608 atoms
-  8 SideChain           :  1215 atoms
-  9 SideChain-H         :   469 atoms
- 10 Prot-Masses         :  1823 atoms
- 11 non-Protein         : 22232 atoms
- 12 Other               :    77 atoms
- 13 UNK                 :    77 atoms
- 14 NA                  :    23 atoms
- 15 CL                  :    22 atoms
- 16 Water               : 22110 atoms
- 17 SOL                 : 22110 atoms
- 18 non-Water           :  1945 atoms
- 19 Ion                 :    45 atoms
- 20 Water_and_ions      : 22155 atoms
-
- nr : group      '!': not  'name' nr name   'splitch' nr    Enter: list groups
- 'a': atom       '&': and  'del' nr         'splitres' nr   'l': list residues
- 't': atom type  '|': or   'keep' nr        'splitat' nr    'h': help
- 'r': residue              'res' nr         'chain' char
- "name": group             'case': case sensitive           'q': save and quit
- 'ri': residue index
-
-> 
-
-> 
-Copied index group 1 'Protein'
-Copied index group 12 'Ligand'
-Merged two groups with OR: 1823 77 -> 1900
-
-> 
-[2026-08-20 19:33:37] Finished step7_minimize
-[2026-08-20 19:33:37] Starting step8_equilibrate
-[2026-08-20 19:33:37] CMD: gmx_cmd grompp -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.mdp -c /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.gro -r /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.gro -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/topol.top -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.tpr -maxwarn 0
-                      :-) GROMACS - gmx grompp, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx grompp -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.mdp -c /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.gro -r /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/minimization/em.gro -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/topol.top -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.tpr -maxwarn 0
-
-Ignoring obsolete mdp entry 'title'
-Generating 1-4 interactions: fudge = 0.5
-Number of degrees of freedom in T-Coupling group Protein is 4603.72
-Number of degrees of freedom in T-Coupling group non-Protein is 44543.28
-
-NOTE 1 [file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.mdp]:
-  Removing center of mass motion in the presence of position restraints
-  might cause artifacts. When you are using position restraints to
-  equilibrate a macro-molecule, the artifacts are usually negligible.
-
-
-There was 1 NOTE
-
-GROMACS reminds you: "Statistics: The only science that enables different experts using the same figures to draw different conclusions." (Evan Esar)
-
-Setting the LD random seed to -293646353
-
-Generated 3081 of the 3081 non-bonded parameter combinations
-
-Generated 3081 of the 3081 1-4 parameter combinations
-
-Excluding 3 bonded neighbours molecule type 'Protein_chain_A'
-
-turning H bonds into constraints...
-
-Excluding 3 bonded neighbours molecule type 'ligand'
-
-turning H bonds into constraints...
-
-Excluding 2 bonded neighbours molecule type 'SOL'
-
-turning H bonds into constraints...
-
-Excluding 1 bonded neighbours molecule type 'NA'
-
-turning H bonds into constraints...
-
-Excluding 1 bonded neighbours molecule type 'CL'
-
-turning H bonds into constraints...
-
-Setting gen_seed to -9440275
-
-Velocities were taken from a Maxwell distribution at 300 K
-Analysing residue names:
-There are:   122    Protein residues
-There are:     1      Other residues
-There are:  7370      Water residues
-There are:    45        Ion residues
-Analysing Protein...
-Analysing residues not classified as Protein/DNA/RNA/Water and splitting into groups...
-
-The largest distance between excluded atoms is 0.442 nm between atom 509 and 710
-
-Determining Verlet buffer for a tolerance of 0.005 kJ/mol/ps at 300 K
-
-Calculated rlist for 1x1 atom pair-list as 1.293 nm, buffer size 0.093 nm
-
-Set rlist, assuming 4x4 atom pair-list, to 1.221 nm, buffer size 0.021 nm
-
-Note that mdrun will redetermine rlist based on the actual pair-list setup
-Calculating fourier grid dimensions for X Y Z
-Using a fourier grid of 60x60x60, spacing 0.117 0.117 0.117
-
-Estimate for the relative computational load of the PME mesh part: 0.20
-
-This run will generate roughly 15 Mb of data
-[2026-08-20 19:33:37] CMD: run_mdrun_with_fallback /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt
-[2026-08-20 19:33:37] mdrun CPU threads: auto (effective: 24); GPU mode: auto
-                      :-) GROMACS - gmx mdrun, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx mdrun -deffnm /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt -pin on -ntmpi 1 -ntomp 24 -nb gpu -pme gpu -bonded gpu
-
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.tpr, VERSION 2025.2 (single precision)
-Changing nstlist from 20 to 100, rlist from 1.221 to 1.341
-
-Update groups can not be used for this system because atoms that are (in)directly constrained together are interdispersed with other atoms
-
-1 GPU selected for this run.
-Mapping of GPU IDs to the 2 GPU tasks in the 1 rank on this node:
-  PP:0,PME:0
-PP tasks will do (non-perturbed) short-ranged and most bonded interactions on the GPU
-PP task will update and constrain coordinates on the GPU
-PME tasks will do all aspects on the GPU
-Using 1 MPI thread
-Using 24 OpenMP threads 
-
-starting mdrun 'Protein in water'
-500000 steps,   1000.0 ps.
-
-Writing final coordinates.
-
-               Core t (s)   Wall t (s)        (%)
-       Time:     4573.187      190.551     2400.0
-                 (ns/day)    (hour/ns)
-Performance:      453.422        0.053
-
-GROMACS reminds you: "Kissing You is Like Kissing Gravel" (Throwing Muses)
-
-[2026-08-20 19:36:52] CMD: gmx_cmd grompp -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/npt/npt.mdp -c /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.gro -r /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.gro -t /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.cpt -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/topol.top -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/npt/npt.tpr -maxwarn 0
-                      :-) GROMACS - gmx grompp, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx grompp -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/npt/npt.mdp -c /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.gro -r /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.gro -t /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.cpt -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/topol.top -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/npt/npt.tpr -maxwarn 0
-
-Ignoring obsolete mdp entry 'title'
-Generating 1-4 interactions: fudge = 0.5
-
-NOTE 1 [file topol.top, line 17541]:
-  You are combining position restraints with Parrinello-Rahman pressure
-  coupling, which can lead to instabilities. If you really want to combine
-  position restraints with pressure coupling, we suggest to use C-rescale
-  pressure coupling instead.
-
-Number of degrees of freedom in T-Coupling group Protein is 4603.72
-Number of degrees of freedom in T-Coupling group non-Protein is 44543.28
-
-NOTE 2 [file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/npt/npt.mdp]:
-  Removing center of mass motion in the presence of position restraints
-  might cause artifacts. When you are using position restraints to
-  equilibrate a macro-molecule, the artifacts are usually negligible.
-
-Last frame         -1 time 1000.000   
-
-There were 2 NOTEs
-
-GROMACS reminds you: "Somewhere, something incredible is waiting to be known." (Carl Sagan)
-
-Setting the LD random seed to -432833235
-
-Generated 3081 of the 3081 non-bonded parameter combinations
-
-Generated 3081 of the 3081 1-4 parameter combinations
-
-Excluding 3 bonded neighbours molecule type 'Protein_chain_A'
-
-turning H bonds into constraints...
-
-Excluding 3 bonded neighbours molecule type 'ligand'
-
-turning H bonds into constraints...
-
-Excluding 2 bonded neighbours molecule type 'SOL'
-
-turning H bonds into constraints...
-
-Excluding 1 bonded neighbours molecule type 'NA'
-
-turning H bonds into constraints...
-
-Excluding 1 bonded neighbours molecule type 'CL'
-
-turning H bonds into constraints...
-
-Taking velocities from '/home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/nvt/nvt.gro'
-Analysing residue names:
-There are:   122    Protein residues
-There are:     1      Other residues
-There are:  7370      Water residues
-There are:    45        Ion residues
-Analysing Protein...
-Analysing residues not classified as Protein/DNA/RNA/Water and splitting into groups...
-
-The largest distance between excluded atoms is 0.429 nm between atom 509 and 710
-
-Determining Verlet buffer for a tolerance of 0.005 kJ/mol/ps at 300 K
-
-Calculated rlist for 1x1 atom pair-list as 1.293 nm, buffer size 0.093 nm
-
-Set rlist, assuming 4x4 atom pair-list, to 1.221 nm, buffer size 0.021 nm
-
-Note that mdrun will redetermine rlist based on the actual pair-list setup
-
-  rest:       	 5.266  5.275  2.474
-  rest:       	 5.266  5.275  2.474
-
-Reading Coordinates, Velocities and Box size from old trajectory
-
-Will read whole trajectory
-
-Using frame at t = 1000 ps
-
-Starting time for run is 0 ps
-Calculating fourier grid dimensions for X Y Z
-Using a fourier grid of 60x60x60, spacing 0.117 0.117 0.117
-
-Estimate for the relative computational load of the PME mesh part: 0.20
-
-This run will generate roughly 15 Mb of data
-[2026-08-20 19:36:53] CMD: run_mdrun_with_fallback /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/npt/npt
-[2026-08-20 19:36:53] mdrun CPU threads: auto (effective: 24); GPU mode: auto
-                      :-) GROMACS - gmx mdrun, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx mdrun -deffnm /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/npt/npt -pin on -ntmpi 1 -ntomp 24 -nb gpu -pme gpu -bonded gpu
-
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/npt/npt.tpr, VERSION 2025.2 (single precision)
-Changing nstlist from 20 to 100, rlist from 1.221 to 1.341
-
-Update groups can not be used for this system because atoms that are (in)directly constrained together are interdispersed with other atoms
-
-1 GPU selected for this run.
-Mapping of GPU IDs to the 2 GPU tasks in the 1 rank on this node:
-  PP:0,PME:0
-PP tasks will do (non-perturbed) short-ranged and most bonded interactions on the GPU
-PP task will update and constrain coordinates on the GPU
-PME tasks will do all aspects on the GPU
-Using 1 MPI thread
-Using 24 OpenMP threads 
-
-starting mdrun 'Protein in water'
-500000 steps,   1000.0 ps.
-
-Writing final coordinates.
-
-               Core t (s)   Wall t (s)        (%)
-       Time:     4709.818      196.244     2400.0
-                 (ns/day)    (hour/ns)
-Performance:      440.268        0.055
-
-GROMACS reminds you: "Hangout In the Suburbs If You've Got the Guts" (Urban Dance Squad)
-
-[2026-08-20 19:40:13] Finished step8_equilibrate
-[2026-08-20 19:40:13] Starting step9_production
-[2026-08-20 19:40:14] CMD: gmx_cmd grompp -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.mdp -c /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/npt/npt.gro -t /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/npt/npt.cpt -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/topol.top -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr -maxwarn 0
-                      :-) GROMACS - gmx grompp, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx grompp -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.mdp -c /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/npt/npt.gro -t /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/npt/npt.cpt -p /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/topol.top -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr -maxwarn 0
-
-Ignoring obsolete mdp entry 'title'
-Generating 1-4 interactions: fudge = 0.5
-Number of degrees of freedom in T-Coupling group Protein is 4603.72
-Number of degrees of freedom in T-Coupling group non-Protein is 44543.28
-Last frame         -1 time 1000.000   
-
-GROMACS reminds you: "It doesn't pay to make predictions" (Crowded House)
-
-Setting the LD random seed to -17826809
-
-Generated 3081 of the 3081 non-bonded parameter combinations
-
-Generated 3081 of the 3081 1-4 parameter combinations
-
-Excluding 3 bonded neighbours molecule type 'Protein_chain_A'
-
-turning H bonds into constraints...
-
-Excluding 3 bonded neighbours molecule type 'ligand'
-
-turning H bonds into constraints...
-
-Excluding 2 bonded neighbours molecule type 'SOL'
-
-turning H bonds into constraints...
-
-Excluding 1 bonded neighbours molecule type 'NA'
-
-turning H bonds into constraints...
-
-Excluding 1 bonded neighbours molecule type 'CL'
-
-turning H bonds into constraints...
-
-Taking velocities from '/home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/equilibration/npt/npt.gro'
-Analysing residue names:
-There are:   122    Protein residues
-There are:     1      Other residues
-There are:  7370      Water residues
-There are:    45        Ion residues
-Analysing Protein...
-Analysing residues not classified as Protein/DNA/RNA/Water and splitting into groups...
-
-The largest distance between excluded atoms is 0.444 nm between atom 509 and 710
-
-Determining Verlet buffer for a tolerance of 0.005 kJ/mol/ps at 300 K
-
-Calculated rlist for 1x1 atom pair-list as 1.294 nm, buffer size 0.094 nm
-
-Set rlist, assuming 4x4 atom pair-list, to 1.221 nm, buffer size 0.021 nm
-
-Note that mdrun will redetermine rlist based on the actual pair-list setup
-
-Reading Coordinates, Velocities and Box size from old trajectory
-
-Will read whole trajectory
-
-Using frame at t = 1000 ps
-
-Starting time for run is 0 ps
-Calculating fourier grid dimensions for X Y Z
-Using a fourier grid of 60x60x60, spacing 0.117 0.117 0.117
-
-Estimate for the relative computational load of the PME mesh part: 0.20
-
-This run will generate roughly 14 Mb of data
-[2026-08-20 19:40:14] CMD: run_mdrun_with_fallback /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md
-[2026-08-20 19:40:14] mdrun CPU threads: auto (effective: 24); GPU mode: auto
-                      :-) GROMACS - gmx mdrun, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx mdrun -deffnm /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md -pin on -ntmpi 1 -ntomp 24 -nb gpu -pme gpu -bonded gpu
-
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Changing nstlist from 20 to 100, rlist from 1.221 to 1.342
-
-Update groups can not be used for this system because atoms that are (in)directly constrained together are interdispersed with other atoms
-
-1 GPU selected for this run.
-Mapping of GPU IDs to the 2 GPU tasks in the 1 rank on this node:
-  PP:0,PME:0
-PP tasks will do (non-perturbed) short-ranged and most bonded interactions on the GPU
-PP task will update and constrain coordinates on the GPU
-PME tasks will do all aspects on the GPU
-Using 1 MPI thread
-Using 24 OpenMP threads 
-
-starting mdrun 'Protein in water'
-500000 steps,   1000.0 ps.
-
-Writing final coordinates.
-
-               Core t (s)   Wall t (s)        (%)
-       Time:     4706.819      196.119     2400.0
-                 (ns/day)    (hour/ns)
-Performance:      440.549        0.054
-
-GROMACS reminds you: "I'll Match Your DNA" (Red Hot Chili Peppers)
-
-[2026-08-20 19:43:34] Finished step9_production
-[2026-08-20 19:43:34] Starting step10_analysis
-[2026-08-20 19:43:34] Using imported index file: /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/indexlig.ndx
-                     :-) GROMACS - gmx trjconv, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx trjconv -s /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.xtc -n /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/index.ndx -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md_nojump.xtc -pbc nojump
-
-Will write xtc: Compressed trajectory (portable xdr format): xtc
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Group     0 (         System) has 24055 elements
-Group     1 (        Protein) has  1823 elements
-Group     2 (      Protein-H) has   958 elements
-Group     3 (        C-alpha) has   122 elements
-Group     4 (       Backbone) has   366 elements
-Group     5 (      MainChain) has   489 elements
-Group     6 (   MainChain+Cb) has   602 elements
-Group     7 (    MainChain+H) has   608 elements
-Group     8 (      SideChain) has  1215 elements
-Group     9 (    SideChain-H) has   469 elements
-Group    10 (    Prot-Masses) has  1823 elements
-Group    11 (    non-Protein) has 22232 elements
-Group    12 (         Ligand) has    77 elements
-Group    13 (            UNK) has    77 elements
-Group    14 (             NA) has    23 elements
-Group    15 (             CL) has    22 elements
-Group    16 (          Water) has 22110 elements
-Group    17 (            SOL) has 22110 elements
-Group    18 (      non-Water) has  1945 elements
-Group    19 (            Ion) has    45 elements
-Group    20 ( Water_and_ions) has 22155 elements
-Group    21 ( Protein_Ligand) has  1900 elements
-Select a group: Reading frame       0 time    0.000   
-Precision of /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.xtc is 0.001 (nm)
-Using output precision of 0.001 (nm)
-Reading frame       1 time   10.000    ->  frame      0 time    0.000      Reading frame       2 time   20.000    ->  frame      1 time   10.000      Reading frame       3 time   30.000    ->  frame      2 time   20.000      Reading frame       4 time   40.000    ->  frame      3 time   30.000      Reading frame       5 time   50.000    ->  frame      4 time   40.000      Reading frame       6 time   60.000    ->  frame      5 time   50.000      Reading frame       7 time   70.000    ->  frame      6 time   60.000      Reading frame       8 time   80.000    ->  frame      7 time   70.000      Reading frame       9 time   90.000    ->  frame      8 time   80.000      Reading frame      10 time  100.000    ->  frame      9 time   90.000      Reading frame      11 time  110.000    ->  frame     10 time  100.000      Reading frame      12 time  120.000    ->  frame     11 time  110.000      Reading frame      13 time  130.000    ->  frame     12 time  120.000      Reading frame      14 time  140.000    ->  frame     13 time  130.000      Reading frame      15 time  150.000    ->  frame     14 time  140.000      Reading frame      16 time  160.000    ->  frame     15 time  150.000      Reading frame      17 time  170.000    ->  frame     16 time  160.000      Reading frame      18 time  180.000    ->  frame     17 time  170.000      Reading frame      19 time  190.000    ->  frame     18 time  180.000      Reading frame      20 time  200.000    ->  frame     19 time  190.000      Reading frame      30 time  300.000    ->  frame     29 time  290.000      Reading frame      40 time  400.000    ->  frame     39 time  390.000      Reading frame      50 time  500.000    ->  frame     49 time  490.000      Reading frame      60 time  600.000    ->  frame     59 time  590.000      Reading frame      70 time  700.000    ->  frame     69 time  690.000      Reading frame      80 time  800.000    ->  frame     79 time  790.000      Reading frame      90 time  900.000    ->  frame     89 time  890.000      Reading frame     100 time 1000.000    ->  frame     99 time  990.000      Last frame        100 time 1000.000   
- ->  frame    100 time 1000.000      
-Last written: frame    100 time 1000.000
-
-
-GROMACS reminds you: "I Don't Want to Calm Down" (Throwing Muses)
-
-Note that major changes are planned in future for trjconv, to improve usability and utility.
-Select group for output
-Selected 0: 'System'
-                     :-) GROMACS - gmx trjconv, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx trjconv -s /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md_nojump.xtc -n /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/index.ndx -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md_center.xtc -center -pbc mol -ur compact
-
-Will write xtc: Compressed trajectory (portable xdr format): xtc
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Group     0 (         System) has 24055 elements
-Group     1 (        Protein) has  1823 elements
-Group     2 (      Protein-H) has   958 elements
-Group     3 (        C-alpha) has   122 elements
-Group     4 (       Backbone) has   366 elements
-Group     5 (      MainChain) has   489 elements
-Group     6 (   MainChain+Cb) has   602 elements
-Group     7 (    MainChain+H) has   608 elements
-Group     8 (      SideChain) has  1215 elements
-Group     9 (    SideChain-H) has   469 elements
-Group    10 (    Prot-Masses) has  1823 elements
-Group    11 (    non-Protein) has 22232 elements
-Group    12 (         Ligand) has    77 elements
-Group    13 (            UNK) has    77 elements
-Group    14 (             NA) has    23 elements
-Group    15 (             CL) has    22 elements
-Group    16 (          Water) has 22110 elements
-Group    17 (            SOL) has 22110 elements
-Group    18 (      non-Water) has  1945 elements
-Group    19 (            Ion) has    45 elements
-Group    20 ( Water_and_ions) has 22155 elements
-Group    21 ( Protein_Ligand) has  1900 elements
-Select a group: Group     0 (         System) has 24055 elements
-Group     1 (        Protein) has  1823 elements
-Group     2 (      Protein-H) has   958 elements
-Group     3 (        C-alpha) has   122 elements
-Group     4 (       Backbone) has   366 elements
-Group     5 (      MainChain) has   489 elements
-Group     6 (   MainChain+Cb) has   602 elements
-Group     7 (    MainChain+H) has   608 elements
-Group     8 (      SideChain) has  1215 elements
-Group     9 (    SideChain-H) has   469 elements
-Group    10 (    Prot-Masses) has  1823 elements
-Group    11 (    non-Protein) has 22232 elements
-Group    12 (         Ligand) has    77 elements
-Group    13 (            UNK) has    77 elements
-Group    14 (             NA) has    23 elements
-Group    15 (             CL) has    22 elements
-Group    16 (          Water) has 22110 elements
-Group    17 (            SOL) has 22110 elements
-Group    18 (      non-Water) has  1945 elements
-Group    19 (            Ion) has    45 elements
-Group    20 ( Water_and_ions) has 22155 elements
-Group    21 ( Protein_Ligand) has  1900 elements
-Select a group: Reading frame       0 time    0.000   
-Precision of /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md_nojump.xtc is 0.001 (nm)
-Using output precision of 0.001 (nm)
-Reading frame       1 time   10.000    ->  frame      0 time    0.000      Reading frame       2 time   20.000    ->  frame      1 time   10.000      Reading frame       3 time   30.000    ->  frame      2 time   20.000      Reading frame       4 time   40.000    ->  frame      3 time   30.000      Reading frame       5 time   50.000    ->  frame      4 time   40.000      Reading frame       6 time   60.000    ->  frame      5 time   50.000      Reading frame       7 time   70.000    ->  frame      6 time   60.000      Reading frame       8 time   80.000    ->  frame      7 time   70.000      Reading frame       9 time   90.000    ->  frame      8 time   80.000      Reading frame      10 time  100.000    ->  frame      9 time   90.000      Reading frame      11 time  110.000    ->  frame     10 time  100.000      Reading frame      12 time  120.000    ->  frame     11 time  110.000      Reading frame      13 time  130.000    ->  frame     12 time  120.000      Reading frame      14 time  140.000    ->  frame     13 time  130.000      Reading frame      15 time  150.000    ->  frame     14 time  140.000      Reading frame      16 time  160.000    ->  frame     15 time  150.000      Reading frame      17 time  170.000    ->  frame     16 time  160.000      Reading frame      18 time  180.000    ->  frame     17 time  170.000      Reading frame      19 time  190.000    ->  frame     18 time  180.000      Reading frame      20 time  200.000    ->  frame     19 time  190.000      Reading frame      30 time  300.000    ->  frame     29 time  290.000      Reading frame      40 time  400.000    ->  frame     39 time  390.000      Reading frame      50 time  500.000    ->  frame     49 time  490.000      Reading frame      60 time  600.000    ->  frame     59 time  590.000      Reading frame      70 time  700.000    ->  frame     69 time  690.000      Reading frame      80 time  800.000    ->  frame     79 time  790.000      Reading frame      90 time  900.000    ->  frame     89 time  890.000      Reading frame     100 time 1000.000    ->  frame     99 time  990.000      Last frame        100 time 1000.000   
- ->  frame    100 time 1000.000      
-Last written: frame    100 time 1000.000
-
-
-GROMACS reminds you: "I Don't Want to Calm Down" (Throwing Muses)
-
-Note that major changes are planned in future for trjconv, to improve usability and utility.
-Select group for centering
-Selected 21: 'Protein_Ligand'
-Select group for output
-Selected 0: 'System'
-[2026-08-20 19:43:35] CMD: gmx_cmd editconf -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.gro -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/md_final.pdb
-                     :-) GROMACS - gmx editconf, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx editconf -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.gro -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/md_final.pdb
-
-
-GROMACS reminds you: "I Don't Want to Calm Down" (Throwing Muses)
-
-Note that major changes are planned in future for editconf, to improve usability and utility.
-Read 24055 atoms
-Volume: 242.725 nm^3, corresponds to roughly 109200 electrons
-Velocities found
-                       :-) GROMACS - gmx rms, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx rms -s /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md_center.xtc -n /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/index.ndx -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsd_protein.xvg
-
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Select group for least squares fit
-Group     0 (         System) has 24055 elements
-Group     1 (        Protein) has  1823 elements
-Group     2 (      Protein-H) has   958 elements
-Group     3 (        C-alpha) has   122 elements
-Group     4 (       Backbone) has   366 elements
-Group     5 (      MainChain) has   489 elements
-Group     6 (   MainChain+Cb) has   602 elements
-Group     7 (    MainChain+H) has   608 elements
-Group     8 (      SideChain) has  1215 elements
-Group     9 (    SideChain-H) has   469 elements
-Group    10 (    Prot-Masses) has  1823 elements
-Group    11 (    non-Protein) has 22232 elements
-Group    12 (         Ligand) has    77 elements
-Group    13 (            UNK) has    77 elements
-Group    14 (             NA) has    23 elements
-Group    15 (             CL) has    22 elements
-Group    16 (          Water) has 22110 elements
-Group    17 (            SOL) has 22110 elements
-Group    18 (      non-Water) has  1945 elements
-Group    19 (            Ion) has    45 elements
-Group    20 ( Water_and_ions) has 22155 elements
-Group    21 ( Protein_Ligand) has  1900 elements
-Select a group: Select group for RMSD calculation
-Group     0 (         System) has 24055 elements
-Group     1 (        Protein) has  1823 elements
-Group     2 (      Protein-H) has   958 elements
-Group     3 (        C-alpha) has   122 elements
-Group     4 (       Backbone) has   366 elements
-Group     5 (      MainChain) has   489 elements
-Group     6 (   MainChain+Cb) has   602 elements
-Group     7 (    MainChain+H) has   608 elements
-Group     8 (      SideChain) has  1215 elements
-Group     9 (    SideChain-H) has   469 elements
-Group    10 (    Prot-Masses) has  1823 elements
-Group    11 (    non-Protein) has 22232 elements
-Group    12 (         Ligand) has    77 elements
-Group    13 (            UNK) has    77 elements
-Group    14 (             NA) has    23 elements
-Group    15 (             CL) has    22 elements
-Group    16 (          Water) has 22110 elements
-Group    17 (            SOL) has 22110 elements
-Group    18 (      non-Water) has  1945 elements
-Group    19 (            Ion) has    45 elements
-Group    20 ( Water_and_ions) has 22155 elements
-Group    21 ( Protein_Ligand) has  1900 elements
-Select a group: Reading frame       0 time    0.000   Reading frame       1 time   10.000   Reading frame       2 time   20.000   Reading frame       3 time   30.000   Reading frame       4 time   40.000   Reading frame       5 time   50.000   Reading frame       6 time   60.000   Reading frame       7 time   70.000   Reading frame       8 time   80.000   Reading frame       9 time   90.000   Reading frame      10 time  100.000   Reading frame      11 time  110.000   Reading frame      12 time  120.000   Reading frame      13 time  130.000   Reading frame      14 time  140.000   Reading frame      15 time  150.000   Reading frame      16 time  160.000   Reading frame      17 time  170.000   Reading frame      18 time  180.000   Reading frame      19 time  190.000   Reading frame      20 time  200.000   Reading frame      30 time  300.000   Reading frame      40 time  400.000   Reading frame      50 time  500.000   Reading frame      60 time  600.000   Reading frame      70 time  700.000   Reading frame      80 time  800.000   Reading frame      90 time  900.000   Reading frame     100 time 1000.000   Last frame        100 time 1000.000   
-
-GROMACS reminds you: "I Don't Want to Calm Down" (Throwing Muses)
-
-Selected 4: 'Backbone'
-Selected 1: 'Protein'
-                       :-) GROMACS - gmx rms, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx rms -s /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md_center.xtc -n /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/index.ndx -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsd_protein_ligand.xvg
-
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Select group for least squares fit
-Group     0 (         System) has 24055 elements
-Group     1 (        Protein) has  1823 elements
-Group     2 (      Protein-H) has   958 elements
-Group     3 (        C-alpha) has   122 elements
-Group     4 (       Backbone) has   366 elements
-Group     5 (      MainChain) has   489 elements
-Group     6 (   MainChain+Cb) has   602 elements
-Group     7 (    MainChain+H) has   608 elements
-Group     8 (      SideChain) has  1215 elements
-Group     9 (    SideChain-H) has   469 elements
-Group    10 (    Prot-Masses) has  1823 elements
-Group    11 (    non-Protein) has 22232 elements
-Group    12 (         Ligand) has    77 elements
-Group    13 (            UNK) has    77 elements
-Group    14 (             NA) has    23 elements
-Group    15 (             CL) has    22 elements
-Group    16 (          Water) has 22110 elements
-Group    17 (            SOL) has 22110 elements
-Group    18 (      non-Water) has  1945 elements
-Group    19 (            Ion) has    45 elements
-Group    20 ( Water_and_ions) has 22155 elements
-Group    21 ( Protein_Ligand) has  1900 elements
-Select a group: Select group for RMSD calculation
-Group     0 (         System) has 24055 elements
-Group     1 (        Protein) has  1823 elements
-Group     2 (      Protein-H) has   958 elements
-Group     3 (        C-alpha) has   122 elements
-Group     4 (       Backbone) has   366 elements
-Group     5 (      MainChain) has   489 elements
-Group     6 (   MainChain+Cb) has   602 elements
-Group     7 (    MainChain+H) has   608 elements
-Group     8 (      SideChain) has  1215 elements
-Group     9 (    SideChain-H) has   469 elements
-Group    10 (    Prot-Masses) has  1823 elements
-Group    11 (    non-Protein) has 22232 elements
-Group    12 (         Ligand) has    77 elements
-Group    13 (            UNK) has    77 elements
-Group    14 (             NA) has    23 elements
-Group    15 (             CL) has    22 elements
-Group    16 (          Water) has 22110 elements
-Group    17 (            SOL) has 22110 elements
-Group    18 (      non-Water) has  1945 elements
-Group    19 (            Ion) has    45 elements
-Group    20 ( Water_and_ions) has 22155 elements
-Group    21 ( Protein_Ligand) has  1900 elements
-Select a group: Reading frame       0 time    0.000   Reading frame       1 time   10.000   Reading frame       2 time   20.000   Reading frame       3 time   30.000   Reading frame       4 time   40.000   Reading frame       5 time   50.000   Reading frame       6 time   60.000   Reading frame       7 time   70.000   Reading frame       8 time   80.000   Reading frame       9 time   90.000   Reading frame      10 time  100.000   Reading frame      11 time  110.000   Reading frame      12 time  120.000   Reading frame      13 time  130.000   Reading frame      14 time  140.000   Reading frame      15 time  150.000   Reading frame      16 time  160.000   Reading frame      17 time  170.000   Reading frame      18 time  180.000   Reading frame      19 time  190.000   Reading frame      20 time  200.000   Reading frame      30 time  300.000   Reading frame      40 time  400.000   Reading frame      50 time  500.000   Reading frame      60 time  600.000   Reading frame      70 time  700.000   Reading frame      80 time  800.000   Reading frame      90 time  900.000   Reading frame     100 time 1000.000   Last frame        100 time 1000.000   
-
-GROMACS reminds you: "I Don't Want to Calm Down" (Throwing Muses)
-
-Selected 21: 'Protein_Ligand'
-Selected 21: 'Protein_Ligand'
-                       :-) GROMACS - gmx rms, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx rms -s /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md_center.xtc -n /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/index.ndx -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsd_ligand.xvg
-
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Select group for least squares fit
-Group     0 (         System) has 24055 elements
-Group     1 (        Protein) has  1823 elements
-Group     2 (      Protein-H) has   958 elements
-Group     3 (        C-alpha) has   122 elements
-Group     4 (       Backbone) has   366 elements
-Group     5 (      MainChain) has   489 elements
-Group     6 (   MainChain+Cb) has   602 elements
-Group     7 (    MainChain+H) has   608 elements
-Group     8 (      SideChain) has  1215 elements
-Group     9 (    SideChain-H) has   469 elements
-Group    10 (    Prot-Masses) has  1823 elements
-Group    11 (    non-Protein) has 22232 elements
-Group    12 (         Ligand) has    77 elements
-Group    13 (            UNK) has    77 elements
-Group    14 (             NA) has    23 elements
-Group    15 (             CL) has    22 elements
-Group    16 (          Water) has 22110 elements
-Group    17 (            SOL) has 22110 elements
-Group    18 (      non-Water) has  1945 elements
-Group    19 (            Ion) has    45 elements
-Group    20 ( Water_and_ions) has 22155 elements
-Group    21 ( Protein_Ligand) has  1900 elements
-Select a group: Select group for RMSD calculation
-Group     0 (         System) has 24055 elements
-Group     1 (        Protein) has  1823 elements
-Group     2 (      Protein-H) has   958 elements
-Group     3 (        C-alpha) has   122 elements
-Group     4 (       Backbone) has   366 elements
-Group     5 (      MainChain) has   489 elements
-Group     6 (   MainChain+Cb) has   602 elements
-Group     7 (    MainChain+H) has   608 elements
-Group     8 (      SideChain) has  1215 elements
-Group     9 (    SideChain-H) has   469 elements
-Group    10 (    Prot-Masses) has  1823 elements
-Group    11 (    non-Protein) has 22232 elements
-Group    12 (         Ligand) has    77 elements
-Group    13 (            UNK) has    77 elements
-Group    14 (             NA) has    23 elements
-Group    15 (             CL) has    22 elements
-Group    16 (          Water) has 22110 elements
-Group    17 (            SOL) has 22110 elements
-Group    18 (      non-Water) has  1945 elements
-Group    19 (            Ion) has    45 elements
-Group    20 ( Water_and_ions) has 22155 elements
-Group    21 ( Protein_Ligand) has  1900 elements
-Select a group: Reading frame       0 time    0.000   Reading frame       1 time   10.000   Reading frame       2 time   20.000   Reading frame       3 time   30.000   Reading frame       4 time   40.000   Reading frame       5 time   50.000   Reading frame       6 time   60.000   Reading frame       7 time   70.000   Reading frame       8 time   80.000   Reading frame       9 time   90.000   Reading frame      10 time  100.000   Reading frame      11 time  110.000   Reading frame      12 time  120.000   Reading frame      13 time  130.000   Reading frame      14 time  140.000   Reading frame      15 time  150.000   Reading frame      16 time  160.000   Reading frame      17 time  170.000   Reading frame      18 time  180.000   Reading frame      19 time  190.000   Reading frame      20 time  200.000   Reading frame      30 time  300.000   Reading frame      40 time  400.000   Reading frame      50 time  500.000   Reading frame      60 time  600.000   Reading frame      70 time  700.000   Reading frame      80 time  800.000   Reading frame      90 time  900.000   Reading frame     100 time 1000.000   Last frame        100 time 1000.000   
-
-GROMACS reminds you: "I Don't Want to Calm Down" (Throwing Muses)
-
-Selected 4: 'Backbone'
-Selected 12: 'Ligand'
-                       :-) GROMACS - gmx rmsf, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx rmsf -s /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md_center.xtc -n /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/index.ndx -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsf_protein.xvg -res
-
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Select group(s) for root mean square calculation
-Group     0 (         System) has 24055 elements
-Group     1 (        Protein) has  1823 elements
-Group     2 (      Protein-H) has   958 elements
-Group     3 (        C-alpha) has   122 elements
-Group     4 (       Backbone) has   366 elements
-Group     5 (      MainChain) has   489 elements
-Group     6 (   MainChain+Cb) has   602 elements
-Group     7 (    MainChain+H) has   608 elements
-Group     8 (      SideChain) has  1215 elements
-Group     9 (    SideChain-H) has   469 elements
-Group    10 (    Prot-Masses) has  1823 elements
-Group    11 (    non-Protein) has 22232 elements
-Group    12 (         Ligand) has    77 elements
-Group    13 (            UNK) has    77 elements
-Group    14 (             NA) has    23 elements
-Group    15 (             CL) has    22 elements
-Group    16 (          Water) has 22110 elements
-Group    17 (            SOL) has 22110 elements
-Group    18 (      non-Water) has  1945 elements
-Group    19 (            Ion) has    45 elements
-Group    20 ( Water_and_ions) has 22155 elements
-Group    21 ( Protein_Ligand) has  1900 elements
-Select a group: Reading frame       0 time    0.000   Reading frame       1 time   10.000   Reading frame       2 time   20.000   Reading frame       3 time   30.000   Reading frame       4 time   40.000   Reading frame       5 time   50.000   Reading frame       6 time   60.000   Reading frame       7 time   70.000   Reading frame       8 time   80.000   Reading frame       9 time   90.000   Reading frame      10 time  100.000   Reading frame      11 time  110.000   Reading frame      12 time  120.000   Reading frame      13 time  130.000   Reading frame      14 time  140.000   Reading frame      15 time  150.000   Reading frame      16 time  160.000   Reading frame      17 time  170.000   Reading frame      18 time  180.000   Reading frame      19 time  190.000   Reading frame      20 time  200.000   Reading frame      30 time  300.000   Reading frame      40 time  400.000   Reading frame      50 time  500.000   Reading frame      60 time  600.000   Reading frame      70 time  700.000   Reading frame      80 time  800.000   Reading frame      90 time  900.000   Reading frame     100 time 1000.000   Last frame        100 time 1000.000   
-
-GROMACS reminds you: "I Don't Want to Calm Down" (Throwing Muses)
-
-Selected 1: 'Protein'
-                      :-) GROMACS - gmx gyrate, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx gyrate -s /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md_center.xtc -n /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/index.ndx -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/gyration_protein.xvg
-
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Reading frame       0 time    0.000   Reading frame       1 time   10.000   Reading frame       2 time   20.000   Reading frame       3 time   30.000   Reading frame       4 time   40.000   Reading frame       5 time   50.000   Reading frame       6 time   60.000   Reading frame       7 time   70.000   Reading frame       8 time   80.000   Reading frame       9 time   90.000   Reading frame      10 time  100.000   Reading frame      11 time  110.000   Reading frame      12 time  120.000   Reading frame      13 time  130.000   Reading frame      14 time  140.000   Reading frame      15 time  150.000   Reading frame      16 time  160.000   Reading frame      17 time  170.000   Reading frame      18 time  180.000   Reading frame      19 time  190.000   Reading frame      20 time  200.000   Reading frame      30 time  300.000   Reading frame      40 time  400.000   Reading frame      50 time  500.000   Reading frame      60 time  600.000   Reading frame      70 time  700.000   Reading frame      80 time  800.000   Reading frame      90 time  900.000   Reading frame     100 time 1000.000   Last frame        100 time 1000.000   
-Analyzed 101 frames, last time 1000.000
-
-GROMACS reminds you: "History has expired" (PubMed Central)
-
-                      :-) GROMACS - gmx hbond, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx hbond -s /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md_center.xtc -n /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/index.ndx -num /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/hbonds_protein_ligand.xvg
-
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-
--------------------------------------------------------
-Program:     gmx hbond, version 2025.2
-Source file: src/gromacs/trajectoryanalysis/modules/hbond.cpp (line 622)
-Function:    static void gmx::analysismodules::{anonymous}::Hbond::linkDA(gmx::analysismodules::{anonymous}::t_info*)
-
-Inconsistency in user input:
-Selection Ligand' has no donors AND has no acceptors! Nothing to be done.
-
-For more information and tips for troubleshooting, please check the GROMACS
-website at https://manual.gromacs.org/current/user-guide/run-time-errors.html
--------------------------------------------------------
-
-Checking for overlap in atoms between Protein (1823 atoms) and Ligand (77 atoms)
-Selection 'Protein' has 350 acceptors and 180 donors.
-Selection 'Ligand' has 0 acceptors and 0 donors.
-[2026-08-20 19:43:36] WARNING: Protein-Ligand hbond analysis failed (ligand may lack donor/acceptor definitions); skipping hbond plot
-                      :-) GROMACS - gmx energy, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx energy -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.edr -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/energies.xvg
-
-Opened /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.edr as single precision energy file
-
-Select the terms you want from the following list by
-selecting either (part of) the name or the number or a combination.
-End your selection with an empty line or a zero.
--------------------------------------------------------------------
-  1  Bond             2  Angle            3  Proper-Dih.      4  Per.-Imp.-Dih.
-  5  LJ-14            6  Coulomb-14       7  LJ-(SR)          8  Disper.-corr. 
-  9  Coulomb-(SR)    10  Coul.-recip.    11  Potential       12  Kinetic-En.   
- 13  Total-Energy    14  Conserved-En.   15  Temperature     16  Pres.-DC      
- 17  Pressure        18  Constr.-rmsd    19  Box-X           20  Box-Y         
- 21  Box-Z           22  Volume          23  Density         24  pV            
- 25  Enthalpy        26  Vir-XX          27  Vir-XY          28  Vir-XZ        
- 29  Vir-YX          30  Vir-YY          31  Vir-YZ          32  Vir-ZX        
- 33  Vir-ZY          34  Vir-ZZ          35  Pres-XX         36  Pres-XY       
- 37  Pres-XZ         38  Pres-YX         39  Pres-YY         40  Pres-YZ       
- 41  Pres-ZX         42  Pres-ZY         43  Pres-ZZ         44  #Surf*SurfTen 
- 45  Box-Vel-XX      46  Box-Vel-YY      47  Box-Vel-ZZ      48  T-Protein     
- 49  T-non-Protein                       50  Lamb-Protein                      
- 51  Lamb-non-Protein                  
-
-Reading energy frame      0 time    0.000         Reading energy frame      1 time   10.000         Reading energy frame      2 time   20.000         Reading energy frame      3 time   30.000         Reading energy frame      4 time   40.000         Reading energy frame      5 time   50.000         Reading energy frame      6 time   60.000         Reading energy frame      7 time   70.000         Reading energy frame      8 time   80.000         Reading energy frame      9 time   90.000         Reading energy frame     10 time  100.000         Reading energy frame     11 time  110.000         Reading energy frame     12 time  120.000         Reading energy frame     13 time  130.000         Reading energy frame     14 time  140.000         Reading energy frame     15 time  150.000         Reading energy frame     16 time  160.000         Reading energy frame     17 time  170.000         Reading energy frame     18 time  180.000         Reading energy frame     19 time  190.000         Reading energy frame     20 time  200.000         Reading energy frame     30 time  300.000         Reading energy frame     40 time  400.000         Reading energy frame     50 time  500.000         Reading energy frame     60 time  600.000         Reading energy frame     70 time  700.000         Reading energy frame     80 time  800.000         Reading energy frame     90 time  900.000         Reading energy frame    100 time 1000.000         Last energy frame read 100 time 1000.000         
-
-GROMACS reminds you: "History has expired" (PubMed Central)
-
-
-Statistics over 500001 steps [ 0.0000 through 1000.0000 ps ], 4 data sets
-All statistics are over 5001 points
-
-Energy                      Average   Err.Est.       RMSD  Tot-Drift
--------------------------------------------------------------------------------
-Potential                   -328350         18     716.55   -111.551  (kJ/mol)
-Temperature                 299.962      0.022    2.14602  -0.079687  (K)
-Pressure                  -0.536401        1.7    215.258    5.17851  (bar)
-Density                     1021.56      0.093    6.32446   0.192172  (kg/m^3)
-                      :-) GROMACS - gmx energy, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx energy -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.edr -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/potential.xvg
-
-Opened /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.edr as single precision energy file
-
-Select the terms you want from the following list by
-selecting either (part of) the name or the number or a combination.
-End your selection with an empty line or a zero.
--------------------------------------------------------------------
-  1  Bond             2  Angle            3  Proper-Dih.      4  Per.-Imp.-Dih.
-  5  LJ-14            6  Coulomb-14       7  LJ-(SR)          8  Disper.-corr. 
-  9  Coulomb-(SR)    10  Coul.-recip.    11  Potential       12  Kinetic-En.   
- 13  Total-Energy    14  Conserved-En.   15  Temperature     16  Pres.-DC      
- 17  Pressure        18  Constr.-rmsd    19  Box-X           20  Box-Y         
- 21  Box-Z           22  Volume          23  Density         24  pV            
- 25  Enthalpy        26  Vir-XX          27  Vir-XY          28  Vir-XZ        
- 29  Vir-YX          30  Vir-YY          31  Vir-YZ          32  Vir-ZX        
- 33  Vir-ZY          34  Vir-ZZ          35  Pres-XX         36  Pres-XY       
- 37  Pres-XZ         38  Pres-YX         39  Pres-YY         40  Pres-YZ       
- 41  Pres-ZX         42  Pres-ZY         43  Pres-ZZ         44  #Surf*SurfTen 
- 45  Box-Vel-XX      46  Box-Vel-YY      47  Box-Vel-ZZ      48  T-Protein     
- 49  T-non-Protein                       50  Lamb-Protein                      
- 51  Lamb-non-Protein                  
-
-Reading energy frame      0 time    0.000         Reading energy frame      1 time   10.000         Reading energy frame      2 time   20.000         Reading energy frame      3 time   30.000         Reading energy frame      4 time   40.000         Reading energy frame      5 time   50.000         Reading energy frame      6 time   60.000         Reading energy frame      7 time   70.000         Reading energy frame      8 time   80.000         Reading energy frame      9 time   90.000         Reading energy frame     10 time  100.000         Reading energy frame     11 time  110.000         Reading energy frame     12 time  120.000         Reading energy frame     13 time  130.000         Reading energy frame     14 time  140.000         Reading energy frame     15 time  150.000         Reading energy frame     16 time  160.000         Reading energy frame     17 time  170.000         Reading energy frame     18 time  180.000         Reading energy frame     19 time  190.000         Reading energy frame     20 time  200.000         Reading energy frame     30 time  300.000         Reading energy frame     40 time  400.000         Reading energy frame     50 time  500.000         Reading energy frame     60 time  600.000         Reading energy frame     70 time  700.000         Reading energy frame     80 time  800.000         Reading energy frame     90 time  900.000         Reading energy frame    100 time 1000.000         Last energy frame read 100 time 1000.000         
-
-GROMACS reminds you: "History has expired" (PubMed Central)
-
-
-Statistics over 500001 steps [ 0.0000 through 1000.0000 ps ], 1 data sets
-All statistics are over 5001 points
-
-Energy                      Average   Err.Est.       RMSD  Tot-Drift
--------------------------------------------------------------------------------
-Potential                   -328350         18     716.55   -111.551  (kJ/mol)
-                      :-) GROMACS - gmx energy, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx energy -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.edr -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/temperature.xvg
-
-Opened /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.edr as single precision energy file
-
-Select the terms you want from the following list by
-selecting either (part of) the name or the number or a combination.
-End your selection with an empty line or a zero.
--------------------------------------------------------------------
-  1  Bond             2  Angle            3  Proper-Dih.      4  Per.-Imp.-Dih.
-  5  LJ-14            6  Coulomb-14       7  LJ-(SR)          8  Disper.-corr. 
-  9  Coulomb-(SR)    10  Coul.-recip.    11  Potential       12  Kinetic-En.   
- 13  Total-Energy    14  Conserved-En.   15  Temperature     16  Pres.-DC      
- 17  Pressure        18  Constr.-rmsd    19  Box-X           20  Box-Y         
- 21  Box-Z           22  Volume          23  Density         24  pV            
- 25  Enthalpy        26  Vir-XX          27  Vir-XY          28  Vir-XZ        
- 29  Vir-YX          30  Vir-YY          31  Vir-YZ          32  Vir-ZX        
- 33  Vir-ZY          34  Vir-ZZ          35  Pres-XX         36  Pres-XY       
- 37  Pres-XZ         38  Pres-YX         39  Pres-YY         40  Pres-YZ       
- 41  Pres-ZX         42  Pres-ZY         43  Pres-ZZ         44  #Surf*SurfTen 
- 45  Box-Vel-XX      46  Box-Vel-YY      47  Box-Vel-ZZ      48  T-Protein     
- 49  T-non-Protein                       50  Lamb-Protein                      
- 51  Lamb-non-Protein                  
-
-Reading energy frame      0 time    0.000         Reading energy frame      1 time   10.000         Reading energy frame      2 time   20.000         Reading energy frame      3 time   30.000         Reading energy frame      4 time   40.000         Reading energy frame      5 time   50.000         Reading energy frame      6 time   60.000         Reading energy frame      7 time   70.000         Reading energy frame      8 time   80.000         Reading energy frame      9 time   90.000         Reading energy frame     10 time  100.000         Reading energy frame     11 time  110.000         Reading energy frame     12 time  120.000         Reading energy frame     13 time  130.000         Reading energy frame     14 time  140.000         Reading energy frame     15 time  150.000         Reading energy frame     16 time  160.000         Reading energy frame     17 time  170.000         Reading energy frame     18 time  180.000         Reading energy frame     19 time  190.000         Reading energy frame     20 time  200.000         Reading energy frame     30 time  300.000         Reading energy frame     40 time  400.000         Reading energy frame     50 time  500.000         Reading energy frame     60 time  600.000         Reading energy frame     70 time  700.000         Reading energy frame     80 time  800.000         Reading energy frame     90 time  900.000         Reading energy frame    100 time 1000.000         Last energy frame read 100 time 1000.000         
-
-GROMACS reminds you: "History has expired" (PubMed Central)
-
-
-Statistics over 500001 steps [ 0.0000 through 1000.0000 ps ], 1 data sets
-All statistics are over 5001 points
-
-Energy                      Average   Err.Est.       RMSD  Tot-Drift
--------------------------------------------------------------------------------
-Temperature                 299.962      0.022    2.14602  -0.079687  (K)
-                      :-) GROMACS - gmx energy, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx energy -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.edr -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/pressure.xvg
-
-Opened /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.edr as single precision energy file
-
-Select the terms you want from the following list by
-selecting either (part of) the name or the number or a combination.
-End your selection with an empty line or a zero.
--------------------------------------------------------------------
-  1  Bond             2  Angle            3  Proper-Dih.      4  Per.-Imp.-Dih.
-  5  LJ-14            6  Coulomb-14       7  LJ-(SR)          8  Disper.-corr. 
-  9  Coulomb-(SR)    10  Coul.-recip.    11  Potential       12  Kinetic-En.   
- 13  Total-Energy    14  Conserved-En.   15  Temperature     16  Pres.-DC      
- 17  Pressure        18  Constr.-rmsd    19  Box-X           20  Box-Y         
- 21  Box-Z           22  Volume          23  Density         24  pV            
- 25  Enthalpy        26  Vir-XX          27  Vir-XY          28  Vir-XZ        
- 29  Vir-YX          30  Vir-YY          31  Vir-YZ          32  Vir-ZX        
- 33  Vir-ZY          34  Vir-ZZ          35  Pres-XX         36  Pres-XY       
- 37  Pres-XZ         38  Pres-YX         39  Pres-YY         40  Pres-YZ       
- 41  Pres-ZX         42  Pres-ZY         43  Pres-ZZ         44  #Surf*SurfTen 
- 45  Box-Vel-XX      46  Box-Vel-YY      47  Box-Vel-ZZ      48  T-Protein     
- 49  T-non-Protein                       50  Lamb-Protein                      
- 51  Lamb-non-Protein                  
-
-Reading energy frame      0 time    0.000         Reading energy frame      1 time   10.000         Reading energy frame      2 time   20.000         Reading energy frame      3 time   30.000         Reading energy frame      4 time   40.000         Reading energy frame      5 time   50.000         Reading energy frame      6 time   60.000         Reading energy frame      7 time   70.000         Reading energy frame      8 time   80.000         Reading energy frame      9 time   90.000         Reading energy frame     10 time  100.000         Reading energy frame     11 time  110.000         Reading energy frame     12 time  120.000         Reading energy frame     13 time  130.000         Reading energy frame     14 time  140.000         Reading energy frame     15 time  150.000         Reading energy frame     16 time  160.000         Reading energy frame     17 time  170.000         Reading energy frame     18 time  180.000         Reading energy frame     19 time  190.000         Reading energy frame     20 time  200.000         Reading energy frame     30 time  300.000         Reading energy frame     40 time  400.000         Reading energy frame     50 time  500.000         Reading energy frame     60 time  600.000         Reading energy frame     70 time  700.000         Reading energy frame     80 time  800.000         Reading energy frame     90 time  900.000         Reading energy frame    100 time 1000.000         Last energy frame read 100 time 1000.000         
-
-GROMACS reminds you: "History has expired" (PubMed Central)
-
-
-Statistics over 500001 steps [ 0.0000 through 1000.0000 ps ], 1 data sets
-All statistics are over 5001 points
-
-Energy                      Average   Err.Est.       RMSD  Tot-Drift
--------------------------------------------------------------------------------
-Pressure                  -0.536401        1.7    215.258    5.17851  (bar)
-                      :-) GROMACS - gmx energy, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx energy -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.edr -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/density.xvg
-
-Opened /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.edr as single precision energy file
-
-Select the terms you want from the following list by
-selecting either (part of) the name or the number or a combination.
-End your selection with an empty line or a zero.
--------------------------------------------------------------------
-  1  Bond             2  Angle            3  Proper-Dih.      4  Per.-Imp.-Dih.
-  5  LJ-14            6  Coulomb-14       7  LJ-(SR)          8  Disper.-corr. 
-  9  Coulomb-(SR)    10  Coul.-recip.    11  Potential       12  Kinetic-En.   
- 13  Total-Energy    14  Conserved-En.   15  Temperature     16  Pres.-DC      
- 17  Pressure        18  Constr.-rmsd    19  Box-X           20  Box-Y         
- 21  Box-Z           22  Volume          23  Density         24  pV            
- 25  Enthalpy        26  Vir-XX          27  Vir-XY          28  Vir-XZ        
- 29  Vir-YX          30  Vir-YY          31  Vir-YZ          32  Vir-ZX        
- 33  Vir-ZY          34  Vir-ZZ          35  Pres-XX         36  Pres-XY       
- 37  Pres-XZ         38  Pres-YX         39  Pres-YY         40  Pres-YZ       
- 41  Pres-ZX         42  Pres-ZY         43  Pres-ZZ         44  #Surf*SurfTen 
- 45  Box-Vel-XX      46  Box-Vel-YY      47  Box-Vel-ZZ      48  T-Protein     
- 49  T-non-Protein                       50  Lamb-Protein                      
- 51  Lamb-non-Protein                  
-
-Reading energy frame      0 time    0.000         Reading energy frame      1 time   10.000         Reading energy frame      2 time   20.000         Reading energy frame      3 time   30.000         Reading energy frame      4 time   40.000         Reading energy frame      5 time   50.000         Reading energy frame      6 time   60.000         Reading energy frame      7 time   70.000         Reading energy frame      8 time   80.000         Reading energy frame      9 time   90.000         Reading energy frame     10 time  100.000         Reading energy frame     11 time  110.000         Reading energy frame     12 time  120.000         Reading energy frame     13 time  130.000         Reading energy frame     14 time  140.000         Reading energy frame     15 time  150.000         Reading energy frame     16 time  160.000         Reading energy frame     17 time  170.000         Reading energy frame     18 time  180.000         Reading energy frame     19 time  190.000         Reading energy frame     20 time  200.000         Reading energy frame     30 time  300.000         Reading energy frame     40 time  400.000         Reading energy frame     50 time  500.000         Reading energy frame     60 time  600.000         Reading energy frame     70 time  700.000         Reading energy frame     80 time  800.000         Reading energy frame     90 time  900.000         Reading energy frame    100 time 1000.000         Last energy frame read 100 time 1000.000         
-
-GROMACS reminds you: "History has expired" (PubMed Central)
-
-
-Statistics over 500001 steps [ 0.0000 through 1000.0000 ps ], 1 data sets
-All statistics are over 5001 points
-
-Energy                      Average   Err.Est.       RMSD  Tot-Drift
--------------------------------------------------------------------------------
-Density                     1021.56      0.093    6.32446   0.192172  (kg/m^3)
-[2026-08-20 19:43:36] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/plot_analysis.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsd_protein.xvg Protein RMSD /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsd_protein.png
-[2026-08-20 19:43:36] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/plot_analysis.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsd_ligand.xvg Ligand RMSD /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsd_ligand.png
-[2026-08-20 19:43:37] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/plot_analysis.py --rmsd-comparison /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsd_protein.xvg /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsd_ligand.xvg /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsd_protein_ligand.png
-[2026-08-20 19:43:37] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/plot_analysis.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsf_protein.xvg Protein RMSF /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsf_protein.png
-[2026-08-20 19:43:38] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/plot_analysis.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/gyration_protein.xvg Protein Radius of Gyration /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/gyration_protein.png
-[2026-08-20 19:43:38] Skipping plot; missing XVG data: /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/hbonds_protein_ligand.xvg
-[2026-08-20 19:43:38] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/plot_analysis.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/potential.xvg Potential Energy /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/potential.png
-[2026-08-20 19:43:39] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/plot_analysis.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/temperature.xvg Temperature /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/temperature.png
-[2026-08-20 19:43:39] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/plot_analysis.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/pressure.xvg Pressure /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/pressure.png
-[2026-08-20 19:43:39] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/plot_analysis.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/density.xvg Density /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/density.png
-[2026-08-20 19:43:40] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/pca_free_energy.py --top /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr --traj /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md_center.xtc --outdir /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/free_energy
-[2026-08-20 19:43:43] Finished step10_analysis
-[2026-08-20 19:43:43] Starting step11_mmpbsa
-[2026-08-20 19:43:43] MM-PBSA configuration:
-[2026-08-20 19:43:43]   TPR: /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr
-[2026-08-20 19:43:43]   XTC: /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.xtc
-[2026-08-20 19:43:43]   Receptor: protein
-[2026-08-20 19:43:43]   Ligand: group Ligand
-[2026-08-20 19:43:43]   Output: /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/mmpbsa
-[2026-08-20 19:43:43] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/mmpbsa_calculation.py
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'altLocs' Using default value of ' '
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'icodes' Using default value of ' '
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'occupancies' Using default value of '1.0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'tempfactors' Using default value of '0.0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'record_types' Using default value of 'ATOM'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'formalcharges' Using default value of '0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1324: UserWarning: Found chainIDs with invalid length. Corresponding atoms will use value of 'X'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'altLocs' Using default value of ' '
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'icodes' Using default value of ' '
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'occupancies' Using default value of '1.0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'tempfactors' Using default value of '0.0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'record_types' Using default value of 'ATOM'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'formalcharges' Using default value of '0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1324: UserWarning: Found chainIDs with invalid length. Corresponding atoms will use value of 'X'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'altLocs' Using default value of ' '
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'icodes' Using default value of ' '
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'occupancies' Using default value of '1.0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'tempfactors' Using default value of '0.0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'record_types' Using default value of 'ATOM'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'formalcharges' Using default value of '0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1324: UserWarning: Found chainIDs with invalid length. Corresponding atoms will use value of 'X'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'altLocs' Using default value of ' '
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'icodes' Using default value of ' '
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'occupancies' Using default value of '1.0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'tempfactors' Using default value of '0.0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'record_types' Using default value of 'ATOM'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'formalcharges' Using default value of '0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1324: UserWarning: Found chainIDs with invalid length. Corresponding atoms will use value of 'X'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'altLocs' Using default value of ' '
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'icodes' Using default value of ' '
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'occupancies' Using default value of '1.0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'tempfactors' Using default value of '0.0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'record_types' Using default value of 'ATOM'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'formalcharges' Using default value of '0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1324: UserWarning: Found chainIDs with invalid length. Corresponding atoms will use value of 'X'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'altLocs' Using default value of ' '
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'icodes' Using default value of ' '
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'occupancies' Using default value of '1.0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'tempfactors' Using default value of '0.0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'record_types' Using default value of 'ATOM'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'formalcharges' Using default value of '0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1324: UserWarning: Found chainIDs with invalid length. Corresponding atoms will use value of 'X'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'altLocs' Using default value of ' '
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'icodes' Using default value of ' '
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'occupancies' Using default value of '1.0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'tempfactors' Using default value of '0.0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'record_types' Using default value of 'ATOM'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'formalcharges' Using default value of '0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1324: UserWarning: Found chainIDs with invalid length. Corresponding atoms will use value of 'X'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'altLocs' Using default value of ' '
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'icodes' Using default value of ' '
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'occupancies' Using default value of '1.0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'tempfactors' Using default value of '0.0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'record_types' Using default value of 'ATOM'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'formalcharges' Using default value of '0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1324: UserWarning: Found chainIDs with invalid length. Corresponding atoms will use value of 'X'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'altLocs' Using default value of ' '
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'icodes' Using default value of ' '
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'occupancies' Using default value of '1.0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'tempfactors' Using default value of '0.0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'record_types' Using default value of 'ATOM'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'formalcharges' Using default value of '0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1324: UserWarning: Found chainIDs with invalid length. Corresponding atoms will use value of 'X'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'altLocs' Using default value of ' '
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'icodes' Using default value of ' '
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'occupancies' Using default value of '1.0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'tempfactors' Using default value of '0.0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'record_types' Using default value of 'ATOM'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'formalcharges' Using default value of '0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1324: UserWarning: Found chainIDs with invalid length. Corresponding atoms will use value of 'X'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'altLocs' Using default value of ' '
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'icodes' Using default value of ' '
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'occupancies' Using default value of '1.0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'tempfactors' Using default value of '0.0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'record_types' Using default value of 'ATOM'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1282: UserWarning: Found no information for attr: 'formalcharges' Using default value of '0'
-  warnings.warn(
-/home/nanomd/anaconda3/lib/python3.13/site-packages/MDAnalysis/coordinates/PDB.py:1324: UserWarning: Found chainIDs with invalid length. Corresponding atoms will use value of 'X'
-  warnings.warn(
-GROMACS: gmx (unknown)
-Trajectory: /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.xtc
-Topology: /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr
-Loaded index groups: ['System', 'Protein', 'Protein-H', 'C-alpha', 'Backbone', 'MainChain', 'MainChain+Cb', 'MainChain+H', 'SideChain', 'SideChain-H', 'Prot-Masses', 'non-Protein', 'Ligand', 'UNK', 'NA', 'CL', 'Water', 'SOL', 'non-Water', 'Ion', 'Water_and_ions', 'Protein_Ligand']
-Trajectory contains 101 frames
-Receptor: 1823 atoms | Ligand: 77 atoms
-Processing 11 frames (every 10 frame(s))
-
---- Setting up energy groups ---
-Index groups: Receptor (1823 atoms), Ligand (77 atoms)
-
-  Frame 1/11 (frame=0, t=0.0 ps)
-    Warning: grompp failed, skipping MM energy for this frame
-    Warning: PB calculation failed: [Errno 13] Permission denied: 'pdb2pqr'
-    SA: ΔSA=354758.3 Å²  ΔG_SA=+2554.26 kcal/mol
-    ΔG_total = +2554.26 kcal/mol
-
-  Frame 2/11 (frame=10, t=100.0 ps)
-    Warning: grompp failed, skipping MM energy for this frame
-    Warning: PB calculation failed: [Errno 13] Permission denied: 'pdb2pqr'
-    SA: ΔSA=353781.1 Å²  ΔG_SA=+2547.22 kcal/mol
-    ΔG_total = +2547.22 kcal/mol
-
-  Frame 3/11 (frame=20, t=200.0 ps)
-    Warning: grompp failed, skipping MM energy for this frame
-    Warning: PB calculation failed: [Errno 13] Permission denied: 'pdb2pqr'
-    SA: ΔSA=354155.7 Å²  ΔG_SA=+2549.92 kcal/mol
-    ΔG_total = +2549.92 kcal/mol
-
-  Frame 4/11 (frame=30, t=300.0 ps)
-    Warning: grompp failed, skipping MM energy for this frame
-    Warning: PB calculation failed: [Errno 13] Permission denied: 'pdb2pqr'
-    SA: ΔSA=354025.4 Å²  ΔG_SA=+2548.98 kcal/mol
-    ΔG_total = +2548.98 kcal/mol
-
-  Frame 5/11 (frame=40, t=400.0 ps)
-    Warning: grompp failed, skipping MM energy for this frame
-    Warning: PB calculation failed: [Errno 13] Permission denied: 'pdb2pqr'
-    SA: ΔSA=353846.3 Å²  ΔG_SA=+2547.69 kcal/mol
-    ΔG_total = +2547.69 kcal/mol
-
-  Frame 6/11 (frame=50, t=500.0 ps)
-    Warning: grompp failed, skipping MM energy for this frame
-    Warning: PB calculation failed: [Errno 13] Permission denied: 'pdb2pqr'
-    SA: ΔSA=353683.4 Å²  ΔG_SA=+2546.52 kcal/mol
-    ΔG_total = +2546.52 kcal/mol
-
-  Frame 7/11 (frame=60, t=600.0 ps)
-    Warning: grompp failed, skipping MM energy for this frame
-    Warning: PB calculation failed: [Errno 13] Permission denied: 'pdb2pqr'
-    SA: ΔSA=354465.1 Å²  ΔG_SA=+2552.15 kcal/mol
-    ΔG_total = +2552.15 kcal/mol
-
-  Frame 8/11 (frame=70, t=700.0 ps)
-    Warning: grompp failed, skipping MM energy for this frame
-    Warning: PB calculation failed: [Errno 13] Permission denied: 'pdb2pqr'
-    SA: ΔSA=354448.9 Å²  ΔG_SA=+2552.03 kcal/mol
-    ΔG_total = +2552.03 kcal/mol
-
-  Frame 9/11 (frame=80, t=800.0 ps)
-    Warning: grompp failed, skipping MM energy for this frame
-    Warning: PB calculation failed: [Errno 13] Permission denied: 'pdb2pqr'
-    SA: ΔSA=354123.1 Å²  ΔG_SA=+2549.69 kcal/mol
-    ΔG_total = +2549.69 kcal/mol
-
-  Frame 10/11 (frame=90, t=900.0 ps)
-    Warning: grompp failed, skipping MM energy for this frame
-    Warning: PB calculation failed: [Errno 13] Permission denied: 'pdb2pqr'
-    SA: ΔSA=353895.1 Å²  ΔG_SA=+2548.04 kcal/mol
-    ΔG_total = +2548.04 kcal/mol
-
-  Frame 11/11 (frame=100, t=1000.0 ps)
-    Warning: grompp failed, skipping MM energy for this frame
-    Warning: PB calculation failed: [Errno 13] Permission denied: 'pdb2pqr'
-    SA: ΔSA=354334.9 Å²  ΔG_SA=+2551.21 kcal/mol
-    ΔG_total = +2551.21 kcal/mol
-
-Per-frame results: /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/mmpbsa/mmpbsa_results.csv
-Summary: /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/mmpbsa/mmpbsa_summary.csv
-JSON summary: /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/mmpbsa/mmpbsa_summary.json
-Decomposition plot: /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/mmpbsa/mmpbsa_decomposition.png
-Time series plot: /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/mmpbsa/mmpbsa_timeseries.png
-
-MM-PBSA calculation complete.
-[2026-08-20 19:45:18] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/generate_report.py
-PDF report generated: /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/md_report.pdf
-[2026-08-20 19:45:20] PDF report: /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/md_report.pdf
-[2026-08-20 19:45:20] Finished step11_mmpbsa
-[2026-08-20 19:45:20] Pipeline completed successfully.

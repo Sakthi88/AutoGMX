@@ -1,615 +1,0 @@
-[2026-08-20 19:43:34] Starting step10_analysis
-[2026-08-20 19:43:34] Using imported index file: /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/indexlig.ndx
-                     :-) GROMACS - gmx trjconv, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx trjconv -s /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.xtc -n /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/index.ndx -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md_nojump.xtc -pbc nojump
-
-Will write xtc: Compressed trajectory (portable xdr format): xtc
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Group     0 (         System) has 24055 elements
-Group     1 (        Protein) has  1823 elements
-Group     2 (      Protein-H) has   958 elements
-Group     3 (        C-alpha) has   122 elements
-Group     4 (       Backbone) has   366 elements
-Group     5 (      MainChain) has   489 elements
-Group     6 (   MainChain+Cb) has   602 elements
-Group     7 (    MainChain+H) has   608 elements
-Group     8 (      SideChain) has  1215 elements
-Group     9 (    SideChain-H) has   469 elements
-Group    10 (    Prot-Masses) has  1823 elements
-Group    11 (    non-Protein) has 22232 elements
-Group    12 (         Ligand) has    77 elements
-Group    13 (            UNK) has    77 elements
-Group    14 (             NA) has    23 elements
-Group    15 (             CL) has    22 elements
-Group    16 (          Water) has 22110 elements
-Group    17 (            SOL) has 22110 elements
-Group    18 (      non-Water) has  1945 elements
-Group    19 (            Ion) has    45 elements
-Group    20 ( Water_and_ions) has 22155 elements
-Group    21 ( Protein_Ligand) has  1900 elements
-Select a group: Reading frame       0 time    0.000   
-Precision of /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.xtc is 0.001 (nm)
-Using output precision of 0.001 (nm)
-Reading frame       1 time   10.000    ->  frame      0 time    0.000      Reading frame       2 time   20.000    ->  frame      1 time   10.000      Reading frame       3 time   30.000    ->  frame      2 time   20.000      Reading frame       4 time   40.000    ->  frame      3 time   30.000      Reading frame       5 time   50.000    ->  frame      4 time   40.000      Reading frame       6 time   60.000    ->  frame      5 time   50.000      Reading frame       7 time   70.000    ->  frame      6 time   60.000      Reading frame       8 time   80.000    ->  frame      7 time   70.000      Reading frame       9 time   90.000    ->  frame      8 time   80.000      Reading frame      10 time  100.000    ->  frame      9 time   90.000      Reading frame      11 time  110.000    ->  frame     10 time  100.000      Reading frame      12 time  120.000    ->  frame     11 time  110.000      Reading frame      13 time  130.000    ->  frame     12 time  120.000      Reading frame      14 time  140.000    ->  frame     13 time  130.000      Reading frame      15 time  150.000    ->  frame     14 time  140.000      Reading frame      16 time  160.000    ->  frame     15 time  150.000      Reading frame      17 time  170.000    ->  frame     16 time  160.000      Reading frame      18 time  180.000    ->  frame     17 time  170.000      Reading frame      19 time  190.000    ->  frame     18 time  180.000      Reading frame      20 time  200.000    ->  frame     19 time  190.000      Reading frame      30 time  300.000    ->  frame     29 time  290.000      Reading frame      40 time  400.000    ->  frame     39 time  390.000      Reading frame      50 time  500.000    ->  frame     49 time  490.000      Reading frame      60 time  600.000    ->  frame     59 time  590.000      Reading frame      70 time  700.000    ->  frame     69 time  690.000      Reading frame      80 time  800.000    ->  frame     79 time  790.000      Reading frame      90 time  900.000    ->  frame     89 time  890.000      Reading frame     100 time 1000.000    ->  frame     99 time  990.000      Last frame        100 time 1000.000   
- ->  frame    100 time 1000.000      
-Last written: frame    100 time 1000.000
-
-
-GROMACS reminds you: "I Don't Want to Calm Down" (Throwing Muses)
-
-Note that major changes are planned in future for trjconv, to improve usability and utility.
-Select group for output
-Selected 0: 'System'
-                     :-) GROMACS - gmx trjconv, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx trjconv -s /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md_nojump.xtc -n /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/index.ndx -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md_center.xtc -center -pbc mol -ur compact
-
-Will write xtc: Compressed trajectory (portable xdr format): xtc
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Group     0 (         System) has 24055 elements
-Group     1 (        Protein) has  1823 elements
-Group     2 (      Protein-H) has   958 elements
-Group     3 (        C-alpha) has   122 elements
-Group     4 (       Backbone) has   366 elements
-Group     5 (      MainChain) has   489 elements
-Group     6 (   MainChain+Cb) has   602 elements
-Group     7 (    MainChain+H) has   608 elements
-Group     8 (      SideChain) has  1215 elements
-Group     9 (    SideChain-H) has   469 elements
-Group    10 (    Prot-Masses) has  1823 elements
-Group    11 (    non-Protein) has 22232 elements
-Group    12 (         Ligand) has    77 elements
-Group    13 (            UNK) has    77 elements
-Group    14 (             NA) has    23 elements
-Group    15 (             CL) has    22 elements
-Group    16 (          Water) has 22110 elements
-Group    17 (            SOL) has 22110 elements
-Group    18 (      non-Water) has  1945 elements
-Group    19 (            Ion) has    45 elements
-Group    20 ( Water_and_ions) has 22155 elements
-Group    21 ( Protein_Ligand) has  1900 elements
-Select a group: Group     0 (         System) has 24055 elements
-Group     1 (        Protein) has  1823 elements
-Group     2 (      Protein-H) has   958 elements
-Group     3 (        C-alpha) has   122 elements
-Group     4 (       Backbone) has   366 elements
-Group     5 (      MainChain) has   489 elements
-Group     6 (   MainChain+Cb) has   602 elements
-Group     7 (    MainChain+H) has   608 elements
-Group     8 (      SideChain) has  1215 elements
-Group     9 (    SideChain-H) has   469 elements
-Group    10 (    Prot-Masses) has  1823 elements
-Group    11 (    non-Protein) has 22232 elements
-Group    12 (         Ligand) has    77 elements
-Group    13 (            UNK) has    77 elements
-Group    14 (             NA) has    23 elements
-Group    15 (             CL) has    22 elements
-Group    16 (          Water) has 22110 elements
-Group    17 (            SOL) has 22110 elements
-Group    18 (      non-Water) has  1945 elements
-Group    19 (            Ion) has    45 elements
-Group    20 ( Water_and_ions) has 22155 elements
-Group    21 ( Protein_Ligand) has  1900 elements
-Select a group: Reading frame       0 time    0.000   
-Precision of /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md_nojump.xtc is 0.001 (nm)
-Using output precision of 0.001 (nm)
-Reading frame       1 time   10.000    ->  frame      0 time    0.000      Reading frame       2 time   20.000    ->  frame      1 time   10.000      Reading frame       3 time   30.000    ->  frame      2 time   20.000      Reading frame       4 time   40.000    ->  frame      3 time   30.000      Reading frame       5 time   50.000    ->  frame      4 time   40.000      Reading frame       6 time   60.000    ->  frame      5 time   50.000      Reading frame       7 time   70.000    ->  frame      6 time   60.000      Reading frame       8 time   80.000    ->  frame      7 time   70.000      Reading frame       9 time   90.000    ->  frame      8 time   80.000      Reading frame      10 time  100.000    ->  frame      9 time   90.000      Reading frame      11 time  110.000    ->  frame     10 time  100.000      Reading frame      12 time  120.000    ->  frame     11 time  110.000      Reading frame      13 time  130.000    ->  frame     12 time  120.000      Reading frame      14 time  140.000    ->  frame     13 time  130.000      Reading frame      15 time  150.000    ->  frame     14 time  140.000      Reading frame      16 time  160.000    ->  frame     15 time  150.000      Reading frame      17 time  170.000    ->  frame     16 time  160.000      Reading frame      18 time  180.000    ->  frame     17 time  170.000      Reading frame      19 time  190.000    ->  frame     18 time  180.000      Reading frame      20 time  200.000    ->  frame     19 time  190.000      Reading frame      30 time  300.000    ->  frame     29 time  290.000      Reading frame      40 time  400.000    ->  frame     39 time  390.000      Reading frame      50 time  500.000    ->  frame     49 time  490.000      Reading frame      60 time  600.000    ->  frame     59 time  590.000      Reading frame      70 time  700.000    ->  frame     69 time  690.000      Reading frame      80 time  800.000    ->  frame     79 time  790.000      Reading frame      90 time  900.000    ->  frame     89 time  890.000      Reading frame     100 time 1000.000    ->  frame     99 time  990.000      Last frame        100 time 1000.000   
- ->  frame    100 time 1000.000      
-Last written: frame    100 time 1000.000
-
-
-GROMACS reminds you: "I Don't Want to Calm Down" (Throwing Muses)
-
-Note that major changes are planned in future for trjconv, to improve usability and utility.
-Select group for centering
-Selected 21: 'Protein_Ligand'
-Select group for output
-Selected 0: 'System'
-[2026-08-20 19:43:35] CMD: gmx_cmd editconf -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.gro -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/md_final.pdb
-                     :-) GROMACS - gmx editconf, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx editconf -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.gro -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/md_final.pdb
-
-
-GROMACS reminds you: "I Don't Want to Calm Down" (Throwing Muses)
-
-Note that major changes are planned in future for editconf, to improve usability and utility.
-Read 24055 atoms
-Volume: 242.725 nm^3, corresponds to roughly 109200 electrons
-Velocities found
-                       :-) GROMACS - gmx rms, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx rms -s /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md_center.xtc -n /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/index.ndx -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsd_protein.xvg
-
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Select group for least squares fit
-Group     0 (         System) has 24055 elements
-Group     1 (        Protein) has  1823 elements
-Group     2 (      Protein-H) has   958 elements
-Group     3 (        C-alpha) has   122 elements
-Group     4 (       Backbone) has   366 elements
-Group     5 (      MainChain) has   489 elements
-Group     6 (   MainChain+Cb) has   602 elements
-Group     7 (    MainChain+H) has   608 elements
-Group     8 (      SideChain) has  1215 elements
-Group     9 (    SideChain-H) has   469 elements
-Group    10 (    Prot-Masses) has  1823 elements
-Group    11 (    non-Protein) has 22232 elements
-Group    12 (         Ligand) has    77 elements
-Group    13 (            UNK) has    77 elements
-Group    14 (             NA) has    23 elements
-Group    15 (             CL) has    22 elements
-Group    16 (          Water) has 22110 elements
-Group    17 (            SOL) has 22110 elements
-Group    18 (      non-Water) has  1945 elements
-Group    19 (            Ion) has    45 elements
-Group    20 ( Water_and_ions) has 22155 elements
-Group    21 ( Protein_Ligand) has  1900 elements
-Select a group: Select group for RMSD calculation
-Group     0 (         System) has 24055 elements
-Group     1 (        Protein) has  1823 elements
-Group     2 (      Protein-H) has   958 elements
-Group     3 (        C-alpha) has   122 elements
-Group     4 (       Backbone) has   366 elements
-Group     5 (      MainChain) has   489 elements
-Group     6 (   MainChain+Cb) has   602 elements
-Group     7 (    MainChain+H) has   608 elements
-Group     8 (      SideChain) has  1215 elements
-Group     9 (    SideChain-H) has   469 elements
-Group    10 (    Prot-Masses) has  1823 elements
-Group    11 (    non-Protein) has 22232 elements
-Group    12 (         Ligand) has    77 elements
-Group    13 (            UNK) has    77 elements
-Group    14 (             NA) has    23 elements
-Group    15 (             CL) has    22 elements
-Group    16 (          Water) has 22110 elements
-Group    17 (            SOL) has 22110 elements
-Group    18 (      non-Water) has  1945 elements
-Group    19 (            Ion) has    45 elements
-Group    20 ( Water_and_ions) has 22155 elements
-Group    21 ( Protein_Ligand) has  1900 elements
-Select a group: Reading frame       0 time    0.000   Reading frame       1 time   10.000   Reading frame       2 time   20.000   Reading frame       3 time   30.000   Reading frame       4 time   40.000   Reading frame       5 time   50.000   Reading frame       6 time   60.000   Reading frame       7 time   70.000   Reading frame       8 time   80.000   Reading frame       9 time   90.000   Reading frame      10 time  100.000   Reading frame      11 time  110.000   Reading frame      12 time  120.000   Reading frame      13 time  130.000   Reading frame      14 time  140.000   Reading frame      15 time  150.000   Reading frame      16 time  160.000   Reading frame      17 time  170.000   Reading frame      18 time  180.000   Reading frame      19 time  190.000   Reading frame      20 time  200.000   Reading frame      30 time  300.000   Reading frame      40 time  400.000   Reading frame      50 time  500.000   Reading frame      60 time  600.000   Reading frame      70 time  700.000   Reading frame      80 time  800.000   Reading frame      90 time  900.000   Reading frame     100 time 1000.000   Last frame        100 time 1000.000   
-
-GROMACS reminds you: "I Don't Want to Calm Down" (Throwing Muses)
-
-Selected 4: 'Backbone'
-Selected 1: 'Protein'
-                       :-) GROMACS - gmx rms, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx rms -s /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md_center.xtc -n /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/index.ndx -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsd_protein_ligand.xvg
-
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Select group for least squares fit
-Group     0 (         System) has 24055 elements
-Group     1 (        Protein) has  1823 elements
-Group     2 (      Protein-H) has   958 elements
-Group     3 (        C-alpha) has   122 elements
-Group     4 (       Backbone) has   366 elements
-Group     5 (      MainChain) has   489 elements
-Group     6 (   MainChain+Cb) has   602 elements
-Group     7 (    MainChain+H) has   608 elements
-Group     8 (      SideChain) has  1215 elements
-Group     9 (    SideChain-H) has   469 elements
-Group    10 (    Prot-Masses) has  1823 elements
-Group    11 (    non-Protein) has 22232 elements
-Group    12 (         Ligand) has    77 elements
-Group    13 (            UNK) has    77 elements
-Group    14 (             NA) has    23 elements
-Group    15 (             CL) has    22 elements
-Group    16 (          Water) has 22110 elements
-Group    17 (            SOL) has 22110 elements
-Group    18 (      non-Water) has  1945 elements
-Group    19 (            Ion) has    45 elements
-Group    20 ( Water_and_ions) has 22155 elements
-Group    21 ( Protein_Ligand) has  1900 elements
-Select a group: Select group for RMSD calculation
-Group     0 (         System) has 24055 elements
-Group     1 (        Protein) has  1823 elements
-Group     2 (      Protein-H) has   958 elements
-Group     3 (        C-alpha) has   122 elements
-Group     4 (       Backbone) has   366 elements
-Group     5 (      MainChain) has   489 elements
-Group     6 (   MainChain+Cb) has   602 elements
-Group     7 (    MainChain+H) has   608 elements
-Group     8 (      SideChain) has  1215 elements
-Group     9 (    SideChain-H) has   469 elements
-Group    10 (    Prot-Masses) has  1823 elements
-Group    11 (    non-Protein) has 22232 elements
-Group    12 (         Ligand) has    77 elements
-Group    13 (            UNK) has    77 elements
-Group    14 (             NA) has    23 elements
-Group    15 (             CL) has    22 elements
-Group    16 (          Water) has 22110 elements
-Group    17 (            SOL) has 22110 elements
-Group    18 (      non-Water) has  1945 elements
-Group    19 (            Ion) has    45 elements
-Group    20 ( Water_and_ions) has 22155 elements
-Group    21 ( Protein_Ligand) has  1900 elements
-Select a group: Reading frame       0 time    0.000   Reading frame       1 time   10.000   Reading frame       2 time   20.000   Reading frame       3 time   30.000   Reading frame       4 time   40.000   Reading frame       5 time   50.000   Reading frame       6 time   60.000   Reading frame       7 time   70.000   Reading frame       8 time   80.000   Reading frame       9 time   90.000   Reading frame      10 time  100.000   Reading frame      11 time  110.000   Reading frame      12 time  120.000   Reading frame      13 time  130.000   Reading frame      14 time  140.000   Reading frame      15 time  150.000   Reading frame      16 time  160.000   Reading frame      17 time  170.000   Reading frame      18 time  180.000   Reading frame      19 time  190.000   Reading frame      20 time  200.000   Reading frame      30 time  300.000   Reading frame      40 time  400.000   Reading frame      50 time  500.000   Reading frame      60 time  600.000   Reading frame      70 time  700.000   Reading frame      80 time  800.000   Reading frame      90 time  900.000   Reading frame     100 time 1000.000   Last frame        100 time 1000.000   
-
-GROMACS reminds you: "I Don't Want to Calm Down" (Throwing Muses)
-
-Selected 21: 'Protein_Ligand'
-Selected 21: 'Protein_Ligand'
-                       :-) GROMACS - gmx rms, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx rms -s /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md_center.xtc -n /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/index.ndx -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsd_ligand.xvg
-
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Select group for least squares fit
-Group     0 (         System) has 24055 elements
-Group     1 (        Protein) has  1823 elements
-Group     2 (      Protein-H) has   958 elements
-Group     3 (        C-alpha) has   122 elements
-Group     4 (       Backbone) has   366 elements
-Group     5 (      MainChain) has   489 elements
-Group     6 (   MainChain+Cb) has   602 elements
-Group     7 (    MainChain+H) has   608 elements
-Group     8 (      SideChain) has  1215 elements
-Group     9 (    SideChain-H) has   469 elements
-Group    10 (    Prot-Masses) has  1823 elements
-Group    11 (    non-Protein) has 22232 elements
-Group    12 (         Ligand) has    77 elements
-Group    13 (            UNK) has    77 elements
-Group    14 (             NA) has    23 elements
-Group    15 (             CL) has    22 elements
-Group    16 (          Water) has 22110 elements
-Group    17 (            SOL) has 22110 elements
-Group    18 (      non-Water) has  1945 elements
-Group    19 (            Ion) has    45 elements
-Group    20 ( Water_and_ions) has 22155 elements
-Group    21 ( Protein_Ligand) has  1900 elements
-Select a group: Select group for RMSD calculation
-Group     0 (         System) has 24055 elements
-Group     1 (        Protein) has  1823 elements
-Group     2 (      Protein-H) has   958 elements
-Group     3 (        C-alpha) has   122 elements
-Group     4 (       Backbone) has   366 elements
-Group     5 (      MainChain) has   489 elements
-Group     6 (   MainChain+Cb) has   602 elements
-Group     7 (    MainChain+H) has   608 elements
-Group     8 (      SideChain) has  1215 elements
-Group     9 (    SideChain-H) has   469 elements
-Group    10 (    Prot-Masses) has  1823 elements
-Group    11 (    non-Protein) has 22232 elements
-Group    12 (         Ligand) has    77 elements
-Group    13 (            UNK) has    77 elements
-Group    14 (             NA) has    23 elements
-Group    15 (             CL) has    22 elements
-Group    16 (          Water) has 22110 elements
-Group    17 (            SOL) has 22110 elements
-Group    18 (      non-Water) has  1945 elements
-Group    19 (            Ion) has    45 elements
-Group    20 ( Water_and_ions) has 22155 elements
-Group    21 ( Protein_Ligand) has  1900 elements
-Select a group: Reading frame       0 time    0.000   Reading frame       1 time   10.000   Reading frame       2 time   20.000   Reading frame       3 time   30.000   Reading frame       4 time   40.000   Reading frame       5 time   50.000   Reading frame       6 time   60.000   Reading frame       7 time   70.000   Reading frame       8 time   80.000   Reading frame       9 time   90.000   Reading frame      10 time  100.000   Reading frame      11 time  110.000   Reading frame      12 time  120.000   Reading frame      13 time  130.000   Reading frame      14 time  140.000   Reading frame      15 time  150.000   Reading frame      16 time  160.000   Reading frame      17 time  170.000   Reading frame      18 time  180.000   Reading frame      19 time  190.000   Reading frame      20 time  200.000   Reading frame      30 time  300.000   Reading frame      40 time  400.000   Reading frame      50 time  500.000   Reading frame      60 time  600.000   Reading frame      70 time  700.000   Reading frame      80 time  800.000   Reading frame      90 time  900.000   Reading frame     100 time 1000.000   Last frame        100 time 1000.000   
-
-GROMACS reminds you: "I Don't Want to Calm Down" (Throwing Muses)
-
-Selected 4: 'Backbone'
-Selected 12: 'Ligand'
-                       :-) GROMACS - gmx rmsf, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx rmsf -s /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md_center.xtc -n /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/index.ndx -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsf_protein.xvg -res
-
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Select group(s) for root mean square calculation
-Group     0 (         System) has 24055 elements
-Group     1 (        Protein) has  1823 elements
-Group     2 (      Protein-H) has   958 elements
-Group     3 (        C-alpha) has   122 elements
-Group     4 (       Backbone) has   366 elements
-Group     5 (      MainChain) has   489 elements
-Group     6 (   MainChain+Cb) has   602 elements
-Group     7 (    MainChain+H) has   608 elements
-Group     8 (      SideChain) has  1215 elements
-Group     9 (    SideChain-H) has   469 elements
-Group    10 (    Prot-Masses) has  1823 elements
-Group    11 (    non-Protein) has 22232 elements
-Group    12 (         Ligand) has    77 elements
-Group    13 (            UNK) has    77 elements
-Group    14 (             NA) has    23 elements
-Group    15 (             CL) has    22 elements
-Group    16 (          Water) has 22110 elements
-Group    17 (            SOL) has 22110 elements
-Group    18 (      non-Water) has  1945 elements
-Group    19 (            Ion) has    45 elements
-Group    20 ( Water_and_ions) has 22155 elements
-Group    21 ( Protein_Ligand) has  1900 elements
-Select a group: Reading frame       0 time    0.000   Reading frame       1 time   10.000   Reading frame       2 time   20.000   Reading frame       3 time   30.000   Reading frame       4 time   40.000   Reading frame       5 time   50.000   Reading frame       6 time   60.000   Reading frame       7 time   70.000   Reading frame       8 time   80.000   Reading frame       9 time   90.000   Reading frame      10 time  100.000   Reading frame      11 time  110.000   Reading frame      12 time  120.000   Reading frame      13 time  130.000   Reading frame      14 time  140.000   Reading frame      15 time  150.000   Reading frame      16 time  160.000   Reading frame      17 time  170.000   Reading frame      18 time  180.000   Reading frame      19 time  190.000   Reading frame      20 time  200.000   Reading frame      30 time  300.000   Reading frame      40 time  400.000   Reading frame      50 time  500.000   Reading frame      60 time  600.000   Reading frame      70 time  700.000   Reading frame      80 time  800.000   Reading frame      90 time  900.000   Reading frame     100 time 1000.000   Last frame        100 time 1000.000   
-
-GROMACS reminds you: "I Don't Want to Calm Down" (Throwing Muses)
-
-Selected 1: 'Protein'
-                      :-) GROMACS - gmx gyrate, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx gyrate -s /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md_center.xtc -n /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/index.ndx -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/gyration_protein.xvg
-
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Reading frame       0 time    0.000   Reading frame       1 time   10.000   Reading frame       2 time   20.000   Reading frame       3 time   30.000   Reading frame       4 time   40.000   Reading frame       5 time   50.000   Reading frame       6 time   60.000   Reading frame       7 time   70.000   Reading frame       8 time   80.000   Reading frame       9 time   90.000   Reading frame      10 time  100.000   Reading frame      11 time  110.000   Reading frame      12 time  120.000   Reading frame      13 time  130.000   Reading frame      14 time  140.000   Reading frame      15 time  150.000   Reading frame      16 time  160.000   Reading frame      17 time  170.000   Reading frame      18 time  180.000   Reading frame      19 time  190.000   Reading frame      20 time  200.000   Reading frame      30 time  300.000   Reading frame      40 time  400.000   Reading frame      50 time  500.000   Reading frame      60 time  600.000   Reading frame      70 time  700.000   Reading frame      80 time  800.000   Reading frame      90 time  900.000   Reading frame     100 time 1000.000   Last frame        100 time 1000.000   
-Analyzed 101 frames, last time 1000.000
-
-GROMACS reminds you: "History has expired" (PubMed Central)
-
-                      :-) GROMACS - gmx hbond, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx hbond -s /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md_center.xtc -n /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/index.ndx -num /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/hbonds_protein_ligand.xvg
-
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-Reading file /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr, VERSION 2025.2 (single precision)
-
--------------------------------------------------------
-Program:     gmx hbond, version 2025.2
-Source file: src/gromacs/trajectoryanalysis/modules/hbond.cpp (line 622)
-Function:    static void gmx::analysismodules::{anonymous}::Hbond::linkDA(gmx::analysismodules::{anonymous}::t_info*)
-
-Inconsistency in user input:
-Selection Ligand' has no donors AND has no acceptors! Nothing to be done.
-
-For more information and tips for troubleshooting, please check the GROMACS
-website at https://manual.gromacs.org/current/user-guide/run-time-errors.html
--------------------------------------------------------
-
-Checking for overlap in atoms between Protein (1823 atoms) and Ligand (77 atoms)
-Selection 'Protein' has 350 acceptors and 180 donors.
-Selection 'Ligand' has 0 acceptors and 0 donors.
-[2026-08-20 19:43:36] WARNING: Protein-Ligand hbond analysis failed (ligand may lack donor/acceptor definitions); skipping hbond plot
-                      :-) GROMACS - gmx energy, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx energy -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.edr -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/energies.xvg
-
-Opened /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.edr as single precision energy file
-
-Select the terms you want from the following list by
-selecting either (part of) the name or the number or a combination.
-End your selection with an empty line or a zero.
--------------------------------------------------------------------
-  1  Bond             2  Angle            3  Proper-Dih.      4  Per.-Imp.-Dih.
-  5  LJ-14            6  Coulomb-14       7  LJ-(SR)          8  Disper.-corr. 
-  9  Coulomb-(SR)    10  Coul.-recip.    11  Potential       12  Kinetic-En.   
- 13  Total-Energy    14  Conserved-En.   15  Temperature     16  Pres.-DC      
- 17  Pressure        18  Constr.-rmsd    19  Box-X           20  Box-Y         
- 21  Box-Z           22  Volume          23  Density         24  pV            
- 25  Enthalpy        26  Vir-XX          27  Vir-XY          28  Vir-XZ        
- 29  Vir-YX          30  Vir-YY          31  Vir-YZ          32  Vir-ZX        
- 33  Vir-ZY          34  Vir-ZZ          35  Pres-XX         36  Pres-XY       
- 37  Pres-XZ         38  Pres-YX         39  Pres-YY         40  Pres-YZ       
- 41  Pres-ZX         42  Pres-ZY         43  Pres-ZZ         44  #Surf*SurfTen 
- 45  Box-Vel-XX      46  Box-Vel-YY      47  Box-Vel-ZZ      48  T-Protein     
- 49  T-non-Protein                       50  Lamb-Protein                      
- 51  Lamb-non-Protein                  
-
-Reading energy frame      0 time    0.000         Reading energy frame      1 time   10.000         Reading energy frame      2 time   20.000         Reading energy frame      3 time   30.000         Reading energy frame      4 time   40.000         Reading energy frame      5 time   50.000         Reading energy frame      6 time   60.000         Reading energy frame      7 time   70.000         Reading energy frame      8 time   80.000         Reading energy frame      9 time   90.000         Reading energy frame     10 time  100.000         Reading energy frame     11 time  110.000         Reading energy frame     12 time  120.000         Reading energy frame     13 time  130.000         Reading energy frame     14 time  140.000         Reading energy frame     15 time  150.000         Reading energy frame     16 time  160.000         Reading energy frame     17 time  170.000         Reading energy frame     18 time  180.000         Reading energy frame     19 time  190.000         Reading energy frame     20 time  200.000         Reading energy frame     30 time  300.000         Reading energy frame     40 time  400.000         Reading energy frame     50 time  500.000         Reading energy frame     60 time  600.000         Reading energy frame     70 time  700.000         Reading energy frame     80 time  800.000         Reading energy frame     90 time  900.000         Reading energy frame    100 time 1000.000         Last energy frame read 100 time 1000.000         
-
-GROMACS reminds you: "History has expired" (PubMed Central)
-
-
-Statistics over 500001 steps [ 0.0000 through 1000.0000 ps ], 4 data sets
-All statistics are over 5001 points
-
-Energy                      Average   Err.Est.       RMSD  Tot-Drift
--------------------------------------------------------------------------------
-Potential                   -328350         18     716.55   -111.551  (kJ/mol)
-Temperature                 299.962      0.022    2.14602  -0.079687  (K)
-Pressure                  -0.536401        1.7    215.258    5.17851  (bar)
-Density                     1021.56      0.093    6.32446   0.192172  (kg/m^3)
-                      :-) GROMACS - gmx energy, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx energy -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.edr -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/potential.xvg
-
-Opened /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.edr as single precision energy file
-
-Select the terms you want from the following list by
-selecting either (part of) the name or the number or a combination.
-End your selection with an empty line or a zero.
--------------------------------------------------------------------
-  1  Bond             2  Angle            3  Proper-Dih.      4  Per.-Imp.-Dih.
-  5  LJ-14            6  Coulomb-14       7  LJ-(SR)          8  Disper.-corr. 
-  9  Coulomb-(SR)    10  Coul.-recip.    11  Potential       12  Kinetic-En.   
- 13  Total-Energy    14  Conserved-En.   15  Temperature     16  Pres.-DC      
- 17  Pressure        18  Constr.-rmsd    19  Box-X           20  Box-Y         
- 21  Box-Z           22  Volume          23  Density         24  pV            
- 25  Enthalpy        26  Vir-XX          27  Vir-XY          28  Vir-XZ        
- 29  Vir-YX          30  Vir-YY          31  Vir-YZ          32  Vir-ZX        
- 33  Vir-ZY          34  Vir-ZZ          35  Pres-XX         36  Pres-XY       
- 37  Pres-XZ         38  Pres-YX         39  Pres-YY         40  Pres-YZ       
- 41  Pres-ZX         42  Pres-ZY         43  Pres-ZZ         44  #Surf*SurfTen 
- 45  Box-Vel-XX      46  Box-Vel-YY      47  Box-Vel-ZZ      48  T-Protein     
- 49  T-non-Protein                       50  Lamb-Protein                      
- 51  Lamb-non-Protein                  
-
-Reading energy frame      0 time    0.000         Reading energy frame      1 time   10.000         Reading energy frame      2 time   20.000         Reading energy frame      3 time   30.000         Reading energy frame      4 time   40.000         Reading energy frame      5 time   50.000         Reading energy frame      6 time   60.000         Reading energy frame      7 time   70.000         Reading energy frame      8 time   80.000         Reading energy frame      9 time   90.000         Reading energy frame     10 time  100.000         Reading energy frame     11 time  110.000         Reading energy frame     12 time  120.000         Reading energy frame     13 time  130.000         Reading energy frame     14 time  140.000         Reading energy frame     15 time  150.000         Reading energy frame     16 time  160.000         Reading energy frame     17 time  170.000         Reading energy frame     18 time  180.000         Reading energy frame     19 time  190.000         Reading energy frame     20 time  200.000         Reading energy frame     30 time  300.000         Reading energy frame     40 time  400.000         Reading energy frame     50 time  500.000         Reading energy frame     60 time  600.000         Reading energy frame     70 time  700.000         Reading energy frame     80 time  800.000         Reading energy frame     90 time  900.000         Reading energy frame    100 time 1000.000         Last energy frame read 100 time 1000.000         
-
-GROMACS reminds you: "History has expired" (PubMed Central)
-
-
-Statistics over 500001 steps [ 0.0000 through 1000.0000 ps ], 1 data sets
-All statistics are over 5001 points
-
-Energy                      Average   Err.Est.       RMSD  Tot-Drift
--------------------------------------------------------------------------------
-Potential                   -328350         18     716.55   -111.551  (kJ/mol)
-                      :-) GROMACS - gmx energy, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx energy -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.edr -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/temperature.xvg
-
-Opened /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.edr as single precision energy file
-
-Select the terms you want from the following list by
-selecting either (part of) the name or the number or a combination.
-End your selection with an empty line or a zero.
--------------------------------------------------------------------
-  1  Bond             2  Angle            3  Proper-Dih.      4  Per.-Imp.-Dih.
-  5  LJ-14            6  Coulomb-14       7  LJ-(SR)          8  Disper.-corr. 
-  9  Coulomb-(SR)    10  Coul.-recip.    11  Potential       12  Kinetic-En.   
- 13  Total-Energy    14  Conserved-En.   15  Temperature     16  Pres.-DC      
- 17  Pressure        18  Constr.-rmsd    19  Box-X           20  Box-Y         
- 21  Box-Z           22  Volume          23  Density         24  pV            
- 25  Enthalpy        26  Vir-XX          27  Vir-XY          28  Vir-XZ        
- 29  Vir-YX          30  Vir-YY          31  Vir-YZ          32  Vir-ZX        
- 33  Vir-ZY          34  Vir-ZZ          35  Pres-XX         36  Pres-XY       
- 37  Pres-XZ         38  Pres-YX         39  Pres-YY         40  Pres-YZ       
- 41  Pres-ZX         42  Pres-ZY         43  Pres-ZZ         44  #Surf*SurfTen 
- 45  Box-Vel-XX      46  Box-Vel-YY      47  Box-Vel-ZZ      48  T-Protein     
- 49  T-non-Protein                       50  Lamb-Protein                      
- 51  Lamb-non-Protein                  
-
-Reading energy frame      0 time    0.000         Reading energy frame      1 time   10.000         Reading energy frame      2 time   20.000         Reading energy frame      3 time   30.000         Reading energy frame      4 time   40.000         Reading energy frame      5 time   50.000         Reading energy frame      6 time   60.000         Reading energy frame      7 time   70.000         Reading energy frame      8 time   80.000         Reading energy frame      9 time   90.000         Reading energy frame     10 time  100.000         Reading energy frame     11 time  110.000         Reading energy frame     12 time  120.000         Reading energy frame     13 time  130.000         Reading energy frame     14 time  140.000         Reading energy frame     15 time  150.000         Reading energy frame     16 time  160.000         Reading energy frame     17 time  170.000         Reading energy frame     18 time  180.000         Reading energy frame     19 time  190.000         Reading energy frame     20 time  200.000         Reading energy frame     30 time  300.000         Reading energy frame     40 time  400.000         Reading energy frame     50 time  500.000         Reading energy frame     60 time  600.000         Reading energy frame     70 time  700.000         Reading energy frame     80 time  800.000         Reading energy frame     90 time  900.000         Reading energy frame    100 time 1000.000         Last energy frame read 100 time 1000.000         
-
-GROMACS reminds you: "History has expired" (PubMed Central)
-
-
-Statistics over 500001 steps [ 0.0000 through 1000.0000 ps ], 1 data sets
-All statistics are over 5001 points
-
-Energy                      Average   Err.Est.       RMSD  Tot-Drift
--------------------------------------------------------------------------------
-Temperature                 299.962      0.022    2.14602  -0.079687  (K)
-                      :-) GROMACS - gmx energy, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx energy -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.edr -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/pressure.xvg
-
-Opened /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.edr as single precision energy file
-
-Select the terms you want from the following list by
-selecting either (part of) the name or the number or a combination.
-End your selection with an empty line or a zero.
--------------------------------------------------------------------
-  1  Bond             2  Angle            3  Proper-Dih.      4  Per.-Imp.-Dih.
-  5  LJ-14            6  Coulomb-14       7  LJ-(SR)          8  Disper.-corr. 
-  9  Coulomb-(SR)    10  Coul.-recip.    11  Potential       12  Kinetic-En.   
- 13  Total-Energy    14  Conserved-En.   15  Temperature     16  Pres.-DC      
- 17  Pressure        18  Constr.-rmsd    19  Box-X           20  Box-Y         
- 21  Box-Z           22  Volume          23  Density         24  pV            
- 25  Enthalpy        26  Vir-XX          27  Vir-XY          28  Vir-XZ        
- 29  Vir-YX          30  Vir-YY          31  Vir-YZ          32  Vir-ZX        
- 33  Vir-ZY          34  Vir-ZZ          35  Pres-XX         36  Pres-XY       
- 37  Pres-XZ         38  Pres-YX         39  Pres-YY         40  Pres-YZ       
- 41  Pres-ZX         42  Pres-ZY         43  Pres-ZZ         44  #Surf*SurfTen 
- 45  Box-Vel-XX      46  Box-Vel-YY      47  Box-Vel-ZZ      48  T-Protein     
- 49  T-non-Protein                       50  Lamb-Protein                      
- 51  Lamb-non-Protein                  
-
-Reading energy frame      0 time    0.000         Reading energy frame      1 time   10.000         Reading energy frame      2 time   20.000         Reading energy frame      3 time   30.000         Reading energy frame      4 time   40.000         Reading energy frame      5 time   50.000         Reading energy frame      6 time   60.000         Reading energy frame      7 time   70.000         Reading energy frame      8 time   80.000         Reading energy frame      9 time   90.000         Reading energy frame     10 time  100.000         Reading energy frame     11 time  110.000         Reading energy frame     12 time  120.000         Reading energy frame     13 time  130.000         Reading energy frame     14 time  140.000         Reading energy frame     15 time  150.000         Reading energy frame     16 time  160.000         Reading energy frame     17 time  170.000         Reading energy frame     18 time  180.000         Reading energy frame     19 time  190.000         Reading energy frame     20 time  200.000         Reading energy frame     30 time  300.000         Reading energy frame     40 time  400.000         Reading energy frame     50 time  500.000         Reading energy frame     60 time  600.000         Reading energy frame     70 time  700.000         Reading energy frame     80 time  800.000         Reading energy frame     90 time  900.000         Reading energy frame    100 time 1000.000         Last energy frame read 100 time 1000.000         
-
-GROMACS reminds you: "History has expired" (PubMed Central)
-
-
-Statistics over 500001 steps [ 0.0000 through 1000.0000 ps ], 1 data sets
-All statistics are over 5001 points
-
-Energy                      Average   Err.Est.       RMSD  Tot-Drift
--------------------------------------------------------------------------------
-Pressure                  -0.536401        1.7    215.258    5.17851  (bar)
-                      :-) GROMACS - gmx energy, 2025.2 (-:
-
-Executable:   /home/nanomd/gromacs/bin/gmx
-Data prefix:  /home/nanomd/gromacs
-Working dir:  /home/nanomd/Desktop/Sakthidhasan/md_pipeline
-Command line:
-  gmx energy -f /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.edr -o /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/density.xvg
-
-Opened /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.edr as single precision energy file
-
-Select the terms you want from the following list by
-selecting either (part of) the name or the number or a combination.
-End your selection with an empty line or a zero.
--------------------------------------------------------------------
-  1  Bond             2  Angle            3  Proper-Dih.      4  Per.-Imp.-Dih.
-  5  LJ-14            6  Coulomb-14       7  LJ-(SR)          8  Disper.-corr. 
-  9  Coulomb-(SR)    10  Coul.-recip.    11  Potential       12  Kinetic-En.   
- 13  Total-Energy    14  Conserved-En.   15  Temperature     16  Pres.-DC      
- 17  Pressure        18  Constr.-rmsd    19  Box-X           20  Box-Y         
- 21  Box-Z           22  Volume          23  Density         24  pV            
- 25  Enthalpy        26  Vir-XX          27  Vir-XY          28  Vir-XZ        
- 29  Vir-YX          30  Vir-YY          31  Vir-YZ          32  Vir-ZX        
- 33  Vir-ZY          34  Vir-ZZ          35  Pres-XX         36  Pres-XY       
- 37  Pres-XZ         38  Pres-YX         39  Pres-YY         40  Pres-YZ       
- 41  Pres-ZX         42  Pres-ZY         43  Pres-ZZ         44  #Surf*SurfTen 
- 45  Box-Vel-XX      46  Box-Vel-YY      47  Box-Vel-ZZ      48  T-Protein     
- 49  T-non-Protein                       50  Lamb-Protein                      
- 51  Lamb-non-Protein                  
-
-Reading energy frame      0 time    0.000         Reading energy frame      1 time   10.000         Reading energy frame      2 time   20.000         Reading energy frame      3 time   30.000         Reading energy frame      4 time   40.000         Reading energy frame      5 time   50.000         Reading energy frame      6 time   60.000         Reading energy frame      7 time   70.000         Reading energy frame      8 time   80.000         Reading energy frame      9 time   90.000         Reading energy frame     10 time  100.000         Reading energy frame     11 time  110.000         Reading energy frame     12 time  120.000         Reading energy frame     13 time  130.000         Reading energy frame     14 time  140.000         Reading energy frame     15 time  150.000         Reading energy frame     16 time  160.000         Reading energy frame     17 time  170.000         Reading energy frame     18 time  180.000         Reading energy frame     19 time  190.000         Reading energy frame     20 time  200.000         Reading energy frame     30 time  300.000         Reading energy frame     40 time  400.000         Reading energy frame     50 time  500.000         Reading energy frame     60 time  600.000         Reading energy frame     70 time  700.000         Reading energy frame     80 time  800.000         Reading energy frame     90 time  900.000         Reading energy frame    100 time 1000.000         Last energy frame read 100 time 1000.000         
-
-GROMACS reminds you: "History has expired" (PubMed Central)
-
-
-Statistics over 500001 steps [ 0.0000 through 1000.0000 ps ], 1 data sets
-All statistics are over 5001 points
-
-Energy                      Average   Err.Est.       RMSD  Tot-Drift
--------------------------------------------------------------------------------
-Density                     1021.56      0.093    6.32446   0.192172  (kg/m^3)
-[2026-08-20 19:43:36] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/plot_analysis.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsd_protein.xvg Protein RMSD /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsd_protein.png
-[2026-08-20 19:43:36] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/plot_analysis.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsd_ligand.xvg Ligand RMSD /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsd_ligand.png
-[2026-08-20 19:43:37] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/plot_analysis.py --rmsd-comparison /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsd_protein.xvg /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsd_ligand.xvg /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsd_protein_ligand.png
-[2026-08-20 19:43:37] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/plot_analysis.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsf_protein.xvg Protein RMSF /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/rmsf_protein.png
-[2026-08-20 19:43:38] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/plot_analysis.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/gyration_protein.xvg Protein Radius of Gyration /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/gyration_protein.png
-[2026-08-20 19:43:38] Skipping plot; missing XVG data: /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/hbonds_protein_ligand.xvg
-[2026-08-20 19:43:38] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/plot_analysis.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/potential.xvg Potential Energy /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/potential.png
-[2026-08-20 19:43:39] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/plot_analysis.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/temperature.xvg Temperature /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/temperature.png
-[2026-08-20 19:43:39] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/plot_analysis.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/pressure.xvg Pressure /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/pressure.png
-[2026-08-20 19:43:39] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/plot_analysis.py /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/density.xvg Density /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/density.png
-[2026-08-20 19:43:40] CMD: /home/nanomd/anaconda3/bin/python /home/nanomd/Desktop/Sakthidhasan/md_pipeline/helpers/pca_free_energy.py --top /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md.tpr --traj /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/results/production/md_center.xtc --outdir /home/nanomd/Desktop/Sakthidhasan/md_pipeline/web_jobs/20260820-193119-93455e15/analysis/free_energy
-[2026-08-20 19:43:43] Finished step10_analysis
