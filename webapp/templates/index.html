@@ -31,8 +31,9 @@
             <label>
               <span>Topology generator</span>
               <select name="ligand_prep_tool" id="ligand_prep_tool">
-                <option value="acpype">ACPYPE (AMBER/GAFF)</option>
+                <option value="acpype">ACPYPE (AMBER/GAFF) — recommended offline</option>
                 <option value="cgenff">CGenFF (CHARMM)</option>
+                <option value="gromos_skeleton">GROMOS skeleton (offline, charges optional)</option>
               </select>
             </label>
             <label><span>Ligand residue</span><input type="text" name="ligand_resname" value="LIG" maxlength="5" required></label>
