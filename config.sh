@@ -27,14 +27,23 @@ CGENFF_PYTHON="${CGENFF_PYTHON:-${PYTHON_BIN}}"
 
 FORCE_FIELD="${FORCE_FIELD:-amber99sb-ildn}"
 WATER_MODEL="${WATER_MODEL:-tip3p}"
-# Supported values: acpype | cgenff | prodrg2
+
+# Ligand preparation tools (fully offline preferred)
+#   acpype          - recommended offline production path (GAFF/GAFF2 + AmberTools)
+#   cgenff          - CHARMM (requires CGenFF binary / server output)
+#   gromos_skeleton - offline GROMOS topology *skeleton* (charges must be supplied/reviewed)
+#   prodrg2         - LEGACY only (PRODRG2 server is permanently offline)
 LIGAND_PREP_TOOL="${LIGAND_PREP_TOOL:-acpype}"
+
 AUTO_RECTIFY="${AUTO_RECTIFY:-yes}"
 ACPYPE_ATOMTYPE="${ACPYPE_ATOMTYPE:-gaff2}"
 CGENFF_FORCEFIELD_DIR="${CGENFF_FORCEFIELD_DIR:-${PIPELINE_DIR}/${FORCE_FIELD}.ff}"
 
-# Directory containing PRODRG2 output files (DRGFIN.GRO + DRGGMX.ITP)
+# Legacy PRODRG2 directory (server is offline – kept only for old local files)
 PRODRG_DIR="${PRODRG_DIR:-${INPUT_DIR}/prodrg}"
+
+# Optional charges file for gromos_skeleton (one charge per line or "idx charge")
+GROMOS_CHARGES_FILE="${GROMOS_CHARGES_FILE:-}"
 
 LIGAND_NAME="${LIGAND_NAME:-ligand}"
 LIGAND_RESNAME="${LIGAND_RESNAME:-LIG}"

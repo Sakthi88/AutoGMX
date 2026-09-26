@@ -45,8 +45,9 @@
           <span>Topology method</span>
           <select name="ligand_prep_tool" id="ligand_prep_tool">
             <option value="prepared_topology">Upload prepared topology</option>
-            <option value="acpype">Generate with ACPYPE (AMBER/GAFF)</option>
+            <option value="acpype">Generate with ACPYPE (AMBER/GAFF) — recommended offline</option>
             <option value="cgenff">Generate with CGenFF (CHARMM)</option>
+            <option value="gromos_skeleton">Generate GROMOS skeleton (offline)</option>
           </select>
         </label>
         <label>
@@ -114,7 +115,7 @@
 
       <label>
         <span>GROMACS command</span>
-        <input type="text" name="gmx_bin" value="C:\Program Files\Gromacs\bin\gmx.exe" required>
+        <input type="text" name="gmx_bin" value="C:\\Program Files\\Gromacs\\bin\\gmx.exe" required>
       </label>
 
       <label class="checkbox">
@@ -154,6 +155,11 @@
       <div class="topology-section method-note" data-topology-section="cgenff" hidden>
         <strong>CGenFF generation</strong>
         <p>Uses the separated ligand MOL2 file. CGenFF executables and CHARMM force field are required.</p>
+      </div>
+
+      <div class="topology-section method-note" data-topology-section="gromos_skeleton" hidden>
+        <strong>GROMOS skeleton (offline)</strong>
+        <p>Builds a fully offline GROMOS-compatible topology skeleton (bonds, angles, dihedrals, approximate atom types). Partial charges default to 0.000 unless you later supply a charges file. Review atom types and charges before production use. For high-quality offline parameters prefer ACPYPE.</p>
       </div>
 
       <div class="analysis-chain">
