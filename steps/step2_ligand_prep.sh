@@ -105,7 +105,7 @@ fi
 
 require_file "${LIGAND_SOURCE}"
 
-if [[ "${LIGAND_PREP_TOOL}" == "acpype" || "${LIGAND_PREP_TOOL}" == "cgenff" ]]; then
+if [[ "${LIGAND_PREP_TOOL}" == "acpype" || "${LIGAND_PREP_TOOL}" == "cgenff" || "${LIGAND_PREP_TOOL}" == "gromos_skeleton" ]]; then
   case "${LIGAND_SOURCE_FORMAT}" in
     mol2)
       cp "${LIGAND_SOURCE}" "${LIGAND_MOL2}"
@@ -124,6 +124,9 @@ fi
 
 case "${LIGAND_PREP_TOOL}" in
   acpype)
+    # ============================================================
+    # RECOMMENDED fully offline production path (GAFF / GAFF2)
+    # ============================================================
     require_command "${ACPYPE_BIN}"
     configure_acpype_runtime_environment
     run_acpype_cmd "${PYTHON_BIN}" "${PIPELINE_DIR}/helpers/check_acpype_runtime.py" "${ACPYPE_BIN}"
@@ -167,33 +170,54 @@ case "${LIGAND_PREP_TOOL}" in
     ' "${LIGAND_ITP}" > "${LIGAND_POSRE}"
     popd >/dev/null
     ;;
+  gromos_skeleton)
+    # ============================================================
+    # Offline GROMOS topology *skeleton*
+    # Builds connectivity + approximate atom types.
+    # Charges remain placeholders unless GROMOS_CHARGES_FILE is set.
+    # ============================================================
+    log "Generating offline GROMOS topology skeleton (charges must be reviewed)..."
+    SKELETON_ARGS=(
+      -i "${LIGAND_SOURCE}"
+      -o "${LIGAND_ITP}"
+      -n "${LIGAND_RESNAME}"
+      --gro "${LIGAND_GRO}"
+    )
+    if [[ -n "${GROMOS_CHARGES_FILE}" ]]; then
+      require_file "${GROMOS_CHARGES_FILE}"
+      SKELETON_ARGS+=(--charges "${GROMOS_CHARGES_FILE}")
+    fi
+    run_cmd "${PYTHON_BIN}" "${PIPELINE_DIR}/helpers/gromos_skeleton.py" "${SKELETON_ARGS[@]}"
+
+    awk '
+      BEGIN {print "[ position_restraints ]"; print "; ai funct fcx fcy fcz"}
+      /^\[ atoms \]/ {in_atoms=1; next}
+      /^\[/ && $0 !~ /^\[ atoms \]/ {in_atoms=0}
+      in_atoms && $1 ~ /^[0-9]+$/ {printf "%6d %6d %6d %6d %6d\n", $1, 1, 1000, 1000, 1000}
+    ' "${LIGAND_ITP}" > "${LIGAND_POSRE}"
+
+    log "GROMOS skeleton written. Review atom types and charges before production use."
+    log "For a fully offline high-quality alternative set LIGAND_PREP_TOOL=acpype."
+    ;;
   prodrg2)
-    # -------------------------------------------------
-    # PRODRG2 (GROMOS) support
-    # Expects: ${PRODRG_DIR}/DRGFIN.GRO and DRGGMX.ITP
-    # -------------------------------------------------
+    # LEGACY – PRODRG2 server is permanently offline.
+    log "WARNING: LIGAND_PREP_TOOL=prodrg2 is legacy. The PRODRG2 server is offline."
+    log "         Prefer LIGAND_PREP_TOOL=acpype (offline) or gromos_skeleton + manual charges."
     require_file "${PRODRG_DIR}/DRGFIN.GRO"
     require_file "${PRODRG_DIR}/DRGGMX.ITP"
 
-    log "Running PRODRG2 ligand topology preparation..."
-
-    # Call the Python helper (Stage A only - coordinate preparation)
-    # Stage B (topology insertion) is handled by step3_assemble_complex.sh
     run_cmd "${PYTHON_BIN}" "${PIPELINE_DIR}/helpers/prodrg2_topology.py" \
       --protein "${WORK_DIR}/01_protein/protein_processed.gro" \
       --ligname "${LIGAND_RESNAME}" \
       --prodrg-dir "${PRODRG_DIR}" \
       --stage a
 
-    # The Python script produces ${LIGAND_RESNAME}.gro
-    # Move / rename it into the expected location for the rest of the pipeline
     if [[ -f "${LIGAND_RESNAME}.gro" ]]; then
       mv "${LIGAND_RESNAME}.gro" "${LIGAND_GRO}"
     else
       die "PRODRG2 helper did not produce ${LIGAND_RESNAME}.gro"
     fi
 
-    # Also produce the ligand .itp by renaming residue in DRGGMX.ITP
     run_cmd "${PYTHON_BIN}" "${PIPELINE_DIR}/helpers/prodrg2_topology.py" \
       --protein "${WORK_DIR}/01_protein/protein_processed.gro" \
       --ligname "${LIGAND_RESNAME}" \
@@ -206,7 +230,6 @@ case "${LIGAND_PREP_TOOL}" in
       die "PRODRG2 helper did not produce ${LIGAND_RESNAME}.itp"
     fi
 
-    # Generate position restraints (same style as other tools)
     awk '
       BEGIN {print "[ position_restraints ]"; print "; ai funct fcx fcy fcz"}
       /^\[ atoms \]/ {in_atoms=1; next}
@@ -214,12 +237,11 @@ case "${LIGAND_PREP_TOOL}" in
       in_atoms && $1 ~ /^[0-9]+$/ {printf "%6d %6d %6d %6d %6d\n", $1, 1, 1000, 1000, 1000}
     ' "${LIGAND_ITP}" > "${LIGAND_POSRE}"
 
-    # Normalize residue name (you already have this helper)
     run_cmd "${PYTHON_BIN}" "${PIPELINE_DIR}/helpers/normalize_gro_resname.py" \
       "${LIGAND_GRO}" "${LIGAND_GRO}" "${LIGAND_RESNAME}"
     ;;
   *)
-    die "Unsupported ligand preparation tool: ${LIGAND_PREP_TOOL}. Supported: acpype, cgenff, prodrg2"
+    die "Unsupported ligand preparation tool: ${LIGAND_PREP_TOOL}. Supported: acpype (recommended offline), cgenff, gromos_skeleton, prodrg2 (legacy)"
     ;;
 esac
 
