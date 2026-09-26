@@ -167,8 +167,59 @@ case "${LIGAND_PREP_TOOL}" in
     ' "${LIGAND_ITP}" > "${LIGAND_POSRE}"
     popd >/dev/null
     ;;
+  prodrg2)
+    # -------------------------------------------------
+    # PRODRG2 (GROMOS) support
+    # Expects: ${PRODRG_DIR}/DRGFIN.GRO and DRGGMX.ITP
+    # -------------------------------------------------
+    require_file "${PRODRG_DIR}/DRGFIN.GRO"
+    require_file "${PRODRG_DIR}/DRGGMX.ITP"
+
+    log "Running PRODRG2 ligand topology preparation..."
+
+    # Call the Python helper (Stage A only - coordinate preparation)
+    # Stage B (topology insertion) is handled by step3_assemble_complex.sh
+    run_cmd "${PYTHON_BIN}" "${PIPELINE_DIR}/helpers/prodrg2_topology.py" \
+      --protein "${WORK_DIR}/01_protein/protein_processed.gro" \
+      --ligname "${LIGAND_RESNAME}" \
+      --prodrg-dir "${PRODRG_DIR}" \
+      --stage a
+
+    # The Python script produces ${LIGAND_RESNAME}.gro
+    # Move / rename it into the expected location for the rest of the pipeline
+    if [[ -f "${LIGAND_RESNAME}.gro" ]]; then
+      mv "${LIGAND_RESNAME}.gro" "${LIGAND_GRO}"
+    else
+      die "PRODRG2 helper did not produce ${LIGAND_RESNAME}.gro"
+    fi
+
+    # Also produce the ligand .itp by renaming residue in DRGGMX.ITP
+    run_cmd "${PYTHON_BIN}" "${PIPELINE_DIR}/helpers/prodrg2_topology.py" \
+      --protein "${WORK_DIR}/01_protein/protein_processed.gro" \
+      --ligname "${LIGAND_RESNAME}" \
+      --prodrg-dir "${PRODRG_DIR}" \
+      --stage b
+
+    if [[ -f "${LIGAND_RESNAME}.itp" ]]; then
+      mv "${LIGAND_RESNAME}.itp" "${LIGAND_ITP}"
+    else
+      die "PRODRG2 helper did not produce ${LIGAND_RESNAME}.itp"
+    fi
+
+    # Generate position restraints (same style as other tools)
+    awk '
+      BEGIN {print "[ position_restraints ]"; print "; ai funct fcx fcy fcz"}
+      /^\[ atoms \]/ {in_atoms=1; next}
+      /^\[/ && $0 !~ /^\[ atoms \]/ {in_atoms=0}
+      in_atoms && $1 ~ /^[0-9]+$/ {printf "%6d %6d %6d %6d %6d\n", $1, 1, 1000, 1000, 1000}
+    ' "${LIGAND_ITP}" > "${LIGAND_POSRE}"
+
+    # Normalize residue name (you already have this helper)
+    run_cmd "${PYTHON_BIN}" "${PIPELINE_DIR}/helpers/normalize_gro_resname.py" \
+      "${LIGAND_GRO}" "${LIGAND_GRO}" "${LIGAND_RESNAME}"
+    ;;
   *)
-    die "Unsupported ligand preparation tool: ${LIGAND_PREP_TOOL}. Supported: acpype, cgenff"
+    die "Unsupported ligand preparation tool: ${LIGAND_PREP_TOOL}. Supported: acpype, cgenff, prodrg2"
     ;;
 esac
 
