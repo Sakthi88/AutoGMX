@@ -10,19 +10,25 @@ WATER_AND_ION_NAMES = {
     "HOH", "WAT", "SOL", "SPC", "TIP", "TIP3", "TIP4", "TIP5",
     "NA", "NA+", "CL", "CL-", "K", "K+", "LI", "LI+", "MG", "MG2",
     "CA", "CA2", "ZN", "FE", "FE2", "FE3", "MN", "CU", "CO", "NI",
+    "ACN", "ACT", "BEN", "DMS", "DMSO", "EDO", "EOH", "GOL", "IPA", "MEO",
+    "MOH", "MPD", "PEG", "PGE", "PG4", "1PE", "2PE", "P4C", "P6G",
+    "RB", "CS", "SR", "BA", "CD", "HG", "AL", "CR", "MO", "W", "V", "Y",
+    "AG", "AU", "PT",
 }
 
 
 def residue_name_from_line(line):
     # PDB columns 18-20 contain the three-character residue name.
     # The following blank and chain-ID columns must not be included.
-    if len(line) >= 20:
-        candidate = line[17:20].strip().upper()
-        if candidate:
-            return candidate
     parts = line.split()
-    if len(parts) >= 4:
-        return parts[3].upper()
+    if len(parts) >= 4 and parts[0] in {"ATOM", "HETATM"}:
+        token_name = parts[3].upper()
+        fixed_name = line[17:20].strip().upper() if len(line) >= 20 else ""
+        # Prefer whitespace fields when a loosely formatted PDB has shifted columns.
+        if token_name and token_name != fixed_name:
+            return token_name
+        if fixed_name:
+            return fixed_name
     return ""
 
 
@@ -58,6 +64,7 @@ def main():
     protein_lines = []
     ligand_lines = []
     heterogen_groups = defaultdict(list)
+    atom_residue_groups = defaultdict(list)
     ligand_atoms = 0
     protein_atoms = 0
 
@@ -79,43 +86,68 @@ def main():
                     protein_lines.append(raw)
                     protein_atoms += 1
             elif record == "ATOM  ":
+                atom_residue_groups[residue_key_from_line(raw)].append(raw)
                 protein_lines.append(raw)
                 protein_atoms += 1
             elif record == "TER   " and protein_lines:
                 protein_lines.append(raw)
 
+    inferred_key = None
     if ligand_atoms == 0:
         candidates = {
             key: lines
             for key, lines in heterogen_groups.items()
             if key[0] not in WATER_AND_ION_NAMES
         }
+        if not candidates:
+            # Some docking/export tools write ligand coordinates as ATOM records.
+            # Consider only nonstandard residue names after ordinary HETATM detection.
+            protein_residue_names = {
+                "ALA", "ARG", "ASN", "ASP", "CYS", "GLN", "GLU", "GLY", "HIS", "ILE",
+                "LEU", "LYS", "MET", "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL",
+                "ASH", "GLH", "CYM", "CYX", "HID", "HIE", "HIP", "LYN", "MSE",
+            }
+            candidates = {
+                key: lines
+                for key, lines in atom_residue_groups.items()
+                if key[0] not in protein_residue_names | WATER_AND_ION_NAMES
+            }
         if len(candidates) == 1:
-            key, ligand_lines = next(iter(candidates.items()))
+            inferred_key, ligand_lines = next(iter(candidates.items()))
             ligand_atoms = len(ligand_lines)
+            source_kind = "ATOM" if inferred_key in atom_residue_groups else "HETATM"
             sys.stderr.write(
                 f"Warning: no atoms matched residue name(s) {', '.join(sorted(ligand_names))}; "
-                f"using the only non-water, non-ion HETATM residue: {format_residue_key(key)}.\n"
+                f"using the only inferred ligand residue: {format_residue_key(inferred_key)} "
+                f"({source_kind} records).\n"
             )
-            if not strip_hetatm:
-                protein_keys = set(candidates)
+            if source_kind == "ATOM":
                 protein_lines = [
                     line for line in protein_lines
-                    if not (line.startswith("HETATM") and residue_key_from_line(line) in protein_keys)
+                    if not (line.startswith("ATOM  ") and residue_key_from_line(line) == inferred_key)
                 ]
                 protein_atoms -= ligand_atoms
         elif len(candidates) > 1:
             available = ", ".join(format_residue_key(key) for key in sorted(candidates))
             raise SystemExit(
                 f"No ligand atoms matched residue name(s) {', '.join(sorted(ligand_names))} in {source_path}. "
-                f"Non-water HETATM residues are: {available}. Set the ligand residue name explicitly."
+                f"Possible ligand residues are: {available}. Choose automatic HETATM detection or enter the exact residue name."
             )
 
     if ligand_atoms == 0:
+        observed_hetatm = sorted({key[0] for key in heterogen_groups})
+        observed_atom_nonstandard = sorted({
+            key[0] for key in atom_residue_groups
+            if key[0] not in {
+                "ALA", "ARG", "ASN", "ASP", "CYS", "GLN", "GLU", "GLY", "HIS", "ILE",
+                "LEU", "LYS", "MET", "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL",
+            }
+        })
         joined_names = ", ".join(sorted(ligand_names))
+        found = f"HETATM residues: {', '.join(observed_hetatm) or 'none'}; nonstandard ATOM residues: {', '.join(observed_atom_nonstandard) or 'none'}"
         raise SystemExit(
             f"No ligand atoms found in {source_path} for residue name(s): {joined_names}. "
-            "Check the PDB residue-name columns and the configured ligand residue name."
+            f"Parsed {found}. Enter the ligand residue name or use automatic detection."
         )
     if protein_atoms == 0:
         raise SystemExit(f"No protein atoms found in {source_path}")
