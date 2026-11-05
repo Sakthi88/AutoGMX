@@ -4,6 +4,15 @@ import argparse
 from pathlib import Path
 
 
+def residue_key(residue):
+    return (
+        residue.chain.id,
+        residue.id,
+        getattr(residue, "insertionCode", ""),
+        residue.name,
+    )
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Rebuild missing atoms in standard residues using PDBFixer."
@@ -32,16 +41,29 @@ def main():
     fixer.missingResidues = {}
     fixer.findMissingAtoms()
 
-    missing_atoms = sum(len(atoms) for atoms in fixer.missingAtoms.values())
-    missing_terminal_atoms = sum(len(atoms) for atoms in fixer.missingTerminals.values())
+    planned_atoms = {}
+    for residue, atoms in fixer.missingAtoms.items():
+        planned_atoms.setdefault(residue_key(residue), set()).update(atom.name for atom in atoms)
+    for residue, atoms in fixer.missingTerminals.items():
+        planned_atoms.setdefault(residue_key(residue), set()).update(atoms)
+
     fixer.addMissingAtoms()
 
-    remaining = sum(len(atoms) for atoms in fixer.missingAtoms.values())
-    remaining += sum(len(atoms) for atoms in fixer.missingTerminals.values())
-    if remaining:
+    rebuilt_atoms = {}
+    for chain in fixer.topology.chains():
+        for residue in chain.residues():
+            rebuilt_atoms[residue_key(residue)] = {atom.name for atom in residue.atoms()}
+
+    still_missing = []
+    for key, atom_names in planned_atoms.items():
+        absent = sorted(atom_names - rebuilt_atoms.get(key, set()))
+        if absent:
+            still_missing.append(f"{key[3]} {key[1]}: {', '.join(absent)}")
+    if still_missing:
         raise SystemExit(
-            f"PDBFixer could not rebuild {remaining} missing atom(s) in {args.input_pdb}. "
-            "Inspect nonstandard residues or gaps in the structure."
+            "PDBFixer could not rebuild the following protein atom(s): "
+            + "; ".join(still_missing)
+            + ". Inspect nonstandard residues or structural gaps."
         )
 
     args.output_pdb.parent.mkdir(parents=True, exist_ok=True)
@@ -54,7 +76,7 @@ def main():
         temporary_path.unlink(missing_ok=True)
         raise
 
-    repaired = missing_atoms + missing_terminal_atoms
+    repaired = sum(len(atom_names) for atom_names in planned_atoms.values())
     if repaired:
         print(f"Added {repaired} missing atom(s) to {args.output_pdb}.")
     else:
