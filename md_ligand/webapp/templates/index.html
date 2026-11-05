@@ -41,7 +41,7 @@
           <div class="triple">
             <label>
               <span>Force field</span>
-              <select name="force_field" required>
+              <select name="force_field" id="force_field_select" required>
                 {% for value, label in force_field_options %}
                   <option value="{{ value }}" {% if value == "amber99sb-ildn" %}selected{% endif %}>{{ label }}</option>
                 {% endfor %}
@@ -56,6 +56,22 @@
               </select>
             </label>
             <label><span>Net charge</span><input type="number" name="ligand_charge" value="0" required></label>
+          </div>
+          <div class="triple" id="charmm_terminus_controls" hidden>
+            <label>
+              <span>N-terminal state</span>
+              <select name="charmm_n_terminus_selection">
+                <option value="0" selected>NH3+ (charged)</option>
+                <option value="1">NH2 (neutral)</option>
+              </select>
+            </label>
+            <label>
+              <span>C-terminal state</span>
+              <select name="charmm_c_terminus_selection">
+                <option value="0" selected>COO- (charged)</option>
+                <option value="1">COOH (neutral)</option>
+              </select>
+            </label>
           </div>
           <div class="triple">
             <label><span>Production time (ns)</span><input type="number" name="md_time_ns" value="100" min="1" required></label>
@@ -316,6 +332,16 @@ Submit a docked complex to begin.{% endif %}</pre>
       document.querySelector(`[data-panel="${button.dataset.tab}"]`).classList.add("active");
     });
   });
+
+  const forceFieldSelect = document.querySelector("#force_field_select");
+  const charmmTerminusControls = document.querySelector("#charmm_terminus_controls");
+  if (forceFieldSelect && charmmTerminusControls) {
+    const syncCharmmTermini = () => {
+      charmmTerminusControls.hidden = !forceFieldSelect.value.toLowerCase().startsWith("charmm");
+    };
+    forceFieldSelect.addEventListener("change", syncCharmmTermini);
+    syncCharmmTermini();
+  }
 
   // Full-auto topology section visibility
   const methodSelect = document.querySelector("#ligand_prep_tool");

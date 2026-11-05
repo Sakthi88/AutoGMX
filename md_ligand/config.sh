@@ -106,7 +106,7 @@ IONS_MDP="${IONS_MDP:-${PIPELINE_DIR}/mdp/ions.mdp}"
 NVT_MDP="${NVT_MDP:-${PIPELINE_DIR}/mdp/nvt.mdp}"
 NPT_MDP="${NPT_MDP:-${PIPELINE_DIR}/mdp/npt.mdp}"
 MD_MDP="${MD_MDP:-${PIPELINE_DIR}/mdp/md.mdp}"
-# The bundled CHARMM port has a broken automatic N-terminal MET block. These
-# menu selections choose standard NH3+ (1) and COO- (0) termini with pdb2gmx.
-CHARMM_N_TERMINUS_SELECTION="${CHARMM_N_TERMINUS_SELECTION:-1}"
+# GROMACS CHARMM menus use 0 for NH3+/COO- and 1 for NH2/COOH.
+# The web form exposes these common charged and neutral terminal states.
+CHARMM_N_TERMINUS_SELECTION="${CHARMM_N_TERMINUS_SELECTION:-0}"
 CHARMM_C_TERMINUS_SELECTION="${CHARMM_C_TERMINUS_SELECTION:-0}"
