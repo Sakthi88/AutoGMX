@@ -628,6 +628,8 @@ def build_override_config(job_dir, form):
         "TMP_DIR": str(job_dir / "tmp"),
         "FORCE_FIELD": form["force_field"],
         "WATER_MODEL": form["water_model"],
+        "CHARMM_N_TERMINUS_SELECTION": form["charmm_n_terminus_selection"],
+        "CHARMM_C_TERMINUS_SELECTION": form["charmm_c_terminus_selection"],
         "LIGAND_PREP_TOOL": form["ligand_prep_tool"],
         "AUTO_RECTIFY": form.get("auto_rectify", "yes"),
         "LIGAND_RESNAME": form["ligand_resname"],
@@ -941,6 +943,8 @@ def collect_run_form(default_project):
         "project_name": request.form.get("project_name", default_project).strip() or default_project,
         "force_field": request.form.get("force_field", "amber99sb-ildn"),
         "water_model": request.form.get("water_model", "tip3p"),
+        "charmm_n_terminus_selection": request.form.get("charmm_n_terminus_selection", "0"),
+        "charmm_c_terminus_selection": request.form.get("charmm_c_terminus_selection", "0"),
         "ligand_resname": request.form.get("ligand_resname", "LIG").upper()[:5],
         "ligand_name": request.form.get("ligand_name", "ligand"),
         "ligand_charge": request.form.get("ligand_charge", "0"),
@@ -986,6 +990,12 @@ def full_auto_job():
     try:
         form["md_time_ns"] = normalize_positive_int(form["md_time_ns"], "Production time")
         form["ntomp"] = normalize_ntomp(form["ntomp"])
+        for field, label in (
+            ("charmm_n_terminus_selection", "N-terminal CHARMM choice"),
+            ("charmm_c_terminus_selection", "C-terminal CHARMM choice"),
+        ):
+            if form[field] not in {"0", "1"}:
+                raise ValueError(f"{label} must be either 0 or 1.")
     except ValueError as exc:
         flash(str(exc), "error")
         return redirect(url_for("index"))
@@ -1011,6 +1021,8 @@ def full_auto_job():
         "project_name": form["project_name"],
         "force_field": form["force_field"],
         "water_model": form["water_model"],
+        "charmm_n_terminus": form["charmm_n_terminus_selection"],
+        "charmm_c_terminus": form["charmm_c_terminus_selection"],
         "ligand_prep_tool": form["ligand_prep_tool"],
         "auto_rectification": "Enabled" if form["auto_rectify"] == "yes" else "Disabled",
         "analysis_plan": build_analysis_plan(form),
