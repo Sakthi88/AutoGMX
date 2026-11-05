@@ -35,13 +35,26 @@
                 <option value="cgenff">CGenFF (CHARMM)</option>
               </select>
             </label>
-            <label><span>Ligand residue</span><input type="text" name="ligand_resname" value="LIG" maxlength="5" required></label>
+            <label>
+              <span>Input ligand residue</span>
+              <select name="ligand_resname_mode" id="ligand_resname_mode">
+                <option value="lig">Residue name LIG</option>
+                <option value="hetatm">Auto-detect ligand from HETATM</option>
+                <option value="manual">Enter residue name</option>
+              </select>
+            </label>
+          </div>
+          <div class="double" id="ligand_resname_manual_wrap" hidden>
+            <label><span>Input residue name (1–5 characters)</span><input type="text" name="ligand_resname_manual" id="ligand_resname_manual" maxlength="5" disabled></label>
+          </div>
+          <div class="double">
+            <label><span>Topology output residue name (1–5 characters)</span><input type="text" name="ligand_output_resname" value="LIG" maxlength="5" required></label>
           </div>
           <label class="file-drop file-drop-large"><span>Docked PDB file</span><input type="file" name="docking_file" accept=".pdb" required></label>
           <div class="triple">
             <label>
               <span>Force field</span>
-              <select name="force_field" required>
+              <select name="force_field" id="force_field_select" required>
                 {% for value, label in force_field_options %}
                   <option value="{{ value }}" {% if value == "amber99sb-ildn" %}selected{% endif %}>{{ label }}</option>
                 {% endfor %}
@@ -56,6 +69,22 @@
               </select>
             </label>
             <label><span>Net charge</span><input type="number" name="ligand_charge" value="0" required></label>
+          </div>
+          <div class="triple" id="charmm_terminus_controls" hidden>
+            <label>
+              <span>N-terminal state</span>
+              <select name="charmm_n_terminus_selection">
+                <option value="0" selected>NH3+ (charged)</option>
+                <option value="1">NH2 (neutral)</option>
+              </select>
+            </label>
+            <label>
+              <span>C-terminal state</span>
+              <select name="charmm_c_terminus_selection">
+                <option value="0" selected>COO- (charged)</option>
+                <option value="1">COOH (neutral)</option>
+              </select>
+            </label>
           </div>
           <div class="triple">
             <label><span>Production time (ns)</span><input type="number" name="md_time_ns" value="100" min="1" required></label>
@@ -316,6 +345,30 @@ Submit a docked complex to begin.{% endif %}</pre>
       document.querySelector(`[data-panel="${button.dataset.tab}"]`).classList.add("active");
     });
   });
+
+  const forceFieldSelect = document.querySelector("#force_field_select");
+  const charmmTerminusControls = document.querySelector("#charmm_terminus_controls");
+  if (forceFieldSelect && charmmTerminusControls) {
+    const syncCharmmTermini = () => {
+      charmmTerminusControls.hidden = !forceFieldSelect.value.toLowerCase().startsWith("charmm");
+    };
+    forceFieldSelect.addEventListener("change", syncCharmmTermini);
+    syncCharmmTermini();
+  }
+
+  const ligandResidueMode = document.querySelector("#ligand_resname_mode");
+  const manualResidueWrap = document.querySelector("#ligand_resname_manual_wrap");
+  const manualResidueInput = document.querySelector("#ligand_resname_manual");
+  if (ligandResidueMode && manualResidueWrap && manualResidueInput) {
+    const syncLigandResidueMode = () => {
+      const manual = ligandResidueMode.value === "manual";
+      manualResidueWrap.hidden = !manual;
+      manualResidueInput.disabled = !manual;
+      manualResidueInput.required = manual;
+    };
+    ligandResidueMode.addEventListener("change", syncLigandResidueMode);
+    syncLigandResidueMode();
+  }
 
   // Full-auto topology section visibility
   const methodSelect = document.querySelector("#ligand_prep_tool");
