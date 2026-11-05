@@ -238,7 +238,7 @@ def clean_complex(source, output, ligand_resname):
         Path(temp_name).unlink(missing_ok=True)
         raise
     report_path = output.with_suffix(output.suffix + ".report.json")
-    report_path.write_text(json.dumps(counts, indent=2) + "\\n", encoding="utf-8")
+    report_path.write_text(json.dumps(counts, indent=2) + "\n", encoding="utf-8")
     return counts
 
 
