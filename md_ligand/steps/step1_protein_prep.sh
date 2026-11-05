@@ -55,7 +55,17 @@ if [[ "${FORCE_FIELD,,}" == charmm* ]]; then
   # The bundled CHARMM port's automatic 1MET terminal block is incomplete.
   log "CHARMM termini: standard NH3+ / COO-"
   PDB2GMX_ARGS+=(-ter)
-  if ! for ((chain=0; chain<100; chain++)); do printf '1\n0\n'; done | gmx_cmd pdb2gmx "${PDB2GMX_ARGS[@]}"; then
+  case "${CHARMM_N_TERMINUS_SELECTION}" in
+    0|1) ;;
+    *) die "CHARMM_N_TERMINUS_SELECTION must be 0 (NH3+) or 1 (NH2)." ;;
+  esac
+  case "${CHARMM_C_TERMINUS_SELECTION}" in
+    0|1) ;;
+    *) die "CHARMM_C_TERMINUS_SELECTION must be 0 (COO-) or 1 (COOH)." ;;
+  esac
+  if ! for ((chain=0; chain<100; chain++)); do
+    printf '%s\n%s\n' "${CHARMM_N_TERMINUS_SELECTION}" "${CHARMM_C_TERMINUS_SELECTION}"
+  done | gmx_cmd pdb2gmx "${PDB2GMX_ARGS[@]}"; then
     die "pdb2gmx failed for ${FORCE_FIELD}/${WATER_MODEL}. Check the preceding GROMACS fatal error for the specific residue, termini, or force-field cause; this is not necessarily a water-model error."
   fi
 elif ! gmx_cmd pdb2gmx "${PDB2GMX_ARGS[@]}"; then
