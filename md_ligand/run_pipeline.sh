@@ -5,7 +5,7 @@ PIPELINE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${PIPELINE_DIR}/config.sh"
 
 JSON_CONFIG=""
-START_STEP=1
+START_STEP=0
 END_STEP=11
 
 while [[ $# -gt 0 ]]; do
@@ -29,7 +29,7 @@ while [[ $# -gt 0 ]]; do
     -h|--help)
       cat <<'EOF'
 Usage: bash run_pipeline.sh [--config custom.sh] [--json overrides.json] [--from N] [--to N]
-Steps: 1=protein_prep, 2=ligand_prep, 3=assemble, 4=box, 5=solvate, 6=ions,
+Steps: 0=docking_cleanup, 1=protein_prep, 2=ligand_prep, 3=assemble, 4=box, 5=solvate, 6=ions,
        7=minimize, 8=equilibrate, 9=production, 10=analysis, 11=mmpbsa, 12=viewer
 EOF
       exit 0
@@ -49,9 +49,17 @@ source "${PIPELINE_DIR}/lib/common.sh"
 prepare_directories
 auto_rectify_config
 auto_select_ligand_generator
+
+CLEANUP_ENV="${STATE_DIR}/docking_cleanup.env"
+CLEANUP_STAMP="${STATE_DIR}/step0_docking_cleanup.done"
+if [[ -f "${CLEANUP_STAMP}" && -f "${CLEANUP_ENV}" ]]; then
+  # Reuse the cleaned copy on continuation/restart runs.
+  source "${CLEANUP_ENV}"
+fi
 print_runtime_summary
 
 steps=(
+  "0:${PIPELINE_DIR}/steps/step0_docking_cleanup.sh"
   "1:${PIPELINE_DIR}/steps/step1_protein_prep.sh"
   "2:${PIPELINE_DIR}/steps/step2_ligand_prep.sh"
   "3:${PIPELINE_DIR}/steps/step3_assemble_complex.sh"
@@ -73,6 +81,10 @@ for entry in "${steps[@]}"; do
     continue
   fi
   bash "${step_script}"
+  if [[ "${step_number}" == "0" && -f "${CLEANUP_ENV}" ]]; then
+    # Pass the cleaned docking-complex path to the remaining step processes.
+    source "${CLEANUP_ENV}"
+  fi
 done
 
 log "Pipeline completed successfully."
