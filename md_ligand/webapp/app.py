@@ -598,11 +598,21 @@ def split_docking_complex(job_dir, docking_path, ligand_resname="LIG"):
     if obabel_result.returncode != 0:
         raise RuntimeError(obabel_result.stderr.strip() or obabel_result.stdout.strip() or "Open Babel ligand conversion failed.")
 
+    ligand_resname_used = ""
+    with ligand_pdb.open("r", encoding="utf-8", errors="replace") as handle:
+        for line in handle:
+            if line.startswith(("ATOM  ", "HETATM")):
+                fields = line.split()
+                ligand_resname_used = fields[3].upper() if len(fields) >= 4 else line[17:20].strip().upper()
+                if ligand_resname_used:
+                    break
+
     return {
         "protein_pdb": str(protein_out),
         "ligand_pdb": str(ligand_pdb),
         "ligand_mol2": str(ligand_mol2),
         "docking_complex": str(docking_path),
+        "ligand_resname_used": ligand_resname_used,
     }
 
 
@@ -1028,6 +1038,8 @@ def full_auto_job():
             raise ValueError("Topology output residue name must be 1 to 5 characters.")
         form["ligand_resname"] = output_name
         generated_files = split_docking_complex(job_dir, docking_path, form["docking_ligand_resname"])
+        if generated_files["ligand_resname_used"]:
+            form["docking_ligand_resname"] = generated_files["ligand_resname_used"]
     except (RuntimeError, ValueError) as exc:
         flash(str(exc), "error")
         return redirect(url_for("index"))
