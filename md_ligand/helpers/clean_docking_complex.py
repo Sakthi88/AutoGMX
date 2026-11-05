@@ -144,7 +144,9 @@ def clean_complex(source, output, ligand_resname):
         if reason:
             counts[f"{reason}_atoms_removed"] += 1
             continue
-        if is_hydrogen(line):
+        if is_hydrogen(line) and not (
+            line.startswith("HETATM") and key[0] == ligand_resname
+        ):
             counts["hydrogens_removed"] += 1
             continue
         filtered.append(line)
