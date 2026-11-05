@@ -11,9 +11,10 @@ dependencies:
   - networkx>=3.0
   - packaging>=23.0
 
-  # Molecular dynamics & analysis
+  # Molecular dynamics & protein structure preparation
   - mdanalysis>=2.7
   - acpype>=2023.10.18
+  - pdbfixer
 
   # Web framework
   - flask>=3.0
