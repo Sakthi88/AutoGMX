@@ -30,9 +30,13 @@ mkdir -p "${CLEANUP_DIR}"
 run_cmd "${PYTHON_BIN}" "${PIPELINE_DIR}/helpers/clean_docking_complex.py" \
   "${DOCKING_COMPLEX_PDB}" "${CLEANED_COMPLEX}" "${DOCKING_LIGAND_RESNAME}"
 
+CLEANUP_REPORT="${CLEANED_COMPLEX}.report.json"
+CLEANED_LIGAND_RESNAME="$("${PYTHON_BIN}" -c 'import json,sys; print(json.load(open(sys.argv[1], encoding="utf-8"))["ligand_resname_used"])' "${CLEANUP_REPORT}")"
+log "Using ligand residue name ${CLEANED_LIGAND_RESNAME} after cleanup."
+
 CLEANUP_ENV="${STATE_DIR}/docking_cleanup.env"
 mkdir -p "${STATE_DIR}"
-printf 'export DOCKING_COMPLEX_PDB=%q\n' "${CLEANED_COMPLEX}" > "${CLEANUP_ENV}.tmp"
+printf 'export DOCKING_COMPLEX_PDB=%q\nexport DOCKING_LIGAND_RESNAME=%q\n' "${CLEANED_COMPLEX}" "${CLEANED_LIGAND_RESNAME}" > "${CLEANUP_ENV}.tmp"
 mv "${CLEANUP_ENV}.tmp" "${CLEANUP_ENV}"
 
 mark_step_done "${STEP_NAME}"
