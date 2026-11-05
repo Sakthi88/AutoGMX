@@ -15,7 +15,7 @@ WATER_AND_ION_NAMES = {
 
 def residue_name_from_line(line):
     # PDB columns 18-20 contain the three-character residue name.
-    # Column 21 is the chain identifier and must not be included.
+    # The following blank and chain-ID columns must not be included.
     if len(line) >= 20:
         candidate = line[17:20].strip().upper()
         if candidate:
