@@ -9,6 +9,9 @@ packaging>=23.0
 MDAnalysis>=2.7
 acpype>=2023.10.18
 
+# Protein atom repair is installed from conda-forge (PDBFixer depends on OpenMM):
+# conda install -c conda-forge pdbfixer
+
 # Web framework
 Flask>=3.0,<4.0
 Werkzeug>=3.0
@@ -25,4 +28,3 @@ reportlab>=4.0
 
 # Optional: for enhanced performance (conda recommended)
 # mpi4py>=3.1
-# openmm>=8.0
