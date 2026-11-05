@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block head_extra %}
+  {% if job.auto_refresh_seconds %}
+    <meta http-equiv="refresh" content="{{ job.auto_refresh_seconds }}">
+  {% endif %}
+{% endblock %}
+{% block content %}
+<section class="detail-layout">
+  <div class="panel detail-panel">
+    <div class="panel-head">
+      <h2>{{ job.project_name }}</h2>
+      <p>{{ job.id }}</p>
+    </div>
+
+    <div class="status-banner">
+      <div>
+        <span class="status-label">Current status</span>
+        <strong>{{ job.status_label }}</strong>
+        <p>{{ job.current_stage }}</p>
+      </div>
+      <div class="status-banner-side">
+        <span class="status status-{{ job.status }}">{{ job.status_label }}</span>
+        <strong>{{ job.runtime_display or "00:00:00" }}</strong>
+        <p>Elapsed runtime</p>
+      </div>
+    </div>
+
+    <div class="facts">
+      <div><span>Stage progress</span><strong>{{ job.progress_label }}</strong></div>
+      <div><span>Steps complete</span><strong>{{ job.completed_steps }}/11</strong></div>
+      <div><span>Created</span><strong>{{ job.started_at_display or job.created_at }}</strong></div>
+      <div><span>Runtime</span><strong>{{ job.runtime_display or "00:00:00" }}</strong></div>
+      <div><span>Force field</span><strong>{{ job.force_field or "n/a" }}</strong></div>
+      <div><span>Water model</span><strong>{{ job.water_model or "n/a" }}</strong></div>
+      <div><span>Ligand prep</span><strong>{{ job.ligand_prep_tool or "prepared_topology" }}</strong></div>
+      <div><span>Auto rectification</span><strong>{{ job.auto_rectification or "Enabled" }}</strong></div>
+      <div><span>PID</span><strong>{{ job.pid or "n/a" }}</strong></div>
+    </div>
+
+    <div class="action-row">
+      <a class="secondary-btn" href="{{ url_for('index') }}">Back</a>
+      {% if job.status == "awaiting_topology" %}
+        <a class="primary-btn" href="{{ url_for('topology_upload', job_id=job.id) }}">Upload Topology</a>
+      {% endif %}
+      {% if job.status == "running" %}
+        <form action="{{ url_for('stop_job', job_id=job.id) }}" method="post">
+          <button type="submit" class="danger-btn">Stop Job</button>
+        </form>
+      {% endif %}
+      {% if job.has_report %}
+        <a class="primary-btn" href="{{ url_for('download_report', job_id=job.id) }}">Download PDF Report</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="panel detail-panel">
+    <div class="panel-head">
+      <h2>Linked Analysis</h2>
+      <p>Result and free-energy tasks connected to this run.</p>
+    </div>
+    <div class="analysis-status-list">
+      {% for item in job.linked_analyses %}
+        <div class="analysis-status-item">
+          <strong>{{ item.label }}</strong>
+          {% if item.enabled %}
+            <span class="status status-{{ 'completed' if item.done else 'queued' }}">{{ "Completed" if item.done else "Queued" }}</span>
+          {% else %}
+            <span class="status status-finished_unknown">Skipped</span>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="panel log-panel">
+    <div class="panel-head">
+      <h2>Run Log</h2>
+      <p>Latest lines from the background pipeline process.</p>
+    </div>
+    <pre class="log-output">{{ job.run_log_tail or "No log output yet." }}</pre>
+  </div>
+
+  {% if job.analysis_plots %}
+  <div class="panel detail-panel">
+    <div class="panel-head">
+      <h2>Analysis Graphs</h2>
+      <p>Generated from the production trajectory and energy outputs.</p>
+    </div>
+    <div class="plot-grid">
+      {% for plot in job.analysis_plots %}
+        <figure class="plot-card">
+          <img src="{{ url_for('analysis_file', job_id=job.id, filename=plot.filename) }}" alt="{{ plot.name }}">
+          <figcaption>{{ plot.name }}</figcaption>
+        </figure>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if job.linked_analysis_files %}
+  <div class="panel detail-panel">
+    <div class="panel-head">
+      <h2>Linked Outputs</h2>
+      <p>Completion summaries created for linked analyses.</p>
+    </div>
+    <div class="analysis-file-list">
+      {% for group in job.linked_analysis_files %}
+        <div>
+          <strong>{{ group.label }}</strong>
+          {% for file in group.files %}
+            <p>{{ file.name }}</p>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}
+  {% if job.mmpbsa_files %}
+  <div class="panel detail-panel">
+    <div class="panel-head">
+      <h2>MM-PBSA Results</h2>
+      <p>Binding-energy values, machine-readable summaries, and generated plots.</p>
+    </div>
+    <div class="plot-grid">
+      {% for file in job.mmpbsa_files if file.is_plot %}
+        <figure class="plot-card">
+          <img src="{{ url_for('analysis_file', job_id=job.id, filename=file.path) }}" alt="{{ file.name }}">
+          <figcaption>{{ file.name }}</figcaption>
+        </figure>
+      {% endfor %}
+    </div>
+    <div class="analysis-file-list">
+      {% for file in job.mmpbsa_files %}
+        {% if not file.is_plot %}
+          <p><a href="{{ url_for('analysis_file', job_id=job.id, filename=file.path) }}" download>{{ file.name }}</a></p>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+

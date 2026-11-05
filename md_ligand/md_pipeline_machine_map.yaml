@@ -1,0 +1,806 @@
+schema_name: "MDPipelineMachineUnderstandingMap"
+schema_version: "1.0"
+generated_for: "ChatGPT manuscript conversion"
+project_name: "AutoGMX / Automated GROMACS Protein-Ligand MD Pipeline"
+source_root: "C:/Users/Sakthi/Desktop/5W07_li8/md_pipeline/md_pipeline"
+verification_scope:
+  code_review_only: true
+  gromacs_executed: false
+  ambertools_executed: false
+  simulation_verified: false
+  note: "This file maps the codebase structure and intended behavior only. It does not claim a new MD run was executed."
+
+manuscript_instruction:
+  role: "Use this file as the complete technical source for drafting a manuscript, methods section, workflow description, or software note."
+  writing_goal: "Convert the structured map into a clear scientific manuscript describing the automation tool, its workflow, implementation, inputs, outputs, rationale, and limitations."
+  preferred_style: "Formal scientific software-description style."
+  do_not_claim:
+    - "Do not claim that a new simulation was run during this analysis."
+    - "Do not claim experimental validation unless separate result data are supplied."
+    - "Do not remove the warning that README.md contains unresolved conflict markers."
+
+tool_identity:
+  name: "AutoGMX"
+  class: "Molecular dynamics automation pipeline"
+  domain: "Computational chemistry, structural biology, protein-ligand simulation"
+  primary_engine: "GROMACS command-line tools"
+  orchestration_language: "Bash"
+  helper_language: "Python"
+  optional_user_interface: "Flask web application"
+  main_value: "Transforms a multi-stage protein-ligand MD workflow into a restart-safe, configurable, semi-automated pipeline."
+
+high_level_summary:
+  what_the_tool_does:
+    - "Accepts protein and ligand inputs, or a docked protein-ligand complex."
+    - "Prepares protein topology using GROMACS pdb2gmx."
+    - "Prepares ligand topology using ACPYPE, CGenFF, pyPolyBuilder, or uploaded prepared topology files."
+    - "Assembles protein and ligand into one simulation system."
+    - "Defines a simulation box, solvates the system, and adds ions."
+    - "Runs energy minimization, NVT equilibration, NPT equilibration, and production MD."
+    - "Processes trajectories to reduce periodic boundary artifacts."
+    - "Generates structural analysis metrics, plots, optional PCA/free-energy landscapes, MM-PBSA estimates, and a PDF report."
+  why_the_tool_is_needed:
+    - "Manual GROMACS workflows contain many dependent commands and fragile file relationships."
+    - "Ligand topology generation is a common failure point in protein-ligand MD."
+    - "Force-field, water-model, and ligand-preparation compatibility must be handled carefully."
+    - "Restart-safe execution is useful for long simulations and failed intermediate steps."
+    - "Human-readable plots and machine-readable CSV/JSON outputs support downstream manuscript preparation."
+
+global_runtime_model:
+  execution_model:
+    - "run_pipeline.sh is the central controller."
+    - "Each step is an independent Bash script in the steps/ directory."
+    - "Each step checks for a matching state/*.done sentinel file before running."
+    - "Logs are written per step under logs/."
+    - "Configuration is loaded from config.sh and optionally overridden by JSON via helpers/json_to_env.py."
+    - "The web app launches the same pipeline in job-specific directories under web_jobs/."
+  restart_model:
+    sentinel_directory: "state/"
+    sentinel_pattern: "<step_name>.done"
+    restart_flags:
+      from_step: "bash run_pipeline.sh --from N"
+      to_step: "bash run_pipeline.sh --to N"
+      force_rerun: "FORCE=1 can bypass sentinel skipping"
+  safety_model:
+    - "Commands fail fast because Bash scripts use set -Eeuo pipefail."
+    - "Missing required files and commands are checked before expensive steps."
+    - "GPU mdrun has a CPU fallback when GPU execution fails."
+    - "ACPYPE runtime and ligand charge are preflight-checked before ligand topology generation."
+    - "Topology preflight is performed after solvation and before ion insertion."
+
+directory_map:
+  root_files:
+    run_pipeline.sh: "Main orchestrator."
+    config.sh: "Default runtime and scientific configuration."
+    config.example.json: "Example JSON override configuration."
+    setup_ubuntu.sh: "Environment setup helper for Ubuntu-like systems."
+    requirements.txt: "Python package requirements."
+    environment.yml: "Conda environment specification."
+    README.md: "Project documentation, currently containing unresolved Git conflict markers."
+    cgenff_charmm2gmx_py3_nx3.py: "CGenFF-to-GROMACS ligand conversion script."
+    ligand_topology2.py: "Ligand topology-related utility script present in root."
+    paramchem2.py: "ParamChem/CGenFF-related helper script present in root."
+  directories:
+    steps: "Bash scripts for MD workflow stages."
+    helpers: "Python helper scripts for configuration, topology, plotting, analysis, and reporting."
+    lib: "Shared Bash runtime library."
+    mdp: "GROMACS MDP templates for ions, minimization, equilibration, and production."
+    charmm36-feb2026_cgenff-5.0.ff: "Bundled/local CHARMM36 force-field directory with CGenFF 5.0 support."
+    webapp: "Flask user interface and background launcher."
+    hpc: "Slurm/PBS scheduler templates, HPC wrapper, and example cluster configuration."
+    web_jobs: "Saved web-submitted job directories, inputs, outputs, logs, and results."
+    logs: "Pipeline logs for local/direct runs."
+    state: "Restart sentinel files and auto-rectification runtime overrides."
+
+configuration_parameters:
+  path_parameters:
+    PROJECT_NAME: "Human-readable project name."
+    INPUT_DIR: "Input directory."
+    WORK_DIR: "Intermediate working directory."
+    RESULTS_DIR: "Simulation results directory."
+    LOG_DIR: "Log directory."
+    STATE_DIR: "Restart state directory."
+    ANALYSIS_DIR: "Analysis output directory."
+    TMP_DIR: "Temporary file directory."
+  input_parameters:
+    PROTEIN_PDB: "Protein input PDB path."
+    LIGAND_INPUT: "Ligand input path, commonly MOL2."
+    LIGAND_INPUT_FORMAT: "Ligand source format."
+    DOCKING_COMPLEX_PDB: "Optional docked complex PDB to split into protein and ligand."
+    DOCKING_LIGAND_RESNAME: "Ligand residue name used when splitting a docked complex."
+  external_binary_parameters:
+    GMX_BIN: "GROMACS executable, usually gmx."
+    MPI_LAUNCHER: "Optional MPI launcher prefix."
+    PYTHON_BIN: "Python executable."
+    OBABEL_BIN: "Open Babel executable."
+    ACPYPE_BIN: "ACPYPE executable."
+    CGENFF_BIN: "CGenFF executable."
+    CGENFF_CONVERTER: "CGenFF-to-GROMACS conversion script."
+    PYPOLYBUILDER_BIN: "pyPolyBuilder executable."
+  science_parameters:
+    FORCE_FIELD: "Protein/system force field, default amber99sb-ildn."
+    WATER_MODEL: "Water model, default tip3p."
+    LIGAND_PREP_TOOL: "Ligand method: acpype, cgenff, pypolybuilder, or prepared_topology."
+    LIGAND_RESNAME: "Residue name assigned to ligand, default LIG."
+    LIGAND_NET_CHARGE: "Formal net charge used for ACPYPE ligand parameterization."
+    BOX_TYPE: "GROMACS box type, default dodecahedron."
+    BOX_DISTANCE_NM: "Solvent margin around complex in nm."
+    ION_CONCENTRATION_M: "Salt concentration in molar units."
+    TEMPERATURE_K: "Simulation temperature."
+    PRESSURE_BAR: "Simulation pressure."
+    EM_STEPS: "Energy minimization step count."
+    NVT_TIME_PS: "NVT equilibration duration in ps unless NVT_STEPS is given."
+    NPT_TIME_PS: "NPT equilibration duration in ps unless NPT_STEPS is given."
+    MD_TIME_NS: "Production MD duration in ns."
+    TIMESTEP_PS: "MD timestep in ps."
+  compute_parameters:
+    USE_GPU: "auto, yes, or no."
+    GPU_ID: "Optional GPU identifier."
+    NTMPI: "MPI ranks for mdrun."
+    NTOMP: "OpenMP threads; auto uses available CPU allocation."
+    PIN_THREADS: "GROMACS thread pinning setting."
+  hpc_parameters:
+    MPI_LAUNCHER: "Scheduler/MPI launcher such as srun or mpirun -np N."
+    GMX_BIN: "Set in submit script; use gmx for thread-MPI/local builds or gmx_mpi for external-MPI builds."
+    NTMPI: "Use 0 when running external-MPI gmx_mpi through srun/mpirun; otherwise use a positive value for thread-MPI builds."
+    NTOMP: "Usually mapped from Slurm --cpus-per-task or PBS OMP_NUM_THREADS."
+    USE_GPU: "Set auto, yes, or no in the submit script according to node type."
+  analysis_parameters:
+    RUN_RESULT_ANALYSIS: "Whether to run normal GROMACS result analysis."
+    RUN_FREE_ENERGY: "Whether to run PCA/free-energy landscape analysis."
+    RUN_UMBRELLA: "Placeholder/summary path for umbrella analysis."
+    RUN_MMBSA: "Whether MM-PBSA is enabled."
+    MD_CENTER_NOJUMP: "Whether to apply pbc nojump before centering."
+    MD_CENTER_GROUP: "Group used for trajectory centering."
+    MD_CENTER_OUTPUT_GROUP: "Output group for centered trajectory."
+    ANALYSIS_FIT_GROUP: "Fit group for RMSD."
+    ANALYSIS_RMS_GROUP: "Protein/group used for RMSD/RMSF/gyration."
+    ANALYSIS_LIGAND_GROUP: "Ligand group used for ligand RMSD and hydrogen bonds."
+  mmpbsa_parameters:
+    MMBSA_FRAME_STEP: "Analyze every Nth frame."
+    MMBSA_IONIC_STRENGTH: "Ionic strength for PB calculation."
+    MMBSA_DECOMPOSE: "Enable per-residue decomposition if yes."
+    MMBSA_USE_APBS: "Use APBS for polar solvation if yes."
+    MMBSA_SURFACE_TENSION: "Surface tension coefficient for nonpolar solvation."
+
+network_graph:
+  nodes:
+    - id: "N0_inputs"
+      type: "input"
+      label: "Protein, ligand, or docked complex input files"
+    - id: "N1_config"
+      type: "configuration"
+      label: "config.sh plus optional JSON overrides"
+    - id: "N2_common_runtime"
+      type: "runtime_library"
+      label: "lib/common.sh"
+    - id: "N3_auto_rectification"
+      type: "helper"
+      label: "helpers/auto_rectify_config.py"
+    - id: "N4_protein_prep"
+      type: "pipeline_step"
+      label: "step1_protein_prep.sh"
+    - id: "N5_ligand_prep"
+      type: "pipeline_step"
+      label: "step2_ligand_prep.sh"
+    - id: "N6_complex_assembly"
+      type: "pipeline_step"
+      label: "step3_assemble_complex.sh"
+    - id: "N7_box"
+      type: "pipeline_step"
+      label: "step4_define_box.sh"
+    - id: "N8_solvation"
+      type: "pipeline_step"
+      label: "step5_solvate.sh"
+    - id: "N9_ions"
+      type: "pipeline_step"
+      label: "step6_add_ions.sh"
+    - id: "N10_minimization"
+      type: "pipeline_step"
+      label: "step7_minimize.sh"
+    - id: "N11_equilibration"
+      type: "pipeline_step"
+      label: "step8_equilibrate.sh"
+    - id: "N12_production"
+      type: "pipeline_step"
+      label: "step9_production.sh"
+    - id: "N13_analysis"
+      type: "pipeline_step"
+      label: "step10_analysis.sh"
+    - id: "N14_mmpbsa_report"
+      type: "pipeline_step"
+      label: "step11_mmpbsa.sh"
+    - id: "N15_webapp"
+      type: "user_interface"
+      label: "webapp/app.py"
+    - id: "N16_outputs"
+      type: "output"
+      label: "work, results, analysis, logs, state, PDF report"
+    - id: "N17_hpc_layer"
+      type: "scheduler_layer"
+      label: "hpc/run_hpc_job.sh, hpc/slurm.submit.sh, hpc/pbs.submit.sh"
+  edges:
+    - from: "N0_inputs"
+      to: "N4_protein_prep"
+      relation: "provides protein or docked complex"
+    - from: "N0_inputs"
+      to: "N5_ligand_prep"
+      relation: "provides ligand structure or prepared topology"
+    - from: "N1_config"
+      to: "N2_common_runtime"
+      relation: "loads global variables"
+    - from: "N2_common_runtime"
+      to: "N3_auto_rectification"
+      relation: "invokes compatibility repair"
+    - from: "N3_auto_rectification"
+      to: "N1_config"
+      relation: "writes state/auto_rectification.env overrides"
+    - from: "N4_protein_prep"
+      to: "N6_complex_assembly"
+      relation: "provides protein_processed.gro, topol.top, posre.itp"
+    - from: "N5_ligand_prep"
+      to: "N6_complex_assembly"
+      relation: "provides ligand.gro, ligand.itp, posre_ligand.itp, ligand metadata"
+    - from: "N6_complex_assembly"
+      to: "N7_box"
+      relation: "provides complex.gro and assembled topology"
+    - from: "N7_box"
+      to: "N8_solvation"
+      relation: "provides boxed.gro and topology"
+    - from: "N8_solvation"
+      to: "N9_ions"
+      relation: "provides solvated.gro and topology"
+    - from: "N9_ions"
+      to: "N10_minimization"
+      relation: "provides solv_ions.gro and neutralized topology"
+    - from: "N10_minimization"
+      to: "N11_equilibration"
+      relation: "provides em.gro, em.tpr, topology, index"
+    - from: "N11_equilibration"
+      to: "N12_production"
+      relation: "provides npt.gro and npt.cpt"
+    - from: "N12_production"
+      to: "N13_analysis"
+      relation: "provides md.tpr, md.xtc, md.gro, md.edr"
+    - from: "N13_analysis"
+      to: "N14_mmpbsa_report"
+      relation: "provides index, processed trajectory context, analysis directory"
+    - from: "N14_mmpbsa_report"
+      to: "N16_outputs"
+      relation: "creates MM-PBSA CSV/JSON/PNG and PDF report"
+    - from: "N15_webapp"
+      to: "N1_config"
+      relation: "writes web_config.json overrides"
+    - from: "N15_webapp"
+      to: "N4_protein_prep"
+      relation: "launches full or partial pipeline jobs"
+    - from: "N17_hpc_layer"
+      to: "N1_config"
+      relation: "sets scheduler-aware runtime variables and optional JSON config"
+    - from: "N17_hpc_layer"
+      to: "N4_protein_prep"
+      relation: "launches the same pipeline inside Slurm/PBS allocations"
+
+hpc_submission_layer:
+  purpose: "Provide batch-scheduler wrappers for running AutoGMX on HPC systems without changing the core pipeline."
+  files:
+    "hpc/run_hpc_job.sh": "Portable wrapper called from scheduler jobs or interactive allocations."
+    "hpc/slurm.submit.sh": "Slurm batch template with CPU, memory, walltime, and module/conda placeholders."
+    "hpc/pbs.submit.sh": "PBS/Torque batch template with CPU, memory, walltime, and module/conda placeholders."
+    "hpc/cluster.example.json": "Science/runtime pipeline configuration intended for HPC jobs; scheduler resource variables are left to submit scripts."
+    "hpc/README.md": "Usage notes for Slurm, PBS, direct allocations, and external-MPI GROMACS."
+  execution_modes:
+    slurm_single_node_thread_mpi: "Use GMX_BIN=gmx, NTMPI=1, NTOMP=$SLURM_CPUS_PER_TASK."
+    slurm_external_mpi: "Use GMX_BIN=gmx_mpi, MPI_LAUNCHER=srun, NTMPI=0."
+    pbs_single_node_thread_mpi: "Use GMX_BIN=gmx, NTMPI=1, NTOMP=$OMP_NUM_THREADS."
+    pbs_external_mpi: "Use GMX_BIN=gmx_mpi, MPI_LAUNCHER='mpirun -np ${PBS_NP:-1}', NTMPI=0."
+    interactive_allocation: "After module/conda setup, run bash hpc/run_hpc_job.sh --json hpc/cluster.example.json --to 11."
+  multi_cluster_model:
+    supported: "Manual per-cluster configuration."
+    not_supported: "Automatic cross-cluster scheduling, remote transfer, queue federation, or cluster-to-cluster orchestration."
+    recommended_usage: "Copy cluster.example.json and submit templates per cluster, then edit module names, partition/queue, walltime, memory, GPU policy, and GROMACS executable."
+  why_needed: "Prevents users from running long MD jobs on login nodes and makes CPU/GPU/MPI settings explicit for scheduler-managed systems."
+
+pipeline_step_details:
+  - step_number: 1
+    id: "step1_protein_prep"
+    script: "steps/step1_protein_prep.sh"
+    purpose: "Prepare protein structure and topology."
+    inputs:
+      - "inputs/protein.pdb, or DOCKING_COMPLEX_PDB"
+      - "FORCE_FIELD"
+      - "WATER_MODEL"
+      - "STRIP_HETATM"
+    actions:
+      - "If a docked complex is supplied, split it into protein and ligand using helpers/split_docking_pdb.py."
+      - "If STRIP_HETATM=yes, keep only ATOM, TER, and END records for protein cleanup."
+      - "Run gmx pdb2gmx with selected force field and water model."
+      - "Convert processed structure to PDB using gmx editconf."
+    outputs:
+      - "work/01_protein/protein.cleaned.pdb"
+      - "work/01_protein/protein_processed.gro"
+      - "work/01_protein/protein_processed.pdb"
+      - "work/01_protein/topol.top"
+      - "work/01_protein/posre.itp"
+    why_needed: "GROMACS requires a processed coordinate file and molecular topology before simulation can begin."
+
+  - step_number: 2
+    id: "step2_ligand_prep"
+    script: "steps/step2_ligand_prep.sh"
+    purpose: "Prepare ligand coordinates and topology."
+    inputs:
+      - "LIGAND_INPUT"
+      - "LIGAND_INPUT_FORMAT"
+      - "LIGAND_PREP_TOOL"
+      - "LIGAND_NET_CHARGE"
+      - "optional prepared ligand topology files"
+    actions:
+      - "Select ligand source from direct input or docked-complex split output."
+      - "Convert ligand to MOL2 when needed using Open Babel."
+      - "If prepared topology is supplied, copy ligand ITP/GRO/POSRE/PRM files."
+      - "If ACPYPE is selected, preflight runtime, validate charge/electron count, and generate GROMACS topology."
+      - "If CGenFF is selected, run CGenFF and convert stream/MOL2 to GROMACS ITP/PRM/GRO."
+      - "If pyPolyBuilder is selected, build dendrimer or polymer topology and coordinates."
+      - "Normalize ligand residue name in GRO."
+      - "Extract ligand moleculetype and save metadata."
+    outputs:
+      - "work/02_ligand/ligand.mol2"
+      - "work/02_ligand/ligand.gro"
+      - "work/02_ligand/ligand.itp"
+      - "work/02_ligand/posre_ligand.itp"
+      - "work/02_ligand/ligand.prm when available"
+      - "work/02_ligand/ligand_metadata.env"
+    why_needed: "Standard protein force fields do not automatically define parameters for arbitrary ligands."
+
+  - step_number: 3
+    id: "step3_assemble_complex"
+    script: "steps/step3_assemble_complex.sh"
+    purpose: "Combine protein and ligand into one simulation-ready complex."
+    inputs:
+      - "work/01_protein/protein_processed.gro"
+      - "work/01_protein/topol.top"
+      - "work/02_ligand/ligand.gro"
+      - "work/02_ligand/ligand.itp"
+      - "work/02_ligand/posre_ligand.itp"
+      - "work/02_ligand/ligand_metadata.env"
+    actions:
+      - "Copy protein and ligand topology files into work/03_complex."
+      - "Merge protein and ligand GRO coordinate records using helpers/merge_gro.py."
+      - "Insert ligand includes and molecule count into topol.top using helpers/assemble_topology.py."
+    outputs:
+      - "work/03_complex/complex.gro"
+      - "work/03_complex/topol.top"
+      - "work/03_complex/ligand.itp"
+      - "work/03_complex/posre.itp"
+      - "work/03_complex/posre_ligand.itp"
+    why_needed: "The simulation engine needs one coordinate system and one consistent topology describing all molecules."
+
+  - step_number: 4
+    id: "step4_define_box"
+    script: "steps/step4_define_box.sh"
+    purpose: "Define the simulation box."
+    inputs:
+      - "work/03_complex/complex.gro"
+      - "BOX_TYPE"
+      - "BOX_DISTANCE_NM"
+    actions:
+      - "Copy topology files into work/04_box."
+      - "Run gmx editconf with centering, box type, and distance."
+    outputs:
+      - "work/04_box/boxed.gro"
+      - "work/04_box/topol.top"
+    why_needed: "A periodic simulation requires a defined box with adequate spacing around the solute."
+
+  - step_number: 5
+    id: "step5_solvate"
+    script: "steps/step5_solvate.sh"
+    purpose: "Add explicit solvent and validate topology."
+    inputs:
+      - "work/04_box/boxed.gro"
+      - "work/04_box/topol.top"
+      - "WATER_MODEL"
+      - "mdp/ions.mdp"
+    actions:
+      - "Choose matching solvent coordinate file for the configured water model."
+      - "Run gmx solvate."
+      - "Render topology_preflight.mdp."
+      - "Run gmx grompp as a topology preflight before ion insertion."
+    outputs:
+      - "work/05_solvate/solvated.gro"
+      - "work/05_solvate/topol.top"
+      - "work/05_solvate/topology_preflight.tpr"
+    why_needed: "Solvation creates a realistic aqueous environment and preflight validation catches ligand/topology errors early."
+
+  - step_number: 6
+    id: "step6_add_ions"
+    script: "steps/step6_add_ions.sh"
+    purpose: "Neutralize and ionize the solvated system."
+    inputs:
+      - "work/05_solvate/solvated.gro"
+      - "work/05_solvate/topol.top"
+      - "mdp/ions.mdp"
+      - "ION_CONCENTRATION_M"
+    actions:
+      - "Render ions.mdp."
+      - "Run gmx grompp to create ions.tpr."
+      - "Run gmx genion, selecting SOL for replacement."
+      - "Add NA and CL ions with neutralization and concentration settings."
+    outputs:
+      - "work/06_ions/ions.tpr"
+      - "work/06_ions/solv_ions.gro"
+      - "work/06_ions/topol.top"
+    why_needed: "Molecular simulations usually require charge neutralization and realistic ionic strength."
+
+  - step_number: 7
+    id: "step7_minimize"
+    script: "steps/step7_minimize.sh"
+    purpose: "Energy minimize the solvated and ionized system."
+    inputs:
+      - "work/06_ions/solv_ions.gro"
+      - "work/06_ions/topol.top"
+      - "mdp/em.mdp"
+    actions:
+      - "Render em.mdp."
+      - "Run gmx grompp to create em.tpr."
+      - "Run gmx mdrun through GPU/CPU-aware wrapper."
+      - "Create protein-ligand index file."
+    outputs:
+      - "results/minimization/em.tpr"
+      - "results/minimization/em.gro"
+      - "results/minimization/em.edr"
+      - "results/minimization/em.log"
+      - "results/minimization/indexlig.ndx"
+    why_needed: "Minimization removes steric clashes and high-energy contacts before equilibration."
+
+  - step_number: 8
+    id: "step8_equilibrate"
+    script: "steps/step8_equilibrate.sh"
+    purpose: "Run restrained NVT and NPT equilibration."
+    inputs:
+      - "results/minimization/em.gro"
+      - "results/minimization/topol.top"
+      - "mdp/nvt.mdp"
+      - "mdp/npt.mdp"
+    actions:
+      - "Render nvt.mdp and create nvt.tpr."
+      - "Run NVT mdrun with position restraints."
+      - "Render npt.mdp and create npt.tpr using NVT checkpoint."
+      - "Run NPT mdrun with position restraints."
+    outputs:
+      - "results/equilibration/nvt/nvt.gro"
+      - "results/equilibration/nvt/nvt.cpt"
+      - "results/equilibration/npt/npt.gro"
+      - "results/equilibration/npt/npt.cpt"
+    why_needed: "NVT stabilizes temperature and NPT stabilizes pressure/density before production MD."
+
+  - step_number: 9
+    id: "step9_production"
+    script: "steps/step9_production.sh"
+    purpose: "Run production molecular dynamics."
+    inputs:
+      - "results/equilibration/npt/npt.gro"
+      - "results/equilibration/npt/npt.cpt"
+      - "results/equilibration/topol.top"
+      - "mdp/md.mdp"
+    actions:
+      - "Render md.mdp from MD_TIME_NS and TIMESTEP_PS."
+      - "Run gmx grompp to create md.tpr."
+      - "Run production mdrun with checkpoint and optional GPU support."
+    outputs:
+      - "results/production/md.tpr"
+      - "results/production/md.xtc"
+      - "results/production/md.gro"
+      - "results/production/md.edr"
+      - "results/production/md.log"
+      - "results/production/md.cpt"
+    why_needed: "Production MD generates the trajectory used for structural dynamics and energetic interpretation."
+
+  - step_number: 10
+    id: "step10_analysis"
+    script: "steps/step10_analysis.sh"
+    purpose: "Analyze the production trajectory."
+    inputs:
+      - "results/production/md.tpr"
+      - "results/production/md.xtc"
+      - "results/production/md.gro"
+      - "results/production/md.edr"
+    actions:
+      - "Create or import protein-ligand index groups."
+      - "Optionally run gmx trjconv -pbc nojump."
+      - "Center the trajectory using gmx trjconv."
+      - "Export final PDB."
+      - "Compute protein RMSD, protein-ligand RMSD, ligand RMSD, RMSF, radius of gyration, hydrogen bonds, and energy time series."
+      - "Generate PNG plots with helpers/plot_analysis.py when matplotlib is available."
+      - "Optionally run PCA/free-energy landscape analysis."
+      - "Write umbrella-analysis placeholder summary when enabled."
+    outputs:
+      - "analysis/index.ndx"
+      - "results/production/md_nojump.xtc"
+      - "results/production/md_center.xtc"
+      - "analysis/md_final.pdb"
+      - "analysis/rmsd_protein.xvg"
+      - "analysis/rmsd_ligand.xvg"
+      - "analysis/rmsd_protein_ligand.xvg"
+      - "analysis/rmsf_protein.xvg"
+      - "analysis/gyration_protein.xvg"
+      - "analysis/hbonds_protein_ligand.xvg"
+      - "analysis/potential.xvg"
+      - "analysis/temperature.xvg"
+      - "analysis/pressure.xvg"
+      - "analysis/density.xvg"
+      - "analysis/*.png"
+      - "analysis/free_energy/* when enabled"
+    why_needed: "Raw MD trajectories must be converted into stability, flexibility, compactness, interaction, and energy metrics."
+
+  - step_number: 11
+    id: "step11_mmpbsa"
+    script: "steps/step11_mmpbsa.sh"
+    purpose: "Compute MM-PBSA binding free energy and produce report."
+    inputs:
+      - "results/production/md.tpr"
+      - "results/production/md.xtc"
+      - "analysis/index.ndx"
+      - "MMBSA_FRAME_STEP"
+      - "MMBSA_IONIC_STRENGTH"
+      - "MMBSA_DECOMPOSE"
+      - "MMBSA_USE_APBS"
+      - "MMBSA_SURFACE_TENSION"
+    actions:
+      - "Call helpers/mmpbsa_calculation.py with receptor and ligand selections."
+      - "Optionally perform per-residue decomposition."
+      - "Call helpers/generate_report.py to create a PDF summary."
+    outputs:
+      - "analysis/mmpbsa/mmpbsa_results.csv"
+      - "analysis/mmpbsa/mmpbsa_summary.csv"
+      - "analysis/mmpbsa/mmpbsa_summary.json"
+      - "analysis/mmpbsa/decomposition.csv when enabled"
+      - "analysis/mmpbsa/mmpbsa_decomposition.png"
+      - "analysis/mmpbsa/mmpbsa_timeseries.png"
+      - "results/md_report.pdf"
+    why_needed: "Provides binding free-energy estimates and report-ready summaries after trajectory analysis."
+
+helper_script_details:
+  json_to_env.py:
+    purpose: "Convert JSON configuration values into shell export statements."
+    why_needed: "Allows web app and command-line users to override Bash configuration through JSON."
+  auto_rectify_config.py:
+    purpose: "Detect and correct incompatible force-field, water-model, and ligand-preparation combinations."
+    why_needed: "Prevents common mismatch errors before pdb2gmx and ligand generation."
+    logic:
+      - "CGenFF prefers CHARMM family force fields."
+      - "ACPYPE is treated as compatible with AMBER/OPLS-style options and selected CHARMM cases."
+      - "pyPolyBuilder is treated as most suitable with GROMOS-style force fields."
+      - "Canonical water models are selected by force-field family."
+  check_acpype_runtime.py:
+    purpose: "Check whether ACPYPE bundled AmberTools executables can start."
+    why_needed: "ACPYPE failures are often caused by missing native shared libraries."
+  check_ligand_charge.py:
+    purpose: "Estimate electron count from MOL2 atom identities and formal charge."
+    why_needed: "Rejects odd-electron closed-shell ACPYPE calculations unless the charge is corrected."
+  split_docking_pdb.py:
+    purpose: "Split a docked PDB complex into separate protein and ligand files."
+    why_needed: "Supports direct use of docking output as pipeline input."
+  normalize_gro_resname.py:
+    purpose: "Overwrite ligand residue name field in GRO coordinates."
+    why_needed: "Ensures topology and coordinate residue naming remain consistent."
+  merge_gro.py:
+    purpose: "Append ligand atoms to protein GRO atoms and update total atom count."
+    why_needed: "Creates one coordinate file for the protein-ligand complex."
+  assemble_topology.py:
+    purpose: "Insert ligand topology and restraint includes into topol.top and update [ molecules ]."
+    why_needed: "GROMACS requires all molecule types and molecule counts in the system topology."
+  render_mdp.py:
+    purpose: "Fill MDP template placeholders using environment variables."
+    why_needed: "Avoids manually editing step counts, temperature, pressure, and timestep."
+  plot_analysis.py:
+    purpose: "Parse XVG files and save PNG plots."
+    why_needed: "Creates visual outputs for reports and manuscript figures."
+  pca_free_energy.py:
+    purpose: "Perform trajectory alignment, PCA, KDE density estimation, and free-energy landscape plotting."
+    why_needed: "Adds conformational landscape interpretation beyond basic RMSD/RMSF metrics."
+  mmpbsa_calculation.py:
+    purpose: "Estimate binding free energy components from trajectory frames."
+    method_components:
+      vdw: "Van der Waals interaction energy."
+      elec: "Electrostatic interaction energy."
+      polar_solv: "Polar solvation energy, using APBS when enabled."
+      nonpolar_solv: "SASA-based nonpolar solvation term."
+      delta_G: "Total estimated binding free energy."
+    outputs:
+      - "Per-frame CSV."
+      - "Summary CSV."
+      - "Summary JSON."
+      - "Optional per-residue decomposition."
+      - "Energy plots."
+  generate_report.py:
+    purpose: "Build a PDF report from simulation parameters, plots, and MM-PBSA results."
+    why_needed: "Packages results into a single document suitable for review or manuscript preparation."
+  run_pypolybuilder.py:
+    purpose: "Run pyPolyBuilder and normalize outputs for dendrimer/polymer ligand systems."
+    why_needed: "Supports nonstandard macromolecular ligands beyond small molecules."
+  validate_cgenff_conversion.py:
+    purpose: "Validate and normalize CGenFF conversion outputs."
+    why_needed: "Detects missing topology/parameter/coordinate sections after CGenFF conversion."
+
+mdp_template_details:
+  ions_mdp:
+    file: "mdp/ions.mdp"
+    purpose: "Minimal steepest-descent settings for ion insertion TPR generation."
+    key_settings:
+      integrator: "steep"
+      nsteps: 5000
+      coulombtype: "PME"
+      rcoulomb_nm: 1.2
+      rvdw_nm: 1.2
+      pbc: "xyz"
+  em_mdp:
+    file: "mdp/em.mdp"
+    purpose: "Energy minimization."
+    key_settings:
+      integrator: "steep"
+      nsteps: "{EM_STEPS}"
+      emtol: 1000.0
+      emstep: 0.01
+  nvt_mdp:
+    file: "mdp/nvt.mdp"
+    purpose: "Constant volume and temperature equilibration."
+    key_settings:
+      define: "-DPOSRES -DPOSRES_LIG"
+      integrator: "md"
+      nsteps: "{NVT_STEPS}"
+      dt: "{TIMESTEP_PS}"
+      tcoupl: "V-rescale"
+      tc_grps: "Protein Non-Protein"
+      pcoupl: "no"
+      gen_vel: "yes"
+  npt_mdp:
+    file: "mdp/npt.mdp"
+    purpose: "Constant pressure and temperature equilibration."
+    key_settings:
+      define: "-DPOSRES -DPOSRES_LIG"
+      integrator: "md"
+      nsteps: "{NPT_STEPS}"
+      dt: "{TIMESTEP_PS}"
+      tcoupl: "V-rescale"
+      pcoupl: "Parrinello-Rahman"
+      pcoupltype: "isotropic"
+      ref_p: "{PRESSURE_BAR}"
+      gen_vel: "no"
+  md_mdp:
+    file: "mdp/md.mdp"
+    purpose: "Production molecular dynamics."
+    key_settings:
+      integrator: "md"
+      nsteps: "{MD_STEPS}"
+      dt: "{TIMESTEP_PS}"
+      tcoupl: "V-rescale"
+      pcoupl: "Parrinello-Rahman"
+      coulombtype: "PME"
+      vdw_modifier: "Force-switch"
+      constraints: "h-bonds"
+
+web_application_details:
+  files:
+    app_py: "webapp/app.py"
+    launcher: "webapp/launch_job.py"
+    templates: "webapp/templates/*.html"
+    static_css: "webapp/static/style.css"
+  purpose: "Provide a browser-based interface to launch, monitor, continue, analyze, and stop MD jobs."
+  key_routes:
+    "/": "Main dashboard and job list."
+    "/jobs/prepare": "Prepare an upload-based job."
+    "/jobs/full-auto": "Start a fully automated run."
+    "/jobs/old-method": "Continue from manually prepared GRO/topology files."
+    "/jobs/resume-stage": "Resume from equilibration, production, or analysis using a previous job or ZIP."
+    "/jobs/special-analysis": "Run or save standalone analysis jobs."
+    "/jobs/mmpbsa": "Launch MM-PBSA from a previous production run."
+    "/jobs/<job_id>": "View job detail and status."
+    "/jobs/<job_id>/topology": "Upload ligand topology when manual/prepared topology is required."
+    "/jobs/<job_id>/download-report": "Download generated PDF report."
+    "/jobs/<job_id>/stop": "Send stop signal to running job."
+  job_storage_model:
+    root: "web_jobs/"
+    per_job_contents:
+      - "inputs/"
+      - "work/"
+      - "results/"
+      - "analysis/"
+      - "logs/"
+      - "state/"
+      - "job.json"
+      - "web_config.json"
+      - "run.log"
+      - "run.failed if execution fails"
+  why_needed: "The web app reduces command-line burden and makes job tracking easier for users."
+
+input_output_contract:
+  expected_inputs:
+    protein:
+      preferred: "inputs/protein.pdb"
+      alternative: "DOCKING_COMPLEX_PDB"
+    ligand:
+      preferred: "inputs/ligand.mol2"
+      alternatives:
+        - "ligand.pdb converted to mol2"
+        - "prepared ligand.itp plus ligand.gro"
+        - "pyPolyBuilder dendrimer/polymer building block files"
+    optional:
+      - "ligand.prm for CHARMM/CGenFF-like extra parameters"
+      - "posre_ligand.itp"
+      - "restart ZIP for web resume"
+  final_outputs:
+    simulation:
+      - "results/minimization/"
+      - "results/equilibration/"
+      - "results/production/md.tpr"
+      - "results/production/md.xtc"
+      - "results/production/md_center.xtc"
+      - "results/production/md.gro"
+      - "results/production/md.edr"
+    analysis:
+      - "analysis/*.xvg"
+      - "analysis/*.png"
+      - "analysis/md_final.pdb"
+      - "analysis/free_energy/* when enabled"
+      - "analysis/mmpbsa/* when enabled"
+    report:
+      - "results/md_report.pdf"
+
+scientific_workflow_narrative:
+  methods_overview: "The pipeline implements a standard explicit-solvent protein-ligand MD workflow using GROMACS. Protein topology is generated with pdb2gmx, ligand parameters are generated or supplied separately, the system is assembled, solvated, neutralized, minimized, equilibrated under NVT and NPT ensembles, and finally simulated under production MD conditions. Postprocessing includes PBC correction, trajectory centering, structural metrics, energetic observables, optional PCA-based free-energy landscapes, MM-PBSA estimation, and PDF reporting."
+  ligand_parameterization_rationale: "Ligand parameterization is separated from protein preparation because small molecules, dendrimers, polymers, and docked ligands require specialized topology generation. The pipeline therefore supports ACPYPE for AMBER/GAFF-style small-molecule topology, CGenFF for CHARMM-compatible ligand parameters, pyPolyBuilder for polymeric systems, and prepared topology upload for expert-curated parameters."
+  reproducibility_rationale: "The pipeline records logs, uses deterministic file names, keeps per-step outputs in fixed directories, renders MDP files from explicit variables, and writes completion stamps to enable reproducible restarts."
+  analysis_rationale: "RMSD, RMSF, radius of gyration, hydrogen bonds, energy terms, PCA/free-energy landscapes, and MM-PBSA summaries describe structural stability, flexibility, compactness, interaction persistence, thermodynamic trends, and estimated binding energetics."
+
+limitations_and_cautions:
+  - "This map is based on static code inspection, not on running a new simulation."
+  - "Correct scientific results depend on valid input structures, protonation states, ligand formal charge, force-field choice, simulation length, and equilibration quality."
+  - "MM-PBSA results are approximate and should be interpreted as estimates, not absolute experimental binding free energies."
+  - "The README.md file contains unresolved Git conflict markers and should be cleaned before public release."
+  - "Production-length MD simulations should be run on suitable workstations, HPC clusters, or cloud systems rather than thermally limited personal laptops."
+  - "The pipeline includes an umbrella-analysis placeholder, but ordinary production MD files alone are insufficient for full WHAM umbrella sampling analysis."
+
+recommended_manuscript_sections:
+  - "Abstract"
+  - "Introduction"
+  - "Software Architecture"
+  - "Pipeline Workflow"
+  - "Protein and Ligand Preparation"
+  - "System Assembly, Solvation, and Ionization"
+  - "Energy Minimization and Equilibration"
+  - "Production MD"
+  - "Trajectory Analysis"
+  - "MM-PBSA Binding Free-Energy Estimation"
+  - "Web-Based Job Management"
+  - "Outputs and Reproducibility"
+  - "Limitations"
+  - "Conclusion"
+
+recommended_figures:
+  - figure_id: "Figure 1"
+    content: "Network workflow graph from input files to final report."
+  - figure_id: "Figure 2"
+    content: "Directory and data-flow architecture."
+  - figure_id: "Figure 3"
+    content: "Stepwise MD protocol: preparation, solvation, ions, minimization, equilibration, production, analysis."
+  - figure_id: "Figure 4"
+    content: "Example output categories: RMSD, RMSF, gyration, energies, MM-PBSA summary."
+
+machine_reading_tags:
+  primary_keywords:
+    - "GROMACS"
+    - "protein-ligand molecular dynamics"
+    - "workflow automation"
+    - "ligand topology"
+    - "ACPYPE"
+    - "CGenFF"
+    - "pyPolyBuilder"
+    - "MM-PBSA"
+    - "PCA free-energy landscape"
+    - "Flask web application"
+  relations:
+    "config controls pipeline": true
+    "steps form directed acyclic workflow": true
+    "helpers support shell steps": true
+    "webapp launches same pipeline": true
+    "outputs are manuscript-ready": true
