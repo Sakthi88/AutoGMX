@@ -546,7 +546,7 @@ def command_exists(command_name):
     return bool(command_name and shutil.which(command_name))
 
 
-def split_docking_complex(job_dir, docking_path):
+def split_docking_complex(job_dir, docking_path, ligand_resname="LIG"):
     inputs_dir = job_dir / "inputs"
     prep_log = job_dir / "prep.log"
     protein_out = inputs_dir / "protein.pdb"
@@ -559,7 +559,7 @@ def split_docking_complex(job_dir, docking_path):
         str(docking_path),
         str(protein_out),
         str(ligand_pdb),
-        "LIG",
+        ligand_resname,
         "yes",
     ]
     split_result = subprocess.run(
@@ -658,7 +658,7 @@ def build_override_config(job_dir, form):
         "GMX_BIN": normalize_gmx_bin(form.get("gmx_bin", "gmx")),
         "PYTHON_BIN": resolve_python_bin(form.get("python_bin", "")),
         "DOCKING_COMPLEX_PDB": str(docking_path),
-        "DOCKING_LIGAND_RESNAME": form["ligand_resname"],
+        "DOCKING_LIGAND_RESNAME": form.get("docking_ligand_resname", form["ligand_resname"]),
         "LIGAND_INPUT": str(ligand_structure),
         "LIGAND_INPUT_FORMAT": "mol2",
     }
@@ -945,7 +945,8 @@ def collect_run_form(default_project):
         "water_model": request.form.get("water_model", "tip3p"),
         "charmm_n_terminus_selection": request.form.get("charmm_n_terminus_selection", "0"),
         "charmm_c_terminus_selection": request.form.get("charmm_c_terminus_selection", "0"),
-        "ligand_resname": request.form.get("ligand_resname", "LIG").upper()[:5],
+        "ligand_resname": request.form.get("ligand_output_resname", request.form.get("ligand_resname", "LIG")).strip().upper()[:5],
+        "docking_ligand_resname": request.form.get("ligand_resname", "LIG").strip().upper()[:5],
         "ligand_name": request.form.get("ligand_name", "ligand"),
         "ligand_charge": request.form.get("ligand_charge", "0"),
         "ligand_prep_tool": request.form.get("ligand_prep_tool", "acpype"),
@@ -1010,8 +1011,24 @@ def full_auto_job():
     docking_path = job_dir / "inputs" / "docking_complex.pdb"
     save_upload(docking_complex, docking_path)
     try:
-        generated_files = split_docking_complex(job_dir, docking_path)
-    except RuntimeError as exc:
+        mode = request.form.get("ligand_resname_mode", "lig").strip().lower()
+        if mode == "lig":
+            form["docking_ligand_resname"] = "LIG"
+        elif mode == "hetatm":
+            form["docking_ligand_resname"] = "HETATM"
+        elif mode == "manual":
+            manual_name = request.form.get("ligand_resname_manual", "").strip().upper()
+            if not manual_name or len(manual_name) > 5:
+                raise ValueError("Enter a ligand residue name of 1 to 5 characters.")
+            form["docking_ligand_resname"] = manual_name
+        else:
+            raise ValueError("Choose LIG, HETATM auto-detect, or manual ligand residue mode.")
+        output_name = request.form.get("ligand_output_resname", "LIG").strip().upper()
+        if not output_name or len(output_name) > 5:
+            raise ValueError("Topology output residue name must be 1 to 5 characters.")
+        form["ligand_resname"] = output_name
+        generated_files = split_docking_complex(job_dir, docking_path, form["docking_ligand_resname"])
+    except (RuntimeError, ValueError) as exc:
         flash(str(exc), "error")
         return redirect(url_for("index"))
 
