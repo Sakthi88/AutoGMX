@@ -95,7 +95,8 @@ def read_first_model(path):
 
 
 def resolve_ligand_resname(atoms, requested):
-    if any(residue_key(line)[0] == requested for line in atoms):
+    auto_detect = requested.upper() in {"HETATM", "AUTO"}
+    if not auto_detect and any(residue_key(line)[0] == requested for line in atoms):
         return requested, False
 
     candidates = defaultdict(list)
@@ -118,13 +119,13 @@ def resolve_ligand_resname(atoms, requested):
         inferred = next(iter(candidate_names))
         return inferred, True
     if not candidate_names:
+        label = "Auto-detection" if auto_detect else f"Ligand residue '{requested}'"
         raise ValueError(
-            f"Ligand residue '{requested}' was not found, and no non-water/non-solvent/non-metal "
-            "HETATM residue could be inferred."
+            f"{label} failed: no non-water/non-solvent/non-metal HETATM residue could be inferred."
         )
     raise ValueError(
-        f"Ligand residue '{requested}' was not found and the docking complex has multiple "
-        f"possible ligand residues: {', '.join(sorted(descriptions))}. Set the ligand residue name."
+        f"{'Auto-detection' if auto_detect else f'Ligand residue {requested!r} was not found'} and the docking complex has multiple "
+        f"possible ligand residues: {', '.join(sorted(descriptions))}. Enter the exact ligand residue name."
     )
 
 
