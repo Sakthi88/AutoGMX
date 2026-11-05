@@ -94,15 +94,53 @@ def read_first_model(path):
     return lines, saw_model
 
 
+def resolve_ligand_resname(atoms, requested):
+    if any(residue_key(line)[0] == requested for line in atoms):
+        return requested, False
+
+    candidates = defaultdict(list)
+    for line in atoms:
+        if line.startswith("HETATM"):
+            candidates[residue_key(line)].append(line)
+
+    candidate_names = set()
+    descriptions = []
+    for key, group in candidates.items():
+        name = key[0]
+        if name in WATER_NAMES or name in SOLVENT_NAMES:
+            continue
+        if name in METAL_RESNAMES or all(element_name(line) in METAL_ELEMENTS for line in group):
+            continue
+        candidate_names.add(name)
+        descriptions.append(f"{name} chain {key[1] or '-'} residue {key[2]}{key[3]}")
+
+    if len(candidate_names) == 1:
+        inferred = next(iter(candidate_names))
+        return inferred, True
+    if not candidate_names:
+        raise ValueError(
+            f"Ligand residue '{requested}' was not found, and no non-water/non-solvent/non-metal "
+            "HETATM residue could be inferred."
+        )
+    raise ValueError(
+        f"Ligand residue '{requested}' was not found and the docking complex has multiple "
+        f"possible ligand residues: {', '.join(sorted(descriptions))}. Set the ligand residue name."
+    )
+
+
 def clean_complex(source, output, ligand_resname):
-    ligand_resname = ligand_resname.strip().upper()
-    if not ligand_resname:
+    requested_ligand_resname = ligand_resname.strip().upper()
+    if not requested_ligand_resname:
         raise ValueError("A ligand residue name is required for automatic docking-complex cleanup.")
 
     records, used_first_model = read_first_model(source)
     atoms = [line for line in records if line.startswith(("ATOM  ", "HETATM"))]
     if not atoms:
         raise ValueError(f"No ATOM/HETATM records were found in {source}.")
+
+    ligand_resname, ligand_was_inferred = resolve_ligand_resname(
+        atoms, requested_ligand_resname
+    )
 
     # Identify complete non-ligand HETATM residues that should be removed.
     heterogens = defaultdict(list)
@@ -125,6 +163,9 @@ def clean_complex(source, output, ligand_resname):
 
     counts = {
         "input_atoms": len(atoms),
+        "ligand_resname_requested": requested_ligand_resname,
+        "ligand_resname_used": ligand_resname,
+        "ligand_resname_inferred": ligand_was_inferred,
         "hydrogens_removed": 0,
         "water_atoms_removed": 0,
         "solvent_atoms_removed": 0,
@@ -196,6 +237,8 @@ def clean_complex(source, output, ligand_resname):
     except Exception:
         Path(temp_name).unlink(missing_ok=True)
         raise
+    report_path = output.with_suffix(output.suffix + ".report.json")
+    report_path.write_text(json.dumps(counts, indent=2) + "\\n", encoding="utf-8")
     return counts
 
 
