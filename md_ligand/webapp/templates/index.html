@@ -35,7 +35,20 @@
                 <option value="cgenff">CGenFF (CHARMM)</option>
               </select>
             </label>
-            <label><span>Ligand residue</span><input type="text" name="ligand_resname" value="LIG" maxlength="5" required></label>
+            <label>
+              <span>Input ligand residue</span>
+              <select name="ligand_resname_mode" id="ligand_resname_mode">
+                <option value="lig">Residue name LIG</option>
+                <option value="hetatm">Auto-detect ligand from HETATM</option>
+                <option value="manual">Enter residue name</option>
+              </select>
+            </label>
+          </div>
+          <div class="double" id="ligand_resname_manual_wrap" hidden>
+            <label><span>Input residue name (1–5 characters)</span><input type="text" name="ligand_resname_manual" id="ligand_resname_manual" maxlength="5" disabled></label>
+          </div>
+          <div class="double">
+            <label><span>Topology output residue name (1–5 characters)</span><input type="text" name="ligand_output_resname" value="LIG" maxlength="5" required></label>
           </div>
           <label class="file-drop file-drop-large"><span>Docked PDB file</span><input type="file" name="docking_file" accept=".pdb" required></label>
           <div class="triple">
@@ -341,6 +354,20 @@ Submit a docked complex to begin.{% endif %}</pre>
     };
     forceFieldSelect.addEventListener("change", syncCharmmTermini);
     syncCharmmTermini();
+  }
+
+  const ligandResidueMode = document.querySelector("#ligand_resname_mode");
+  const manualResidueWrap = document.querySelector("#ligand_resname_manual_wrap");
+  const manualResidueInput = document.querySelector("#ligand_resname_manual");
+  if (ligandResidueMode && manualResidueWrap && manualResidueInput) {
+    const syncLigandResidueMode = () => {
+      const manual = ligandResidueMode.value === "manual";
+      manualResidueWrap.hidden = !manual;
+      manualResidueInput.disabled = !manual;
+      manualResidueInput.required = manual;
+    };
+    ligandResidueMode.addEventListener("change", syncLigandResidueMode);
+    syncLigandResidueMode();
   }
 
   // Full-auto topology section visibility
