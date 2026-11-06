@@ -6,6 +6,7 @@ import signal
 import shutil
 import subprocess
 import sys
+import time
 import uuid
 import zipfile
 from datetime import datetime
@@ -50,6 +51,8 @@ STATUS_LABELS = {
     "completed": "Completed",
     "finished_unknown": "Finished (unknown result)",
     "analysis_ready": "Analysis Ready",
+    "stopping": "Stopping",
+    "stopped": "Stopped",
 }
 
 AUTO_REFRESH_SECONDS = 60
@@ -178,6 +181,8 @@ def infer_stage(job_dir, status):
         current_step = index
         if status == "failed":
             current_stage = f"Failed during {label}"
+        elif status in {"stopping", "stopped"}:
+            current_stage = f"Stopped during {label}"
         elif status == "queued":
             current_stage = f"Waiting for {label}"
         elif status == "finished_unknown":
@@ -278,6 +283,8 @@ def normalize_nonnegative_int(value, field_name, required=True):
 def infer_status(job_dir, meta):
     if (job_dir / "state" / "step10_analysis.done").exists():
         return "completed"
+    if meta.get("status_override") in {"stopping", "stopped"}:
+        return meta["status_override"]
     if (job_dir / "run.failed").exists():
         return "failed"
 
@@ -1543,16 +1550,62 @@ def job_detail(job_id):
 
 @app.route("/jobs/<job_id>/stop", methods=["POST"])
 def stop_job(job_id):
+    job_dir = JOBS_DIR / job_id
     try:
+        meta = load_job_meta(job_dir)
         job = read_job(job_id)
     except FileNotFoundError:
         abort(404)
-    pid = job.get("pid")
-    if pid and job["status"] == "running":
-        os.killpg(pid, signal.SIGTERM)
-        flash(f"Stop signal sent to job {job_id}.", "success")
-    else:
+
+    pid = meta.get("pid")
+    if not pid or job["status"] != "running":
         flash("Job is not currently running.", "error")
+        return redirect(url_for("job_detail", job_id=job_id))
+
+    try:
+        pid = int(pid)
+        pgid = os.getpgid(pid)
+        if pgid != pid:
+            raise RuntimeError("The job process is no longer in its expected process group.")
+
+        proc_cmdline = Path(f"/proc/{pid}/cmdline")
+        if proc_cmdline.exists():
+            command = proc_cmdline.read_bytes().replace(b"\0", b" ").decode("utf-8", errors="replace")
+            if "launch_job.py" not in command or job_id not in command:
+                raise RuntimeError("The saved job PID no longer matches this pipeline; refusing to signal it.")
+
+        meta["status_override"] = "stopping"
+        meta["stop_requested_at"] = datetime.now().isoformat(timespec="seconds")
+        save_job_meta(job_dir, meta)
+        os.killpg(pgid, signal.SIGTERM)
+
+        # Give GROMACS and shell steps time to exit cleanly, then force-stop
+        # any process in the isolated job group that ignored SIGTERM.
+        deadline = time.monotonic() + 3.0
+        while time.monotonic() < deadline:
+            try:
+                os.killpg(pgid, 0)
+            except ProcessLookupError:
+                break
+            time.sleep(0.1)
+        else:
+            os.killpg(pgid, signal.SIGKILL)
+
+        meta["status_override"] = "stopped"
+        meta["stopped_at"] = datetime.now().isoformat(timespec="seconds")
+        save_job_meta(job_dir, meta)
+        flash(f"Job {job_id} stopped.", "success")
+    except ProcessLookupError:
+        meta["status_override"] = "stopped"
+        meta["stopped_at"] = datetime.now().isoformat(timespec="seconds")
+        save_job_meta(job_dir, meta)
+        flash(f"Job {job_id} had already exited.", "success")
+    except (OSError, RuntimeError, ValueError) as exc:
+        if meta.get("status_override") == "stopping":
+            meta["status_override"] = "running"
+            save_job_meta(job_dir, meta)
+        flash(f"Could not stop job {job_id}: {exc}", "error")
+
     return redirect(url_for("job_detail", job_id=job_id))
 
 
