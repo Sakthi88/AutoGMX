@@ -232,7 +232,11 @@ def infer_runtime(job_dir, meta, status):
     if status in {"running", "awaiting_topology"}:
         ended_at = now()
     elif status == "completed":
-        ended_at = datetime.fromtimestamp((job_dir / "state" / "step10_analysis.done").stat().st_mtime)
+        completion_marker = job_dir / "run.completed"
+        if completion_marker.exists():
+            ended_at = datetime.fromtimestamp(completion_marker.stat().st_mtime)
+        else:
+            ended_at = datetime.fromtimestamp((job_dir / "state" / "step10_analysis.done").stat().st_mtime)
     elif (job_dir / "run.failed").exists():
         ended_at = datetime.fromtimestamp((job_dir / "run.failed").stat().st_mtime)
     elif (job_dir / "run.log").exists():
@@ -281,7 +285,7 @@ def normalize_nonnegative_int(value, field_name, required=True):
 
 
 def infer_status(job_dir, meta):
-    if (job_dir / "state" / "step10_analysis.done").exists():
+    if (job_dir / "run.completed").exists():
         return "completed"
     if meta.get("status_override") in {"stopping", "stopped"}:
         return meta["status_override"]
@@ -291,15 +295,19 @@ def infer_status(job_dir, meta):
     pid = meta.get("pid")
     if pid:
         try:
-            os.kill(pid, 0)
-        except OSError:
-            return "finished_unknown"
-        return "running"
+            os.kill(int(pid), 0)
+        except (OSError, TypeError, ValueError):
+            pass
+        else:
+            return "running"
 
+    # Support older jobs that predate the explicit completion marker.
+    if (job_dir / "state" / "step10_analysis.done").exists():
+        return "completed"
     status_override = meta.get("status_override")
     if status_override:
         return status_override
-    return "queued"
+    return "finished_unknown" if pid else "queued"
 
 
 def tail_file(path, max_lines=30):
@@ -1395,22 +1403,8 @@ def mmpbsa_job():
     }
     save_job_meta(job_dir, metadata)
 
-    # Run MM-PBSA as background process
-    run_log = (job_dir / "run.log").open("w", encoding="utf-8")
-    subprocess.Popen(
-        [
-            resolve_python_bin(),
-            str(APP_DIR / "launch_job.py"),
-            str(PIPELINE_DIR),
-            str(config_path),
-            str(job_dir / "run.failed"),
-        ],
-        cwd=PIPELINE_DIR,
-        stdout=run_log,
-        stderr=subprocess.STDOUT,
-        start_new_session=True,
-        env=os.environ.copy(),
-    )
+    # Launch through the shared launcher so the PID is saved and Stop Job can signal it.
+    launch_pipeline(job_dir, config_path, metadata)
 
     flash(f"MM-PBSA calculation started for job {job_id} (based on {previous_job_id}).", "success")
     return redirect(url_for("job_detail", job_id=job_id))
