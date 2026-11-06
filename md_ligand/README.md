@@ -122,6 +122,7 @@ conda activate md_pipeline
 conda install -c conda-forge gromacs=2024.3 -y
 conda install -c conda-forge ambertools=23 -y
 conda install -c conda-forge apbs=3.5 pdb2pqr=3.5 -y
+conda install -c conda-forge pdbfixer
 
 # Python packages
 pip install -r requirements.txt
