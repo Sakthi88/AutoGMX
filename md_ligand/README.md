@@ -119,7 +119,7 @@ conda create -n md_pipeline python=3.10 -y
 conda activate md_pipeline
 
 # Core MD tools
-conda install -c conda-forge gromacs=2024.3 -y
+conda install -c conda-forge gromacs=2026.0 -y
 conda install -c conda-forge ambertools=23 -y
 conda install -c conda-forge apbs=3.5 pdb2pqr=3.5 -y
 conda install -c conda-forge pdbfixer
