@@ -39,10 +39,10 @@ def plot_rmsd_comparison(protein_path, ligand_path, output_path):
     ax.set_title("Protein and Ligand RMSD")
     ax.set_xlabel("Time (ps)")
     ax.set_ylabel("RMSD (nm)")
-    ax.grid(alpha=0.3)
+    ax.grid(alpha=0.1)
     ax.legend()
     fig.tight_layout()
-    fig.savefig(output_path, dpi=200)
+    fig.savefig(output_path, dpi=300)
     plt.close(fig)
 
 
@@ -72,9 +72,9 @@ def main():
     ax.set_title(title)
     ax.set_xlabel("X")
     ax.set_ylabel("Y")
-    ax.grid(alpha=0.3)
+    ax.grid(alpha=0.1)
     fig.tight_layout()
-    fig.savefig(output_path, dpi=200)
+    fig.savefig(output_path, dpi=300)
     plt.close(fig)
 
 
